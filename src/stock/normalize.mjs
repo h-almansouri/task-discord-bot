@@ -77,15 +77,27 @@ export function claimContainers(payload) {
   }));
 }
 
-/** Containers from a player `/inventories` response. */
+/**
+ * Containers from a player `/inventories` response.
+ *
+ * Three kinds arrive mixed together:
+ *   personal    owned by the character itself — Inventory, Toolbelt, Wallet
+ *   deployable  a wagon, cart or bird — owned by the deployable, no claim
+ *   bank        storage inside a claim the player belongs to
+ *
+ * Owner id alone is not enough: a deployable is not owned by the player either,
+ * so keying only on that would file a wagon as a claim bank.
+ */
 export function playerContainers(payload, playerId) {
   return (payload?.inventories ?? []).map((inv) => {
     const personal = playerId != null && String(inv.ownerEntityId) === String(playerId);
+    const claimName = inv.claimName ?? null;
+    const origin = personal ? 'personal' : claimName ? 'bank' : 'deployable';
     return {
       id: String(inv.entityId),
       name: inv.inventoryName || inv.buildingName || '(unnamed)',
-      origin: personal ? 'personal' : 'bank',
-      claimName: inv.claimName ?? null,
+      origin,
+      claimName,
       pockets: inv.pockets ?? [],
     };
   });

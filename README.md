@@ -18,7 +18,8 @@ Early. The data layer works end to end; storage tracking is not built yet.
 | Rulebook fetcher (relay, both encodings) | done |
 | Stock normalizer (three endpoint shapes) | done |
 | Discord connection + `/travelers`, `/traveler` | done |
-| Storage picker, thresholds, tracker message | not started |
+| Storage picker + per-guild config (`/storage`) | done |
+| Thresholds, tracker message, rotation reminder | not started |
 
 ## Commands
 
@@ -49,8 +50,11 @@ src/relay/decode.mjs      envelope + row parsing, positional -> named
 src/relay/client.mjs      one-shot snapshot reads, with relay fallback
 src/rulebook/build.mjs    task -> traveler join, material classification
 src/rulebook/load.mjs     read the committed rulebook
+src/stock/bitjita.mjs     REST client for live storage
 src/stock/normalize.mjs   the three container shapes -> one
-src/commands.mjs          slash commands
+src/stock/discover.mjs    container discovery, grouping, paging
+src/config/store.mjs      per-guild config, serialised writes
+src/commands/             slash commands and component routing
 src/bot.mjs               entry point
 ```
 

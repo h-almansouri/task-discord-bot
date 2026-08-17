@@ -112,6 +112,33 @@ test('playerContainers distinguishes personal storage from claim banks', () => {
   assert.equal(bank.claimName, 'Aurelia');
 });
 
+test('a deployable is not filed as a claim bank', () => {
+  // Real shape: a wagon is owned by the deployable, not the player, and sits in
+  // no claim. Keying on owner id alone would call this a bank.
+  const payload = {
+    inventories: [{
+      entityId: '1369094287796856539',
+      ownerEntityId: '1369094287796856539',
+      inventoryName: "Velcruza's Wagon (III)",
+      claimName: null,
+      pockets: [],
+    }],
+  };
+  const [wagon] = playerContainers(payload, '1369094286781181638');
+  assert.equal(wagon.origin, 'deployable');
+  assert.notEqual(wagon.origin, 'bank');
+});
+
+test('a bank is identified by its claim, not by ownership alone', () => {
+  const payload = {
+    inventories: [{
+      entityId: '5', ownerEntityId: '999', inventoryName: 'Ancient Bank',
+      claimName: 'Amberfall', pockets: [],
+    }],
+  };
+  assert.equal(playerContainers(payload, '1')[0].origin, 'bank');
+});
+
 test('houseContainers surfaces buildingNickname', () => {
   const [c] = houseContainers({ inventories: [HOUSE_INVENTORY] });
   assert.equal(c.name, 'Logs');

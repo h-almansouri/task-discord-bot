@@ -1,7 +1,7 @@
 import 'dotenv/config';
-import { Client, GatewayIntentBits, Events } from 'discord.js';
+import { Client, GatewayIntentBits, Events, MessageFlags } from 'discord.js';
 import { loadRulebook } from './rulebook/load.mjs';
-import { buildCommands } from './commands.mjs';
+import { buildCommands, routeComponent } from './commands/index.mjs';
 
 const token = process.env.DISCORD_TOKEN;
 if (!token) {
@@ -27,17 +27,21 @@ client.once(Events.ClientReady, (c) => {
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
-  if (!interaction.isChatInputCommand()) return;
-  const command = commands.get(interaction.commandName);
-  if (!command) return;
-
   try {
-    await command.run(interaction);
+    if (interaction.isChatInputCommand()) {
+      const command = commands.get(interaction.commandName);
+      if (command) await command.run(interaction);
+      return;
+    }
+    if (interaction.isStringSelectMenu() || interaction.isButton()) {
+      await routeComponent(interaction);
+    }
   } catch (err) {
-    console.error(`/${interaction.commandName} failed:`, err);
-    const msg = { content: 'That command hit an error. Check the bot logs.', ephemeral: true };
+    const label = interaction.commandName ?? interaction.customId ?? 'interaction';
+    console.error(`${label} failed:`, err);
+    const msg = { content: 'That hit an error. Check the bot logs.', flags: MessageFlags.Ephemeral };
     if (interaction.deferred || interaction.replied) await interaction.followUp(msg).catch(() => {});
-    else await interaction.reply(msg).catch(() => {});
+    else await interaction.reply?.(msg).catch(() => {});
   }
 });
 

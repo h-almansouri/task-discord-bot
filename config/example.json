@@ -1,0 +1,35 @@
+{
+  "_comment": "Example only. Real config lives at config/<guildId>.json and is gitignored. See DESIGN.md section 6.",
+
+  "channelId": "123456789012345678",
+  "messageId": null,
+
+  "reminder": {
+    "roleId": "123456789012345678",
+    "hoursBefore": 24
+  },
+
+  "storages": [
+    {
+      "source": { "type": "player", "id": "1369094286781181638", "name": "Velcruza" },
+      "containers": [
+        { "id": "1369094288186713242", "name": "Logs", "origin": "house" },
+        { "id": "1369094288186713243", "name": "Metal", "origin": "house" }
+      ]
+    },
+    {
+      "source": { "type": "claim", "id": "864691128488445884", "name": "Mystic Embassy" },
+      "containers": [
+        { "id": "864691128481122398", "name": "Alesi Tasks", "origin": "claim" }
+      ]
+    }
+  ],
+
+  "travelers": {
+    "Alesi": { "tiers": [1, 5] }
+  },
+
+  "turnIns": 5,
+  "overrides": { "Alesi": { "turnIns": 8 } },
+  "absolute": { "item:1110015": 500 }
+}

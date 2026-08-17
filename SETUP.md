@@ -137,10 +137,23 @@ Storage tracking isn't built yet. These exist so you can confirm the whole chain
 | `/ping` | confirms the bot is connected, shows heartbeat latency |
 | `/travelers` | all six travelers with task and material counts |
 | `/traveler name:Alesi` | one traveler's materials grouped by family |
+| `/storage add name:…` | pick which containers count as traveler supply |
+| `/storage list` | show what is tracked |
+| `/storage remove number:1` | stop tracking a source |
 
 `/traveler name:Alesi` should return five families — Plant Fiber, Grain, Vegetable,
 Baitfish, Healing Potion — each spanning T1–T10. That is the grouping described in
 DESIGN.md §8, running on real game data.
+
+`/storage add name:Velcruza` fetches every container that character can reach — around
+50, across personal slots, house chests, wagons and claim banks — and lets you choose.
+Pick a group, tick the containers, then **Save**. Selections carry across groups and
+pages, so you can take a few house chests and a claim bank in one go. Nothing is tracked
+until you save, and re-running `/storage add` on the same source shows your current
+picks ticked so you can edit rather than start over.
+
+Only the person who ran the command sees the picker, and it expires after 14 minutes
+(Discord invalidates the interaction after 15).
 
 ---
 

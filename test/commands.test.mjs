@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { loadRulebook, findTraveler, groupByTag } from '../src/rulebook/load.mjs';
-import { buildCommands } from '../src/commands.mjs';
+import { buildCommands } from '../src/commands/index.mjs';
 
 // Runs against the committed rulebook, so it also guards that file's shape.
 const rulebook = await loadRulebook();

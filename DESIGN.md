@@ -172,6 +172,16 @@ Discovered during the spike; several contradict widely-circulated advice.
     | player `/inventories` | `inventories[].pockets[]` | `itemId`, `itemType` |
     | house `/housing/{id}` | `inventories[].inventory[]` | `item_id`, `item_type` |
     One normalizer, applied at the boundary, or counts silently read zero.
+14. **A player's container list is not stable between fetches.** The same character
+    returned 19 containers one hour and 17 the next — a wagon and a bird had gone,
+    presumably dismissed in game. Containers are therefore matched by id and a tracked
+    container may simply be absent from a later response. That is not an error, but
+    `/storage list` should show when a tracked container has stopped appearing rather
+    than quietly counting it as zero.
+15. **Owner id alone does not identify personal storage.** A deployable (wagon, cart,
+    bird) is owned by the deployable, not the player, so `ownerEntityId === playerId`
+    files it alongside claim banks. Deployables are distinguished by having no
+    `claimName`.
 
 ---
 
@@ -299,10 +309,11 @@ One command for both players and claims — the bot works out which the name is.
 Real listing for one character:
 
 ```
-personal   Inventory · Toolbelt · Wallet · Velcruza's Wagon (III) · Velcruza's Bird (I)
-banks      Amberfall · Aurelia · Murwent · Notsolis · Oceansky City · … (14 claims)
-house      Metal · Logs · Planks · Leather · Cloth · Foraging · Fishing · Farming ·
-           Seeds N Fert · Raw Mats · Cooked Mats · Foods · Dropbox · … (35 chests)
+Personal          3   Inventory · Toolbelt · Wallet
+House            35   Metal · Logs · Planks · Leather · Cloth · Foraging · Fishing ·
+                      Farming · Seeds N Fert · Raw Mats · Foods · Dropbox · …
+Wagons & mounts   2   Velcruza's Wagon (III) · Velcruza's Bird (I)
+Claim banks      14   Amberfall · Aurelia · Murwent · Notsolis · Oceansky City · …
 ```
 
 **Discord caps a select menu at 25 options**, and 54 containers exceeds that. The picker

@@ -11,7 +11,7 @@
 import 'dotenv/config';
 import { REST, Routes } from 'discord.js';
 import { loadRulebook } from '../src/rulebook/load.mjs';
-import { buildCommands } from '../src/commands.mjs';
+import { buildCommands } from '../src/commands/index.mjs';
 
 const { DISCORD_TOKEN: token, DISCORD_CLIENT_ID: clientId, DISCORD_GUILD_ID: guildId } = process.env;
 

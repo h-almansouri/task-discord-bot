@@ -1,11 +1,7 @@
-import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { findTraveler, groupByTag } from './rulebook/load.mjs';
+import { SlashCommandBuilder, EmbedBuilder, MessageFlags } from 'discord.js';
+import { findTraveler, groupByTag } from '../rulebook/load.mjs';
 
-/**
- * Commands available so far. Storage tracking is not built yet — these exist to
- * prove the rulebook pipeline end to end inside Discord.
- */
-export function buildCommands(rulebook) {
+export function rulebookCommands(rulebook) {
   const travelerNames = Object.keys(rulebook.travelers).sort();
 
   return [
@@ -16,7 +12,7 @@ export function buildCommands(rulebook) {
       async run(interaction) {
         await interaction.reply({
           content: `Pong — websocket heartbeat ${Math.round(interaction.client.ws.ping)}ms`,
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       },
     },
@@ -59,11 +55,14 @@ export function buildCommands(rulebook) {
         const wanted = interaction.options.getString('name');
         const traveler = findTraveler(rulebook, wanted);
         if (!traveler) {
-          await interaction.reply({ content: `No traveler called "${wanted}".`, ephemeral: true });
+          await interaction.reply({
+            content: `No traveler called "${wanted}".`,
+            flags: MessageFlags.Ephemeral,
+          });
           return;
         }
 
-        const turnIns = 5; // placeholder until config lands
+        const turnIns = 5; // placeholder until /config lands
         const sections = groupByTag(traveler.materials).map(([tag, mats]) => {
           const tiers = mats.map((m) => m.tier).filter((t) => t != null && t > 0);
           const range = tiers.length ? `T${Math.min(...tiers)}–T${Math.max(...tiers)}` : 'untiered';
