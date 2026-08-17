@@ -143,12 +143,24 @@ test('groupShortfalls marks a family with one shared target as uniform', () => {
 
 // --- rendering -------------------------------------------------------------
 
-test('a uniform family collapses to two lines', () => {
+test('a uniform family is a header plus one row of tiers', () => {
   const rows = [1, 2, 3].map((t) => ({ ...grain(t), have: 0, target: 1000, short: 1000 }));
   const text = renderGroup(groupShortfalls(rows)[0]);
   assert.equal(text.split('\n').length, 2);
-  assert.match(text, /200\/turn-in/);
-  assert.match(text, /T1 \*\*1,000\*\*/);
+  assert.match(text, /\*\*Grain\*\* · 1,000\/tier/);
+  assert.match(text, /T1 −1,000 · T2 −1,000 · T3 −1,000/);
+});
+
+test('a family with a single tier stays on one line', () => {
+  const text = renderGroup(groupShortfalls([{ ...grain(3), have: 900, target: 1000, short: 100 }])[0]);
+  assert.equal(text.split('\n').length, 1);
+  assert.match(text, /T3 −100/);
+});
+
+test('the word "short" is not repeated on every row', () => {
+  const rows = [1, 2, 3].map((t) => ({ ...grain(t), have: 0, target: 1000, short: 1000 }));
+  const text = renderGroup(groupShortfalls(rows)[0]);
+  assert.doesNotMatch(text, /short/i, 'the footer states this once; rows should not repeat it');
 });
 
 test('mixed targets fall back to one line per material', () => {
@@ -158,13 +170,60 @@ test('mixed targets fall back to one line per material', () => {
   ];
   const text = renderGroup(groupShortfalls(rows)[0]);
   assert.equal(text.split('\n').length, 2);
-  assert.match(text, /T1/);
+  assert.match(text, /0\/1,000 · −1,000/);
 });
 
 test('untiered materials render by name, not as T-1', () => {
   const text = renderGroup(groupShortfalls([{ ...fur, have: 0, target: 50, short: 50 }])[0]);
   assert.match(text, /Jakyl Fur/);
   assert.doesNotMatch(text, /T-1/);
+});
+
+// --- timestamp -------------------------------------------------------------
+
+test('the tracker carries a native timestamp Discord can render', () => {
+  const stock = new Map();
+  const { embeds } = renderTracker(
+    computeShortfalls({ rulebook: RULEBOOK, config: withTracked({ Alesi: { tiers: [1, 10] } }), stock }),
+    { updatedAt: Date.parse('2026-08-17T02:00:00Z'), storageCount: 3 },
+  );
+  const last = embeds[embeds.length - 1];
+  assert.equal(last.timestamp, '2026-08-17T02:00:00.000Z');
+});
+
+test('regression: no <t:…> tag is placed where Discord renders it literally', () => {
+  // Footer and author text are plain — a timestamp tag there shows as raw
+  // characters, which is exactly the bug this replaced.
+  const cases = [
+    computeShortfalls({ rulebook: RULEBOOK, config: defaultConfig(), stock: new Map() }),
+    computeShortfalls({
+      rulebook: RULEBOOK, config: withTracked({ Alesi: { tiers: [1, 10] } }),
+      stock: new Map([['item:grain1', 9e9], ['item:grain2', 9e9], ['item:grain3', 9e9]]),
+    }),
+    computeShortfalls({ rulebook: RULEBOOK, config: withTracked({ Alesi: { tiers: [1, 10] } }), stock: new Map() }),
+  ];
+  for (const result of cases) {
+    for (const e of renderTracker(result, { updatedAt: Date.now(), storageCount: 1 }).embeds) {
+      assert.doesNotMatch(e.footer?.text ?? '', /<t:/, 'timestamp tag in footer text');
+      assert.doesNotMatch(e.description ?? '', /<t:/, 'timestamp tag left in description');
+      assert.doesNotMatch(e.title ?? '', /<t:/, 'timestamp tag in title');
+    }
+  }
+});
+
+test('every embed variant sets a timestamp', () => {
+  const variants = [
+    computeShortfalls({ rulebook: RULEBOOK, config: defaultConfig(), stock: new Map() }),
+    computeShortfalls({
+      rulebook: RULEBOOK, config: withTracked({ Alesi: { tiers: [1, 10] } }),
+      stock: new Map([['item:grain1', 9e9], ['item:grain2', 9e9], ['item:grain3', 9e9]]),
+    }),
+    computeShortfalls({ rulebook: RULEBOOK, config: withTracked({ Alesi: { tiers: [1, 10] } }), stock: new Map() }),
+  ];
+  for (const result of variants) {
+    const { embeds } = renderTracker(result, { storageCount: 1 });
+    assert.ok(embeds[embeds.length - 1].timestamp, 'last embed should carry a timestamp');
+  }
 });
 
 test('nothing tracked yields a prompt to add a traveler', () => {

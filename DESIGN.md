@@ -182,6 +182,21 @@ Discovered during the spike; several contradict widely-circulated advice.
     bird) is owned by the deployable, not the player, so `ownerEntityId === playerId`
     files it alongside claim banks. Deployables are distinguished by having no
     `claimName`.
+16. **Embed footer text is plain — no markdown, no timestamp tags.** A `<t:…:R>` tag
+    placed there renders as literal characters. Use the embed's native `timestamp`
+    field, which Discord renders beside the footer and localises per viewer.
+17. **Components V2 was evaluated and rejected.** discord.js 14.27 supports it fully, and
+    a working prototype validated, but the 40-component cap is the binding constraint
+    rather than its 4,000-character budget: one Section per material family — the only
+    layout giving a per-row icon — costs 42 components at just *two* travelers. Its one
+    real advantage over embeds is therefore unusable here, while its text budget is a
+    third smaller than the 6,000 embeds allow. Embeds already give one thumbnail per
+    traveler, since the tracker renders one embed each.
+18. **Item icons are available** at `https://bitjita.com/{iconAssetName}.webp` — note
+    `.webp`, not `.png`. Coverage is incomplete: Salt's asset path is `Items/Salt` rather
+    than `GeneratedIcons/…` and 404s, and only three of six travelers have a portrait
+    (found via `npc_desc.prefab_address`, not the display name). If icons are ever used,
+    resolve and validate the URLs when building the rulebook rather than per render.
 
 ---
 
@@ -335,23 +350,28 @@ Rows are **grouped by `item_desc.tag`**, with tiers collapsed onto one line per 
 Real output, Alesi at tiers 1–5 and 5 turn-ins, against a live claim:
 
 ```
-**Alesi** · tiers 1-5 · 5 turn-ins
-`Baitfish` — 10/turn-in · target 50/tier
-   short: T1 43 · T2 44 · T3 50 · T4 50 · T5 50
-`Healing Potion` — 5/turn-in · target 25/tier
-   short: T1 21 · T2 25 · T3 25 · T4 25 · T5 25
-`Grain` — 200/turn-in · target 1000/tier
-   short: T3 1000 · T4 1000 · T5 1000
-`Plant Fiber` — 300/turn-in · target 1500/tier
-   short: T1 1360 · T4 1500 · T5 1500
-`Vegetable` — 30/turn-in · target 150/tier
-   short: T3 150 · T4 150 · T5 150
+Alesi · T1–5
+**Healing Potion** · 25/tier
+T1 −21 · T2 −24 · T3 −25 · T4 −25 · T5 −25
+**Plant Fiber** · 1,500/tier
+T1 −1,500 · T2 −1,480 · T3 −1,500 · T4 −1,500 · T5 −1,500
+**Baitfish** · 50/tier
+T1 −45 · T4 −50
+**Parchment** · 100/tier · T3 −22
+⚠️ Needs a threshold: Salt · set with `/config threshold`
 ```
 
-The same data rendered flat is 19 rows and 1,094 characters; grouped it is 5 groups and
-535. Against Discord's 6,000-character budget that is 11 Alesi-sized travelers instead of
-5.5 — so grouping is what keeps the message inside the limit, not just what makes it
-readable.
+Every number is a deficit. The footer states that once, so rows carry no repeated "short"
+label — across a dozen families that word alone cost a line's worth of width each time. A
+family with only one tier short stays on a single line rather than splitting across two.
+
+The same data rendered flat is 19 rows and 1,094 characters; grouped it is 535. Tightened
+as above, a real two-traveler message is 573 characters where the earlier format took 980.
+Against Discord's 6,000-character budget, grouping is what keeps the message inside the
+limit, not merely what makes it readable.
+
+The timestamp is the embed's native `timestamp` field, never a `<t:…>` tag in the footer
+(§4.16).
 
 The binding constraint is Discord's **6,000 characters across all embeds** — not the
 4,096-per-description limit, which is never reached first. At roughly 50 characters per

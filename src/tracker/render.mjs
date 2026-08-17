@@ -25,22 +25,27 @@ export function embedLength(embed) {
 
 const num = (n) => n.toLocaleString('en-US');
 
-/** One family, collapsed to a single line when every tier shares a target. */
-export function renderGroup(group) {
-  const tiered = group.rows.filter((r) => r.tier != null && r.tier >= 1);
+const isTiered = (row) => row.tier != null && row.tier >= 1;
 
-  if (group.uniformTarget != null && tiered.length === group.rows.length && group.rows.length > 1) {
-    const head = group.perTurnIn
-      ? `\`${group.tag}\` — ${num(group.perTurnIn)}/turn-in · target ${num(group.uniformTarget)}/tier`
-      : `\`${group.tag}\` — target ${num(group.uniformTarget)}/tier`;
-    const short = group.rows.map((r) => `T${r.tier} **${num(r.short)}**`).join(' · ');
-    return `${head}\n   short: ${short}`;
+/**
+ * One family. Every number shown is a deficit, which the embed footer states
+ * once, so rows carry no repeated "short" label — with a dozen families that
+ * word alone was costing a line's worth of width each time.
+ */
+export function renderGroup(group) {
+  const allTiered = group.rows.every(isTiered);
+
+  if (group.uniformTarget != null && allTiered) {
+    const head = `**${group.tag}** · ${num(group.uniformTarget)}/tier`;
+    const cells = group.rows.map((r) => `T${r.tier} −${num(r.short)}`).join(' · ');
+    // A lone tier reads better on one line than split across two.
+    return group.rows.length === 1 ? `${head} · ${cells}` : `${head}\n${cells}`;
   }
 
   // Mixed targets, or untiered materials like combat drops — one line each.
   return group.rows.map((r) => {
-    const label = r.tier != null && r.tier >= 1 ? `${r.name} (T${r.tier})` : r.name;
-    return `\`${label}\` — ${num(r.have)} / ${num(r.target)} · short **${num(r.short)}**`;
+    const label = isTiered(r) ? `${r.name} (T${r.tier})` : r.name;
+    return `**${label}** · ${num(r.have)}/${num(r.target)} · −${num(r.short)}`;
   }).join('\n');
 }
 
@@ -50,13 +55,12 @@ function travelerEmbed(traveler) {
   if (traveler.unconfigured.length) {
     const names = traveler.unconfigured.map((m) => m.name).join(', ');
     parts.push(
-      `\n⚠️ ${traveler.unconfigured.length} material(s) need a threshold before they can be ` +
-      `tracked: ${names.length > 300 ? `${names.slice(0, 297)}…` : names}\n` +
-      'Set one with `/config threshold`.',
+      `⚠️ Needs a threshold: ${names.length > 200 ? `${names.slice(0, 197)}…` : names} ` +
+      '· set with `/config threshold`',
     );
   }
 
-  const tiers = traveler.tiers ? ` · tiers ${traveler.tiers[0]}–${traveler.tiers[1]}` : '';
+  const tiers = traveler.tiers ? ` · T${traveler.tiers[0]}–${traveler.tiers[1]}` : '';
   return {
     title: `${traveler.name}${tiers}`,
     description: parts.join('\n'),
@@ -90,7 +94,10 @@ function truncateTo(embed, allowance) {
  * @param options  { updatedAt, storageCount }
  */
 export function renderTracker(result, { updatedAt = null, storageCount = 0 } = {}) {
-  const stamp = updatedAt ? `updated <t:${Math.floor(updatedAt / 1000)}:R>` : 'updated just now';
+  // Discord renders this natively beside the footer and localises it per viewer.
+  // A <t:…> tag cannot be used here: footer text is plain, so the tag would show
+  // literally rather than as a time.
+  const timestamp = new Date(updatedAt ?? Date.now()).toISOString();
   const footer = { text: `${storageCount} container(s) tracked` };
 
   if (!result.anyTracked) {
@@ -100,6 +107,7 @@ export function renderTracker(result, { updatedAt = null, storageCount = 0 } = {
         description: 'No travelers tracked yet. Add one with `/traveler add`.',
         color: COLOUR_OK,
         footer,
+        timestamp,
       }],
     };
   }
@@ -108,9 +116,10 @@ export function renderTracker(result, { updatedAt = null, storageCount = 0 } = {
     return {
       embeds: [{
         title: 'Traveler supply — all stocked',
-        description: `Every tracked material is at or above target.\n${stamp}`,
+        description: 'Every tracked material is at or above target.',
         color: COLOUR_OK,
         footer,
+        timestamp,
       }],
     };
   }
@@ -139,10 +148,12 @@ export function renderTracker(result, { updatedAt = null, storageCount = 0 } = {
     }
   }
 
-  const summary = `${result.totalShort} material(s) below target · ${stamp}` +
+  const summary = `${result.totalShort} below target · ${footer.text}` +
     (dropped ? ` · ${dropped} traveler(s) omitted for length` : '');
   if (embeds.length) {
-    embeds[embeds.length - 1].footer = { text: `${summary} · ${footer.text}` };
+    const last = embeds[embeds.length - 1];
+    last.footer = { text: summary };
+    last.timestamp = timestamp;
   }
 
   return { embeds };
