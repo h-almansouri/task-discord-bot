@@ -143,18 +143,18 @@ test('groupShortfalls marks a family with one shared target as uniform', () => {
 
 // --- rendering -------------------------------------------------------------
 
-test('a uniform family is a header plus one row of tiers', () => {
+test('a family is a name line plus one pipe-separated row of tiers', () => {
   const rows = [1, 2, 3].map((t) => ({ ...grain(t), have: 0, target: 1000, short: 1000 }));
   const text = renderGroup(groupShortfalls(rows)[0]);
   assert.equal(text.split('\n').length, 2);
-  assert.match(text, /\*\*Grain\*\* · 1,000\/tier/);
-  assert.match(text, /T1 −1,000 · T2 −1,000 · T3 −1,000/);
+  assert.match(text, /^\*\*Grain\*\*$/m);
+  assert.match(text, /T1 −1,000 \| T2 −1,000 \| T3 −1,000/);
 });
 
 test('a family with a single tier stays on one line', () => {
   const text = renderGroup(groupShortfalls([{ ...grain(3), have: 900, target: 1000, short: 100 }])[0]);
   assert.equal(text.split('\n').length, 1);
-  assert.match(text, /T3 −100/);
+  assert.match(text, /\*\*Grain\*\* T3 −100/);
 });
 
 test('the word "short" is not repeated on every row', () => {
@@ -163,20 +163,39 @@ test('the word "short" is not repeated on every row', () => {
   assert.doesNotMatch(text, /short/i, 'the footer states this once; rows should not repeat it');
 });
 
-test('mixed targets fall back to one line per material', () => {
+test('targets are not shown anywhere in a family line', () => {
+  const rows = [1, 2].map((t) => ({ ...grain(t), have: 0, target: 1000, short: 1000 }));
+  const text = renderGroup(groupShortfalls(rows)[0]);
+  assert.doesNotMatch(text, /\/tier/, 'the per-tier target should be gone');
+  assert.doesNotMatch(text, /0\/1,000/, 'the have/target pair should be gone');
+});
+
+test('tiers still share a line when their targets differ', () => {
+  // Targets are no longer rendered, so uniformity of target no longer matters —
+  // only whether every row is tiered.
   const rows = [
     { ...grain(1), have: 0, target: 1000, short: 1000 },
     { ...grain(2), have: 0, target: 400, short: 400 },
   ];
   const text = renderGroup(groupShortfalls(rows)[0]);
   assert.equal(text.split('\n').length, 2);
-  assert.match(text, /0\/1,000 · −1,000/);
+  assert.match(text, /T1 −1,000 \| T2 −400/);
 });
 
-test('untiered materials render by name, not as T-1', () => {
+test('untiered materials render by name, one per line', () => {
   const text = renderGroup(groupShortfalls([{ ...fur, have: 0, target: 50, short: 50 }])[0]);
-  assert.match(text, /Jakyl Fur/);
+  assert.match(text, /\*\*Jakyl Fur\*\* −50/);
   assert.doesNotMatch(text, /T-1/);
+});
+
+test('the family label is preferred over the raw tag', () => {
+  // "Vegetable" is the tag that groups Starbulb; players know it as Starbulb.
+  const rows = [1, 2].map((t) => ({
+    ...grain(t), tag: 'Vegetable', family: 'Starbulb', have: 0, target: 150, short: 150,
+  }));
+  const text = renderGroup(groupShortfalls(rows)[0]);
+  assert.match(text, /\*\*Starbulb\*\*/);
+  assert.doesNotMatch(text, /Vegetable/);
 });
 
 // --- timestamp -------------------------------------------------------------
@@ -262,6 +281,31 @@ test('the rendered message never exceeds Discord\'s 6000-character budget', () =
   const total = embeds.reduce((n, e) => n + embedLength(e), 0);
   assert.ok(total <= 6000, `rendered ${total} characters, over the limit`);
   assert.ok(embeds.length <= 10, 'Discord allows at most 10 embeds per message');
+});
+
+test('the 10-embed cap holds even when everything fits on characters', () => {
+  // Regression: with a compact layout the character budget no longer bites
+  // first, so the embed count became the real limit. 20 tiny travelers fit in
+  // 6000 characters easily but must still yield at most 10 embeds.
+  const travelers = {}; const config = { ...defaultConfig(), travelers: {} };
+  for (let t = 0; t < 20; t++) {
+    const name = `T${t}`;
+    travelers[name] = {
+      materials: [{
+        key: `item:t${t}`, name: 'X', tier: 1, tag: 'F', family: 'F',
+        fixed: true, perTurnIn: 1, quantities: [1],
+      }],
+    };
+    config.travelers[name] = { tiers: [1, 10] };
+  }
+  const { embeds } = renderTracker(
+    computeShortfalls({ rulebook: { travelers }, config, stock: new Map() }),
+    { storageCount: 1 },
+  );
+  const total = embeds.reduce((n, e) => n + embedLength(e), 0);
+  assert.ok(total < 6000, 'this case should be well inside the character budget');
+  assert.ok(embeds.length <= 10, `rendered ${embeds.length} embeds, over Discord's cap`);
+  assert.match(embeds[embeds.length - 1].footer.text, /omitted/, 'dropped travelers should be disclosed');
 });
 
 test('truncation is disclosed rather than silent', () => {

@@ -11,6 +11,13 @@
  */
 const TOTAL_BUDGET = 6000;
 const SAFETY_MARGIN = 200;   // headroom for the footer and any rounding
+/**
+ * Discord rejects a message carrying more than ten embeds. This is a separate
+ * ceiling from the character budget, and the tighter layout made it reachable:
+ * once each traveler costs fewer characters, more of them fit in 6,000 and the
+ * count becomes the binding limit instead.
+ */
+const MAX_EMBEDS = 10;
 const COLOUR_SHORT = 0xd9534f;
 const COLOUR_OK = 0x5cb85c;
 
@@ -31,21 +38,25 @@ const isTiered = (row) => row.tier != null && row.tier >= 1;
  * One family. Every number shown is a deficit, which the embed footer states
  * once, so rows carry no repeated "short" label — with a dozen families that
  * word alone was costing a line's worth of width each time.
+ *
+ * Targets are deliberately absent: the tracker answers "what do I need to go
+ * get", and the target is available from /config show when it is wanted.
  */
 export function renderGroup(group) {
-  const allTiered = group.rows.every(isTiered);
+  const label = group.label ?? group.tag;
 
-  if (group.uniformTarget != null && allTiered) {
-    const head = `**${group.tag}** · ${num(group.uniformTarget)}/tier`;
-    const cells = group.rows.map((r) => `T${r.tier} −${num(r.short)}`).join(' · ');
+  // With targets gone, tiers can share a header whether or not their targets
+  // matched — only whether every row is tiered still matters.
+  if (group.rows.every(isTiered)) {
+    const cells = group.rows.map((r) => `T${r.tier} −${num(r.short)}`).join(' | ');
     // A lone tier reads better on one line than split across two.
-    return group.rows.length === 1 ? `${head} · ${cells}` : `${head}\n${cells}`;
+    return group.rows.length === 1 ? `**${label}** ${cells}` : `**${label}**\n${cells}`;
   }
 
-  // Mixed targets, or untiered materials like combat drops — one line each.
+  // Untiered materials, like combat drops — one line each.
   return group.rows.map((r) => {
-    const label = isTiered(r) ? `${r.name} (T${r.tier})` : r.name;
-    return `**${label}** · ${num(r.have)}/${num(r.target)} · −${num(r.short)}`;
+    const name = isTiered(r) ? `${r.name} (T${r.tier})` : r.name;
+    return `**${name}** −${num(r.short)}`;
   }).join('\n');
 }
 
@@ -129,6 +140,11 @@ export function renderTracker(result, { updatedAt = null, storageCount = 0 } = {
   let dropped = 0;
 
   for (const traveler of result.travelers) {
+    if (embeds.length >= MAX_EMBEDS) {
+      dropped++;
+      continue;
+    }
+
     const embed = travelerEmbed(traveler);
     const length = embedLength(embed);
 

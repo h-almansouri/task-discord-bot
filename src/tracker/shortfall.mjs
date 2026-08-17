@@ -40,6 +40,7 @@ export function computeShortfalls({ rulebook, config, stock }) {
         name: material.name,
         tier: material.tier,
         tag: material.tag ?? 'Other',
+        family: material.family ?? material.tag ?? 'Other',
         perTurnIn: material.perTurnIn,
         basis: resolved.basis,
         have,
@@ -82,6 +83,8 @@ export function groupShortfalls(shortfalls) {
       rows.sort((a, b) => (a.tier ?? 0) - (b.tier ?? 0));
       return {
         tag,
+        // What the player sees; the tag stays as the grouping key.
+        label: rows[0].family ?? tag,
         rows,
         // A family shares one per-turn-in quantity when every row agrees, which
         // lets the renderer collapse it to a single line.

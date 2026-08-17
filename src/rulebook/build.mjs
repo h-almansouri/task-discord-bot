@@ -11,6 +11,46 @@ import { itemKey } from '../stock/normalize.mjs';
 
 export const RULEBOOK_TABLES = ['traveler_task_desc', 'npc_desc', 'item_desc', 'cargo_desc'];
 
+/**
+ * The words every name in a family ends with — "Basic Starbulb", "Fine Starbulb"
+ * and so on share "Starbulb". Returns '' when there is no shared ending.
+ */
+export function commonTrailingWords(names) {
+  if (!names.length) return '';
+  const words = names.map((n) => String(n).trim().split(/\s+/));
+  const shortest = Math.min(...words.map((w) => w.length));
+  const tail = [];
+  for (let i = 1; i <= shortest; i++) {
+    const word = words[0][words[0].length - i];
+    if (!words.every((w) => w[w.length - i] === word)) break;
+    tail.unshift(word);
+  }
+  return tail.join(' ');
+}
+
+/**
+ * A label a player would recognise for a material family.
+ *
+ * `item_desc.tag` groups correctly but is sometimes the internal category
+ * rather than the thing itself — Starbulb is tagged "Vegetable". The member
+ * names usually share the real name, so prefer that. Families whose members
+ * share nothing (Baitfish: Briny Guppi, Azure Minni, Divine Tetra…) keep the
+ * tag, which is the only sensible label for them.
+ */
+export function familyLabel(tag, names) {
+  const shared = commonTrailingWords(names);
+  if (!shared) return tag || 'Other';
+
+  // A derived label that only trims words off the front of the tag is less
+  // informative, not more: "Oceanfish Scale" must not collapse to "Scale".
+  // "Starbulb" from tag "Vegetable" is fine — it is not a trim, it is a name.
+  const t = String(tag ?? '');
+  if (t && shared.length < t.length && t.toLowerCase().endsWith(shared.toLowerCase())) {
+    return t;
+  }
+  return shared;
+}
+
 export function buildRulebook({ traveler_task_desc, npc_desc, item_desc, cargo_desc }, meta = {}) {
   const items = new Map();
   for (const it of item_desc ?? []) {
@@ -68,6 +108,19 @@ export function buildRulebook({ traveler_task_desc, npc_desc, item_desc, cargo_d
         perTurnIn: distinct.length === 1 ? distinct[0] : null,
       });
     }
+    // Name each family from its members, so the tracker shows "Starbulb" rather
+    // than the "Vegetable" tag that happens to group them.
+    const byTag = new Map();
+    for (const m of materials) {
+      const list = byTag.get(m.tag) ?? [];
+      byTag.set(m.tag, list);
+      list.push(m);
+    }
+    for (const [tag, list] of byTag) {
+      const label = familyLabel(tag, list.map((m) => m.name));
+      for (const m of list) m.family = label;
+    }
+
     materials.sort((a, b) => (a.tag ?? '').localeCompare(b.tag ?? '') || (a.tier ?? 0) - (b.tier ?? 0));
     travelers[name] = {
       npcType: entry.npc.npc_type,

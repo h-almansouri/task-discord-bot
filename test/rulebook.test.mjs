@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildRulebook, verifyJoin } from '../src/rulebook/build.mjs';
+import { buildRulebook, verifyJoin, commonTrailingWords, familyLabel } from '../src/rulebook/build.mjs';
 
 // Shaped like the real tables, trimmed to two travelers.
 const npc_desc = [
@@ -83,4 +83,46 @@ test('verifyJoin agrees with the traveler named in each description', () => {
 test('verifyJoin catches a join that contradicts the description', () => {
   const wrong = [{ id: 9, level_requirement: { skill_id: 17 }, required_items: [], description: 'Ramparte wants fur.' }];
   assert.equal(verifyJoin(wrong, npc_desc).mismatched, 1);
+});
+
+// --- family labels ---------------------------------------------------------
+
+test('commonTrailingWords finds the shared ending of a family', () => {
+  assert.equal(commonTrailingWords(['Basic Starbulb', 'Simple Starbulb', 'Fine Starbulb']), 'Starbulb');
+  assert.equal(commonTrailingWords(['Rough Plant Fiber', 'Simple Plant Fiber']), 'Plant Fiber');
+  assert.equal(commonTrailingWords(['Salt']), 'Salt');
+});
+
+test('commonTrailingWords returns nothing when names share no ending', () => {
+  // Alesi's baitfish: no common substring at all.
+  assert.equal(commonTrailingWords(['Briny Guppi', 'Azure Minni', 'Divine Tetra']), '');
+  assert.equal(commonTrailingWords([]), '');
+});
+
+test('familyLabel prefers the real name over an internal tag', () => {
+  assert.equal(familyLabel('Vegetable', ['Basic Starbulb', 'Fine Starbulb']), 'Starbulb');
+  assert.equal(familyLabel('Grain', ['Basic Embergrain', 'Fine Embergrain']), 'Embergrain');
+});
+
+test('familyLabel keeps the tag when names share no ending', () => {
+  assert.equal(familyLabel('Baitfish', ['Briny Guppi', 'Azure Minni']), 'Baitfish');
+});
+
+test('familyLabel does not trim a more specific tag down to a vaguer word', () => {
+  // Members share only "Scale", but "Oceanfish Scale" says more, so the tag wins.
+  assert.equal(
+    familyLabel('Oceanfish Scale', ['Basic Oceanfish Scale', 'Crystalized Bass Scale']),
+    'Oceanfish Scale',
+  );
+});
+
+test('buildRulebook assigns a family label to every material', () => {
+  const rb = buildRulebook({ traveler_task_desc, npc_desc, item_desc, cargo_desc });
+  for (const traveler of Object.values(rb.travelers)) {
+    for (const m of traveler.materials) {
+      assert.ok(m.family, `${m.name} has no family label`);
+    }
+  }
+  const grain = rb.travelers.Alesi.materials.find((m) => m.key === 'item:1100007');
+  assert.equal(grain.family, 'Embergrain');   // from tag "Grain"
 });
