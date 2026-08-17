@@ -78,6 +78,12 @@ export function configCommands(rulebook) {
             .setDescription('Material name').setRequired(true).setAutocomplete(true))
           .addIntegerOption((o) => o.setName('amount')
             .setDescription('How many to keep').setRequired(true).setMinValue(0)))
+        .addSubcommand((s) => s.setName('variable')
+          .setDescription('Default target for materials asked for at varying amounts (Salt, combat drops)')
+          .addIntegerOption((o) => o.setName('amount')
+            .setDescription('How many to keep of each').setRequired(true).setMinValue(0))
+          .addStringOption((o) => o.setName('traveler')
+            .setDescription('Apply to one traveler only').addChoices(...travelerChoices)))
         .addSubcommand((s) => s.setName('show')
           .setDescription('Show the current settings')),
 
@@ -106,6 +112,7 @@ export function configCommands(rulebook) {
         const sub = interaction.options.getSubcommand();
         if (sub === 'turnins') return setTurnIns(interaction);
         if (sub === 'threshold') return setThreshold(interaction, rulebook);
+        if (sub === 'variable') return setVariableDefault(interaction, rulebook);
         if (sub === 'show') return showConfig(interaction, rulebook);
       },
     },
@@ -142,6 +149,31 @@ async function setTurnIns(interaction) {
     content: traveler
       ? `**${traveler}** now targets **${count}** turn-ins.`
       : `Default is now **${count}** turn-ins. Per-traveler overrides still apply.`,
+    flags: MessageFlags.Ephemeral,
+  });
+}
+
+async function setVariableDefault(interaction, rulebook) {
+  const amount = interaction.options.getInteger('amount');
+  const traveler = interaction.options.getString('traveler');
+
+  await updateGuildConfig(interaction.guildId, (c) => (traveler
+    ? { ...c, overrides: { ...c.overrides, [traveler]: { ...c.overrides?.[traveler], variableDefault: amount } } }
+    : { ...c, variableDefault: amount }));
+  invalidate(interaction.guildId);
+
+  // Say how much this actually settled, since the point is avoiding the
+  // per-material prompts.
+  const covered = Object.entries(rulebook.travelers)
+    .filter(([name]) => !traveler || name === traveler)
+    .flatMap(([, t]) => t.materials.filter((m) => !m.fixed));
+
+  await interaction.reply({
+    content: (traveler
+      ? `**${traveler}**'s varying-quantity materials now target **${amount}** each`
+      : `Varying-quantity materials now target **${amount}** each by default`) +
+      ` — ${covered.length} material(s) covered. ` +
+      'Per-material values from `/config threshold` still win.',
     flags: MessageFlags.Ephemeral,
   });
 }
@@ -197,13 +229,20 @@ async function showConfig(interaction, rulebook) {
     .addFields(
       { name: 'Channel', value: c.channelId ? `<#${c.channelId}>` : '*not set — `/setup channel`*' },
       { name: 'Turn-ins', value: String(c.turnIns ?? 5), inline: true },
+      {
+        name: 'Varying-qty default',
+        value: Number.isFinite(c.variableDefault) ? String(c.variableDefault) : '*not set*',
+        inline: true,
+      },
       { name: 'Containers', value: String(countContainers(c)), inline: true },
       { name: 'Materials watched', value: String(materialCount), inline: true },
       {
         name: 'Travelers',
         value: travelers.length
           ? travelers.map(([n, s]) => `${n} (T${s.tiers?.[0] ?? 1}–${s.tiers?.[1] ?? 10})` +
-            (c.overrides?.[n]?.turnIns ? ` · ${c.overrides[n].turnIns} turn-ins` : '')).join('\n')
+            (c.overrides?.[n]?.turnIns ? ` · ${c.overrides[n].turnIns} turn-ins` : '') +
+            (Number.isFinite(c.overrides?.[n]?.variableDefault) ? ` · varying ${c.overrides[n].variableDefault}` : '') +
+            (s.excluded?.length ? ` · ignoring ${s.excluded.join(', ')}` : '')).join('\n')
           : '*none — `/traveler add`*',
       },
       {

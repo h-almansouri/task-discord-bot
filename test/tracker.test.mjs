@@ -75,6 +75,69 @@ test('a variable material with an absolute becomes usable', () => {
   assert.equal(r.configured, true);
 });
 
+test('a global varying-quantity default covers every such material', () => {
+  const config = withTracked({}, { variableDefault: 50 });
+  for (const [who, material] of [['Svim', salt], ['Ramparte', fur]]) {
+    const r = resolveTarget(config, who, material);
+    assert.equal(r.target, 50, `${material.name} should use the global default`);
+    assert.equal(r.basis, 'variable-global');
+    assert.equal(r.configured, true);
+  }
+});
+
+test('a per-traveler varying default beats the global one', () => {
+  const config = withTracked({}, {
+    variableDefault: 50,
+    overrides: { Ramparte: { variableDefault: 5 } },
+  });
+  assert.equal(resolveTarget(config, 'Ramparte', fur).target, 5);
+  assert.equal(resolveTarget(config, 'Svim', salt).target, 50);
+});
+
+test('a per-material threshold still beats both varying defaults', () => {
+  const config = withTracked({}, {
+    variableDefault: 50,
+    overrides: { Svim: { variableDefault: 20 } },
+    absolute: { 'item:1110015': 500 },
+  });
+  const r = resolveTarget(config, 'Svim', salt);
+  assert.equal(r.target, 500);
+  assert.equal(r.basis, 'absolute');
+});
+
+test('the varying default does not touch fixed-quantity materials', () => {
+  // Those follow turn-ins; a blanket number must not hijack them.
+  const config = withTracked({}, { variableDefault: 7, turnIns: 5 });
+  const r = resolveTarget(config, 'Alesi', grain(1));
+  assert.equal(r.target, 1000);
+  assert.equal(r.basis, 'global');
+});
+
+test('setting the varying default clears the awaiting-a-threshold warning', () => {
+  const before = withTracked({ Svim: { tiers: [1, 10] } });
+  assert.equal(unconfiguredMaterials(before, 'Svim', RULEBOOK.travelers.Svim).length, 1);
+
+  const after = withTracked({ Svim: { tiers: [1, 10] } }, { variableDefault: 50 });
+  assert.equal(unconfiguredMaterials(after, 'Svim', RULEBOOK.travelers.Svim).length, 0);
+});
+
+test('a varying default of zero is honoured, not treated as unset', () => {
+  // 0 is falsy but a legitimate "never flag this" value.
+  const config = withTracked({}, { variableDefault: 0 });
+  const r = resolveTarget(config, 'Ramparte', fur);
+  assert.equal(r.target, 0);
+  assert.equal(r.configured, true);
+});
+
+test('the varying default feeds through to shortfalls', () => {
+  const config = withTracked({ Svim: { tiers: [1, 10] } }, { variableDefault: 50 });
+  const r = computeShortfalls({ rulebook: RULEBOOK, config, stock: new Map([['item:1110015', 20]]) });
+  const row = r.travelers[0].groups.flatMap((g) => g.rows).find((x) => x.name === 'Salt');
+  assert.equal(row.target, 50);
+  assert.equal(row.short, 30);
+  assert.equal(r.travelers[0].unconfigured.length, 0);
+});
+
 test('tier range filters tiered materials', () => {
   assert.equal(inTierRange(grain(3), [1, 5]), true);
   assert.equal(inTierRange(grain(7), [1, 5]), false);

@@ -14,12 +14,21 @@ export function resolveTarget(config, travelerName, material) {
     return { target: absolute, basis: 'absolute', configured: true };
   }
 
+  const override = config.overrides?.[travelerName];
+
   if (!material.fixed) {
-    // Variable quantity with no absolute set: nothing sensible to compute.
+    // Turn-in maths is meaningless here, but a blanket number is not: setting
+    // Ramparte's seven combat drops one at a time is tedious when the same
+    // figure suits all of them.
+    if (Number.isFinite(override?.variableDefault)) {
+      return { target: override.variableDefault, basis: 'variable-traveler', configured: true };
+    }
+    if (Number.isFinite(config.variableDefault)) {
+      return { target: config.variableDefault, basis: 'variable-global', configured: true };
+    }
+    // Nothing set anywhere: still better to report it than to guess.
     return { target: null, basis: 'variable', configured: false };
   }
-
-  const override = config.overrides?.[travelerName];
   const perMaterial = override?.materials?.[material.key]?.turnIns;
   if (Number.isFinite(perMaterial)) {
     return { target: perMaterial * material.perTurnIn, basis: 'material', turnIns: perMaterial, configured: true };

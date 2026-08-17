@@ -19,6 +19,9 @@ export function defaultConfig() {
     storages: [],
     travelers: {},
     turnIns: 5,
+    // Blanket target for materials asked for at varying quantities, where
+    // turn-in maths does not apply. null means "ask me" rather than guess.
+    variableDefault: null,
     overrides: {},
     absolute: {},
   };

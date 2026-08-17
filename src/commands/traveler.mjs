@@ -181,7 +181,10 @@ function thresholdStep(travelerName, pending, config) {
           (Number.isFinite(set) ? ` · target **${set}**` : ' · *not set*');
       }).join('\n'),
     )
-    .setFooter({ text: 'Anything left unset stays untracked — nothing is guessed.' });
+    .setFooter({
+      text: 'Anything left unset stays untracked — nothing is guessed. ' +
+        'To cover them all at once, use /config variable.',
+    });
 
   const menu = new StringSelectMenuBuilder()
     .setCustomId(cid('pickmat', travelerName))

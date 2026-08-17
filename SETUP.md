@@ -157,6 +157,7 @@ the numbers actually change, so a quiet claim costs nothing.
 | `/storage list` / `/storage remove number:1` | manage tracked storage |
 | `/config turnins count:5 [traveler:…]` | how many turn-ins to keep stocked |
 | `/config threshold material:… amount:…` | absolute target for one material |
+| `/config variable amount:… [traveler:…]` | one target for all varying-quantity materials |
 | `/config show` | current settings |
 | `/setup channel channel:#…` | where the tracker message goes |
 | `/refresh` | redraw now instead of waiting |
@@ -186,6 +187,17 @@ materials at several different quantities — Salt anywhere from 10 to 55 — so
 has no single meaning and the bot asks for a plain stock target instead. Anything you
 skip stays untracked and shows up in `/traveler list`; nothing is guessed. The other four
 travelers add in one step.
+
+To settle all of them at once instead of one by one:
+
+```
+/config variable amount:25
+```
+
+That covers every varying-quantity material — Ramparte's seven combat drops and Svim's
+Salt — and clears the prompts. Narrow it per traveler with
+`/config variable amount:5 traveler:Ramparte`, or override a single material with
+`/config threshold`, which always wins.
 
 ---
 

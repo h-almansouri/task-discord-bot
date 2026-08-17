@@ -244,12 +244,20 @@ that material untracked and listed by `/traveler list`, never silently defaulted
 
 Only Svim (1) and Ramparte (7) trigger this. The other four travelers add in one step.
 
-**Resolution order**, first match wins:
+**Resolution order**, first match wins. A per-material number always wins; after that
+the two kinds diverge, because turn-in maths only means something for one of them:
 
-1. Per-material absolute number
-2. Per-material turn-ins override
-3. Per-traveler turn-ins override
-4. Global turn-ins default
+| | Fixed quantity | Varying quantity |
+|---|---|---|
+| 1 | per-material absolute (`/config threshold`) | per-material absolute (`/config threshold`) |
+| 2 | per-material turn-ins | per-traveler default (`/config variable traveler:…`) |
+| 3 | per-traveler turn-ins (`/config turnins traveler:…`) | global default (`/config variable`) |
+| 4 | global turn-ins (`/config turnins`) | *awaiting a threshold* |
+
+The varying-quantity defaults exist because setting Ramparte's seven combat drops one at
+a time is tedious when one figure suits all of them. A default of `0` is honoured as
+"never flag this" rather than treated as unset. With no default anywhere, the material is
+still reported as unconfigured rather than guessed at.
 
 ### Switching materials off
 
@@ -301,8 +309,12 @@ Per guild. JSON file to start; SQLite only if multi-guild becomes real.
     }
   },
   "turnIns": 5,
-  "overrides": { "Alesi": { "turnIns": 8 } },
-  "absolute":  { "0:1110015": 500 }   // Salt
+  "variableDefault": 25,              // blanket target for varying-qty materials
+  "overrides": {
+    "Alesi":    { "turnIns": 8 },
+    "Ramparte": { "variableDefault": 5 }
+  },
+  "absolute":  { "item:1110015": 500 }   // Salt, beats every default
 }
 ```
 
