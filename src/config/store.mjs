@@ -116,6 +116,23 @@ export function setStorageContainers(config, source, containers) {
   return { ...config, storages };
 }
 
+/**
+ * Change a traveler's tier range, keeping everything else about it.
+ *
+ * Written as a merge rather than a replacement on purpose: a traveler entry also
+ * holds its channel, the id of the message being edited in place, and any
+ * ignored families. Replacing the object silently discarded all three.
+ */
+export function setTravelerTiers(config, name, tiers) {
+  return {
+    ...config,
+    travelers: {
+      ...config.travelers,
+      [name]: { ...config.travelers?.[name], tiers },
+    },
+  };
+}
+
 export function findStorage(config, source) {
   return (config.storages ?? []).find(
     (s) => s.source.type === source.type && String(s.source.id) === String(source.id),

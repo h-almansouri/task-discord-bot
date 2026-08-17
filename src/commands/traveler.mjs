@@ -11,8 +11,8 @@ import {
   StringSelectMenuBuilder, StringSelectMenuOptionBuilder,
   ModalBuilder, TextInputBuilder, TextInputStyle,
 } from 'discord.js';
-import { findTraveler, groupByTag } from '../rulebook/load.mjs';
-import { loadGuildConfig, updateGuildConfig } from '../config/store.mjs';
+import { findTraveler } from '../rulebook/load.mjs';
+import { loadGuildConfig, updateGuildConfig, setTravelerTiers } from '../config/store.mjs';
 import {
   unconfiguredMaterials, watchedMaterials, familiesOf, inTierRange,
 } from '../tracker/thresholds.mjs';
@@ -22,9 +22,6 @@ export const PREFIX = 'tv';
 const cid = (...parts) => [PREFIX, ...parts].join('|');
 
 export function travelerCommands(rulebook) {
-  const names = Object.keys(rulebook.travelers).sort();
-  const choices = names.map((n) => ({ name: n, value: n }));
-
   return [{
     data: new SlashCommandBuilder()
       .setName('traveler')
@@ -39,6 +36,14 @@ export function travelerCommands(rulebook) {
         .addIntegerOption((o) => o.setName('tier_min').setDescription('Lowest tier to watch (default 1)')
           .setMinValue(1).setMaxValue(10))
         .addIntegerOption((o) => o.setName('tier_max').setDescription('Highest tier to watch (default 10)')
+          .setMinValue(1).setMaxValue(10)))
+      .addSubcommand((s) => s.setName('update')
+        .setDescription('Change a tracked traveler’s tier range, keeping everything else')
+        .addStringOption((o) => o.setName('name').setDescription('Which traveler')
+          .setRequired(true).setAutocomplete(true))
+        .addIntegerOption((o) => o.setName('tier_min').setDescription('Lowest tier to watch')
+          .setMinValue(1).setMaxValue(10))
+        .addIntegerOption((o) => o.setName('tier_max').setDescription('Highest tier to watch')
           .setMinValue(1).setMaxValue(10)))
       .addSubcommand((s) => s.setName('remove')
         .setDescription('Stop tracking a traveler')
@@ -57,11 +62,7 @@ export function travelerCommands(rulebook) {
         .addStringOption((o) => o.setName('traveler').setDescription('Which traveler')
           .setRequired(true).setAutocomplete(true))
         .addStringOption((o) => o.setName('family').setDescription('Which material family')
-          .setRequired(true).setAutocomplete(true)))
-      .addSubcommand((s) => s.setName('info')
-        .setDescription('Show everything a traveler can ask for')
-        .addStringOption((o) => o.setName('name').setDescription('Which traveler')
-          .setRequired(true).addChoices(...choices))),
+          .setRequired(true).setAutocomplete(true))),
 
     async autocomplete(interaction) {
       const sub = interaction.options.getSubcommand();
@@ -100,7 +101,7 @@ export function travelerCommands(rulebook) {
       // Traveler pickers: the useful list depends on the subcommand.
       let pool = Object.keys(rulebook.travelers).sort();
       if (sub === 'add') pool = pool.filter((n) => !tracked.includes(n));
-      if (sub === 'remove' || sub === 'ignore' || sub === 'unignore') {
+      if (['update', 'remove', 'ignore', 'unignore'].includes(sub)) {
         pool = pool.filter((n) => tracked.includes(n));
       }
       await respond(pool.map((n) => ({ name: n, value: n })));
@@ -112,16 +113,24 @@ export function travelerCommands(rulebook) {
         return;
       }
       const sub = interaction.options.getSubcommand();
-      if (sub === 'add') return runAdd(interaction, rulebook);
+      if (sub === 'add') return setTiers(interaction, rulebook, { updating: false });
+      if (sub === 'update') return setTiers(interaction, rulebook, { updating: true });
       if (sub === 'remove') return runRemove(interaction, rulebook);
       if (sub === 'list') return runList(interaction, rulebook);
-      if (sub === 'info') return runInfo(interaction, rulebook);
       if (sub === 'ignore' || sub === 'unignore') return runIgnore(interaction, rulebook, sub === 'ignore');
     },
   }];
 }
 
-async function runAdd(interaction, rulebook) {
+/**
+ * Shared by add and update.
+ *
+ * `updating` only changes the wording and which precondition is checked — the
+ * write is identical, and critically it *merges* into the existing entry rather
+ * than replacing it. Replacing silently discarded the traveler's channel, its
+ * message id and any ignored families.
+ */
+async function setTiers(interaction, rulebook, { updating }) {
   const name = interaction.options.getString('name');
   const traveler = findTraveler(rulebook, name);
   if (!traveler) {
@@ -129,8 +138,27 @@ async function runAdd(interaction, rulebook) {
     return;
   }
 
-  const min = interaction.options.getInteger('tier_min') ?? 1;
-  const max = interaction.options.getInteger('tier_max') ?? 10;
+  const before = await loadGuildConfig(interaction.guildId);
+  const existing = before.travelers?.[traveler.name];
+
+  if (updating && !existing) {
+    await interaction.reply({
+      content: `**${traveler.name}** is not tracked yet — use \`/traveler add\`.`,
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+  if (!updating && existing) {
+    await interaction.reply({
+      content: `**${traveler.name}** is already tracked. Use \`/traveler update\` to change its tiers, ` +
+        'which keeps its channel and ignored families.',
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  const min = interaction.options.getInteger('tier_min') ?? existing?.tiers?.[0] ?? 1;
+  const max = interaction.options.getInteger('tier_max') ?? existing?.tiers?.[1] ?? 10;
   if (min > max) {
     await interaction.reply({
       content: `Tier range ${min}–${max} is backwards.`,
@@ -139,20 +167,21 @@ async function runAdd(interaction, rulebook) {
     return;
   }
 
-  const before = await loadGuildConfig(interaction.guildId);
-  const wasTracked = Boolean(before.travelers?.[traveler.name]);
-
-  const config = await updateGuildConfig(interaction.guildId, (c) => ({
-    ...c,
-    travelers: { ...c.travelers, [traveler.name]: { tiers: [min, max] } },
-  }));
-  invalidate(interaction.guildId);
+  const config = await updateGuildConfig(
+    interaction.guildId,
+    (c) => setTravelerTiers(c, traveler.name, [min, max]),
+  );
+  invalidate(interaction.guildId, traveler.name);
 
   const inRange = traveler.materials.filter((m) => inTierRange(m, [min, max]));
   const pending = unconfiguredMaterials(config, traveler.name, traveler);
-  // Tracked travelers are filtered out of the autocomplete, so reaching here
-  // means the name was typed deliberately — treat it as a tier-range change.
-  const verb = wasTracked ? 'Updated' : 'Tracking';
+  const kept = [
+    existing?.channelId && `channel <#${existing.channelId}>`,
+    existing?.excluded?.length && `${existing.excluded.length} ignored family(s)`,
+  ].filter(Boolean);
+  const verb = updating
+    ? `Updated${kept.length ? ` (kept ${kept.join(' and ')})` : ''}`
+    : 'Tracking';
 
   if (!pending.length) {
     await interaction.reply({
@@ -319,33 +348,6 @@ async function runList(interaction, rulebook) {
   await interaction.reply({
     embeds: [new EmbedBuilder().setTitle('Tracked travelers').setDescription(lines.join('\n'))],
     flags: MessageFlags.Ephemeral,
-  });
-}
-
-async function runInfo(interaction, rulebook) {
-  const traveler = findTraveler(rulebook, interaction.options.getString('name'));
-  const config = await loadGuildConfig(interaction.guildId);
-  const turnIns = config.overrides?.[traveler.name]?.turnIns ?? config.turnIns ?? 5;
-
-  const sections = groupByTag(traveler.materials).map(([tag, mats]) => {
-    const tiers = mats.map((m) => m.tier).filter((t) => t != null && t > 0);
-    const range = tiers.length ? `T${Math.min(...tiers)}–T${Math.max(...tiers)}` : 'untiered';
-    const variable = mats.filter((m) => !m.fixed);
-    if (variable.length) {
-      return `\`${tag}\` — ${range} · ${variable.length} need a manual threshold ` +
-        `(${variable.map((m) => m.name).join(', ')})`;
-    }
-    const per = mats[0].perTurnIn;
-    return new Set(mats.map((m) => m.perTurnIn)).size === 1
-      ? `\`${tag}\` — ${per}/turn-in · ${range} · target ${per * turnIns}/tier`
-      : `\`${tag}\` — ${range} · ${mats.length} materials`;
-  });
-
-  await interaction.reply({
-    embeds: [new EmbedBuilder()
-      .setTitle(`${traveler.name} · ${traveler.taskCount} tasks · ${traveler.materials.length} materials`)
-      .setDescription(sections.join('\n'))
-      .setFooter({ text: `targets shown at ${turnIns} turn-ins` })],
   });
 }
 

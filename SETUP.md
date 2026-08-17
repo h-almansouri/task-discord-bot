@@ -156,9 +156,8 @@ That way people can follow the travelers they care about and mute the rest.
 | Command | What it does |
 |---|---|
 | `/ping` | confirms the bot is connected, shows heartbeat latency |
-| `/travelers` | all six travelers with task and material counts |
-| `/traveler info name:Alesi` | one traveler's materials grouped by family |
 | `/traveler add name:… tier_min:… tier_max:…` | start tracking a traveler |
+| `/traveler update name:… tier_min:… tier_max:…` | change its tiers, keeping everything else |
 | `/traveler list` / `/traveler remove` | manage tracked travelers |
 | `/traveler ignore traveler:… family:…` | stop watching one material family entirely |
 | `/traveler unignore traveler:… family:…` | watch it again |

@@ -19,7 +19,7 @@ Early. The data layer works end to end; storage tracking is not built yet.
 | Stock normalizer (three endpoint shapes) | done |
 | Discord connection + `/travelers`, `/traveler` | done |
 | Storage picker + per-guild config (`/storage`) | done |
-| Thresholds + live tracker message (`/traveler`, `/config`) | done |
+| Thresholds, tier bands, live per-traveler tracker | done |
 | Weekly rotation reminder | not started |
 
 ## Commands

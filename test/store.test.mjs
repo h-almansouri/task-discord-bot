@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  defaultConfig, setStorageContainers, findStorage, countContainers,
+  defaultConfig, setStorageContainers, findStorage, countContainers, setTravelerTiers,
   loadGuildConfig, saveGuildConfig, updateGuildConfig, deleteGuildConfig,
 } from '../src/config/store.mjs';
 
@@ -57,6 +57,41 @@ test('findStorage and countContainers agree with what was set', () => {
   assert.equal(findStorage(c, SOURCE)?.containers.length, 2);
   assert.equal(findStorage(c, { type: 'claim', id: SOURCE.id }), undefined);
   assert.equal(countContainers(c), 2);
+});
+
+test('regression: changing tiers must not discard the rest of a traveler', () => {
+  // Replacing the entry rather than merging silently dropped the traveler's
+  // channel, the message being edited in place, and every ignored family.
+  const before = {
+    ...defaultConfig(),
+    travelers: {
+      Alesi: {
+        tiers: [1, 10],
+        channelId: '111',
+        messageId: '222',
+        excluded: ['Experimental Compounds'],
+      },
+    },
+  };
+  const after = setTravelerTiers(before, 'Alesi', [1, 5]);
+  assert.deepEqual(after.travelers.Alesi.tiers, [1, 5]);
+  assert.equal(after.travelers.Alesi.channelId, '111', 'the channel was lost');
+  assert.equal(after.travelers.Alesi.messageId, '222', 'the message id was lost');
+  assert.deepEqual(after.travelers.Alesi.excluded, ['Experimental Compounds'], 'exclusions were lost');
+});
+
+test('setTravelerTiers adds a traveler that was not there', () => {
+  const after = setTravelerTiers(defaultConfig(), 'Svim', [1, 3]);
+  assert.deepEqual(after.travelers.Svim, { tiers: [1, 3] });
+});
+
+test('setTravelerTiers leaves other travelers untouched', () => {
+  const before = {
+    ...defaultConfig(),
+    travelers: { Alesi: { tiers: [1, 10] }, Svim: { tiers: [1, 3], channelId: '9' } },
+  };
+  const after = setTravelerTiers(before, 'Alesi', [1, 5]);
+  assert.deepEqual(after.travelers.Svim, { tiers: [1, 3], channelId: '9' });
 });
 
 test('config round-trips through disk', async (t) => {

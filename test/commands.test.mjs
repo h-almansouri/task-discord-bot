@@ -83,28 +83,27 @@ test('no choice list anywhere exceeds Discord\'s 25-option cap', () => {
   }
 });
 
-test('/traveler info offers exactly the six travelers with tasks', () => {
-  const traveler = buildCommands(rulebook).find((c) => c.data.name === 'traveler');
-  const lists = allChoiceOptions(traveler.data.toJSON());
-  assert.equal(lists.length, 1, 'only /traveler info should use fixed choices');
-  assert.match(lists[0].path, /info/);
-  assert.equal(lists[0].choices.length, 6);
-});
-
-test('/traveler add and remove use autocomplete, not fixed choices', () => {
-  // The useful list differs per guild — untracked for add, tracked for remove —
+test('every /traveler traveler picker uses autocomplete, not fixed choices', () => {
+  // The useful list differs per guild — untracked for add, tracked for the rest —
   // and registered choices are identical for every server.
   const traveler = buildCommands(rulebook).find((c) => c.data.name === 'traveler');
-  const subs = traveler.data.toJSON().options;
-  for (const sub of subs.filter((s) => s.name === 'add' || s.name === 'remove')) {
-    const nameOption = sub.options.find((o) => o.name === 'name');
-    assert.equal(nameOption.autocomplete, true, `/traveler ${sub.name} name should autocomplete`);
-    assert.equal(nameOption.choices, undefined, `/traveler ${sub.name} name should not have choices`);
+  assert.equal(allChoiceOptions(traveler.data.toJSON()).length, 0, 'no fixed choices should remain');
+
+  for (const sub of traveler.data.toJSON().options) {
+    const picker = sub.options?.find((o) => o.name === 'name' || o.name === 'traveler');
+    if (!picker) continue;
+    assert.equal(picker.autocomplete, true, `/traveler ${sub.name} should autocomplete`);
   }
   assert.equal(typeof traveler.autocomplete, 'function', 'the command needs an autocomplete handler');
 });
 
 test('the expected commands are registered', () => {
   const names = buildCommands(rulebook).map((c) => c.data.name).sort();
-  assert.deepEqual(names, ['config', 'ping', 'refresh', 'setup', 'storage', 'traveler', 'travelers']);
+  assert.deepEqual(names, ['config', 'ping', 'refresh', 'setup', 'storage', 'traveler']);
+});
+
+test('/traveler exposes add and update as separate subcommands', () => {
+  const traveler = buildCommands(rulebook).find((c) => c.data.name === 'traveler');
+  const subs = traveler.data.toJSON().options.map((o) => o.name).sort();
+  assert.deepEqual(subs, ['add', 'ignore', 'list', 'remove', 'unignore', 'update']);
 });

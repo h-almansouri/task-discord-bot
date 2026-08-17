@@ -1,4 +1,4 @@
-import { rulebookCommands } from './rulebook.mjs';
+import { basicCommands } from './basic.mjs';
 import { storageCommands, handleComponent as storageComponent, PREFIX as STORAGE_PREFIX } from './storage.mjs';
 import {
   travelerCommands, handleComponent as travelerComponent,
@@ -8,7 +8,7 @@ import { configCommands } from './config.mjs';
 
 export function buildCommands(rulebook) {
   return [
-    ...rulebookCommands(rulebook),
+    ...basicCommands(),
     ...storageCommands(),
     ...travelerCommands(rulebook),
     ...configCommands(rulebook),
