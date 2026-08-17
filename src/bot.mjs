@@ -1,7 +1,8 @@
 import 'dotenv/config';
 import { Client, GatewayIntentBits, Events, MessageFlags } from 'discord.js';
 import { loadRulebook } from './rulebook/load.mjs';
-import { buildCommands, routeComponent } from './commands/index.mjs';
+import { buildCommands, routeComponent, routeModal } from './commands/index.mjs';
+import { startTracker, DEFAULT_INTERVAL_MS } from './tracker/poll.mjs';
 
 const token = process.env.DISCORD_TOKEN;
 if (!token) {
@@ -16,29 +17,42 @@ console.log(
 );
 
 const commands = new Map(buildCommands(rulebook).map((c) => [c.data.name, c]));
+const ctx = { rulebook };
 
 // No message content intent: everything runs through slash commands, so the bot
 // needs no privileged intents and no message-reading permission.
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
+let stopTracker = null;
+
 client.once(Events.ClientReady, (c) => {
   console.log(`logged in as ${c.user.tag}`);
   console.log(`serving ${c.guilds.cache.size} guild(s): ${[...c.guilds.cache.values()].map((g) => g.name).join(', ') || '(none yet)'}`);
+  stopTracker = startTracker(c, { rulebook });
+  console.log(`tracker polling every ${DEFAULT_INTERVAL_MS / 1000}s`);
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
   try {
+    if (interaction.isAutocomplete()) {
+      await commands.get(interaction.commandName)?.autocomplete?.(interaction);
+      return;
+    }
     if (interaction.isChatInputCommand()) {
-      const command = commands.get(interaction.commandName);
-      if (command) await command.run(interaction);
+      await commands.get(interaction.commandName)?.run(interaction);
+      return;
+    }
+    if (interaction.isModalSubmit()) {
+      await routeModal(interaction, ctx);
       return;
     }
     if (interaction.isStringSelectMenu() || interaction.isButton()) {
-      await routeComponent(interaction);
+      await routeComponent(interaction, ctx);
     }
   } catch (err) {
     const label = interaction.commandName ?? interaction.customId ?? 'interaction';
     console.error(`${label} failed:`, err);
+    if (interaction.isAutocomplete?.()) return;
     const msg = { content: 'That hit an error. Check the bot logs.', flags: MessageFlags.Ephemeral };
     if (interaction.deferred || interaction.replied) await interaction.followUp(msg).catch(() => {});
     else await interaction.reply?.(msg).catch(() => {});
@@ -48,6 +62,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 for (const signal of ['SIGINT', 'SIGTERM']) {
   process.on(signal, () => {
     console.log(`\n${signal} — shutting down`);
+    stopTracker?.();
     client.destroy();
     process.exit(0);
   });

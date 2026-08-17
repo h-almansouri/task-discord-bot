@@ -19,7 +19,8 @@ Early. The data layer works end to end; storage tracking is not built yet.
 | Stock normalizer (three endpoint shapes) | done |
 | Discord connection + `/travelers`, `/traveler` | done |
 | Storage picker + per-guild config (`/storage`) | done |
-| Thresholds, tracker message, rotation reminder | not started |
+| Thresholds + live tracker message (`/traveler`, `/config`) | done |
+| Weekly rotation reminder | not started |
 
 ## Commands
 
@@ -53,6 +54,11 @@ src/rulebook/load.mjs     read the committed rulebook
 src/stock/bitjita.mjs     REST client for live storage
 src/stock/normalize.mjs   the three container shapes -> one
 src/stock/discover.mjs    container discovery, grouping, paging
+src/stock/fetch.mjs       stock for tracked containers only
+src/tracker/thresholds.mjs  target resolution, tier ranges
+src/tracker/shortfall.mjs   stock vs target
+src/tracker/render.mjs      embeds, within the 6000-char budget
+src/tracker/poll.mjs        the 20s loop, edit-on-change
 src/config/store.mjs      per-guild config, serialised writes
 src/commands/             slash commands and component routing
 src/bot.mjs               entry point

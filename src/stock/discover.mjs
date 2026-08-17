@@ -19,8 +19,29 @@ export const GROUPS = [
   { key: 'claim', label: 'Claim buildings', hint: 'buildings in the claim' },
 ];
 
+/**
+ * Which houses a player owns changes rarely, so the *list* is cached and only
+ * the contents are refetched. That takes a house-owning player from three
+ * requests per poll to two (DESIGN.md §10).
+ */
+const HOUSE_LIST_TTL_MS = 30 * 60 * 1000;
+const houseListCache = new Map();
+
+async function cachedHouseList(playerId) {
+  const hit = houseListCache.get(playerId);
+  if (hit && hit.expiresAt > Date.now()) return hit.houses;
+  const houses = await playerHousing(playerId);
+  const list = Array.isArray(houses) ? houses : [];
+  houseListCache.set(playerId, { houses: list, expiresAt: Date.now() + HOUSE_LIST_TTL_MS });
+  return list;
+}
+
+export function clearHouseListCache() {
+  houseListCache.clear();
+}
+
 /** Every container a source exposes, flattened. */
-export async function discoverContainers(source) {
+export async function discoverContainers(source, { cacheHouseList = false } = {}) {
   if (source.type === 'claim') {
     const payload = await claimInventories(source.id);
     return claimContainers(payload);
@@ -31,7 +52,7 @@ export async function discoverContainers(source) {
   containers.push(...playerContainers(inv, source.id));
 
   // Housing is a separate fetch; /inventories never includes it.
-  const houses = await playerHousing(source.id);
+  const houses = cacheHouseList ? await cachedHouseList(source.id) : await playerHousing(source.id);
   for (const house of Array.isArray(houses) ? houses : []) {
     const houseId = String(house.buildingEntityId ?? house.entityId);
     const detail = await houseDetail(source.id, houseId);

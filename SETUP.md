@@ -132,14 +132,32 @@ serving 1 guild(s): Your Server
 Storage tracking isn't built yet. These exist so you can confirm the whole chain — relay
 → rulebook → Discord — actually works.
 
+**The three-step setup**, in order:
+
+```
+/storage add name:Velcruza      pick which containers hold traveler supplies
+/traveler add name:Alesi tier_min:1 tier_max:5    who to keep stocked
+/setup channel channel:#supplies                  where the tracker lives
+```
+
+After `/setup channel` the tracker posts immediately and then updates itself every
+20 seconds, editing that one message rather than posting new ones. It only edits when
+the numbers actually change, so a quiet claim costs nothing.
+
 | Command | What it does |
 |---|---|
 | `/ping` | confirms the bot is connected, shows heartbeat latency |
 | `/travelers` | all six travelers with task and material counts |
-| `/traveler name:Alesi` | one traveler's materials grouped by family |
+| `/traveler info name:Alesi` | one traveler's materials grouped by family |
+| `/traveler add name:… tier_min:… tier_max:…` | start tracking a traveler |
+| `/traveler list` / `/traveler remove` | manage tracked travelers |
 | `/storage add name:…` | pick which containers count as traveler supply |
-| `/storage list` | show what is tracked |
-| `/storage remove number:1` | stop tracking a source |
+| `/storage list` / `/storage remove number:1` | manage tracked storage |
+| `/config turnins count:5 [traveler:…]` | how many turn-ins to keep stocked |
+| `/config threshold material:… amount:…` | absolute target for one material |
+| `/config show` | current settings |
+| `/setup channel channel:#…` | where the tracker message goes |
+| `/refresh` | redraw now instead of waiting |
 
 `/traveler name:Alesi` should return five families — Plant Fiber, Grain, Vegetable,
 Baitfish, Healing Potion — each spanning T1–T10. That is the grouping described in
@@ -154,6 +172,12 @@ picks ticked so you can edit rather than start over.
 
 Only the person who ran the command sees the picker, and it expires after 14 minutes
 (Discord invalidates the interaction after 15).
+
+Adding **Svim** or **Ramparte** will prompt you for extra numbers. Those two ask for some
+materials at several different quantities — Salt anywhere from 10 to 55 — so "5 turn-ins"
+has no single meaning and the bot asks for a plain stock target instead. Anything you
+skip stays untracked and shows up in `/traveler list`; nothing is guessed. The other four
+travelers add in one step.
 
 ---
 

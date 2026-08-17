@@ -61,9 +61,38 @@ test('every command passes discord.js validation', () => {
   }
 });
 
-test('the traveler choice list stays inside Discord\'s 25-option cap', () => {
+/** Every option carrying choices, at any nesting depth. */
+function allChoiceOptions(json) {
+  const found = [];
+  const walk = (options, path) => {
+    for (const o of options ?? []) {
+      const here = `${path} ${o.name}`;
+      if (o.choices) found.push({ path: here, choices: o.choices });
+      walk(o.options, here);
+    }
+  };
+  walk(json.options, `/${json.name}`);
+  return found;
+}
+
+test('no choice list anywhere exceeds Discord\'s 25-option cap', () => {
+  const lists = buildCommands(rulebook).flatMap((c) => allChoiceOptions(c.data.toJSON()));
+  assert.ok(lists.length > 0, 'expected at least one choice list to check');
+  for (const { path, choices } of lists) {
+    assert.ok(choices.length <= 25, `${path} has ${choices.length} choices, over the cap`);
+  }
+});
+
+test('traveler pickers offer exactly the six travelers with tasks', () => {
   const traveler = buildCommands(rulebook).find((c) => c.data.name === 'traveler');
-  const choices = traveler.data.toJSON().options[0].choices;
-  assert.ok(choices.length <= 25, `${choices.length} choices exceeds the cap`);
-  assert.equal(choices.length, 6);
+  const lists = allChoiceOptions(traveler.data.toJSON());
+  assert.ok(lists.length >= 3, 'add, remove and info should each offer a traveler choice');
+  for (const { path, choices } of lists) {
+    assert.equal(choices.length, 6, `${path} should list 6 travelers`);
+  }
+});
+
+test('the expected commands are registered', () => {
+  const names = buildCommands(rulebook).map((c) => c.data.name).sort();
+  assert.deepEqual(names, ['config', 'ping', 'refresh', 'setup', 'storage', 'traveler', 'travelers']);
 });
