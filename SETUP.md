@@ -65,6 +65,18 @@ hour. During testing you want the former.
 
 ## 5. Run it
 
+> **On Windows PowerShell**, `npm install` may fail with *"npm.ps1 cannot be loaded
+> because running scripts is disabled on this system"*. That is PowerShell's execution
+> policy blocking npm's `.ps1` wrapper — nothing to do with this project. Three ways
+> past it, in order of least disruption:
+>
+> 1. **Call node directly** and skip npm — every command below has a plain-node form.
+> 2. **Use `npm.cmd`** instead of `npm`, which avoids the `.ps1` wrapper entirely.
+> 3. **Allow local scripts** for your user only:
+>    `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`. This is a security setting —
+>    `RemoteSigned` permits local scripts while still requiring downloaded ones to be
+>    signed. Your call whether to change it.
+
 ```bash
 npm install
 ```
@@ -95,6 +107,15 @@ Start the bot:
 ```bash
 npm start
 ```
+
+Each of those has a plain-node equivalent, useful if npm is blocked:
+
+| npm | node |
+|---|---|
+| `npm run rulebook` | `node scripts/fetch-rulebook.mjs` |
+| `npm run commands` | `node scripts/register-commands.mjs` |
+| `npm start` | `node src/bot.mjs` |
+| `npm test` | `node --test` |
 
 You should see:
 
