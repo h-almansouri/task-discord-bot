@@ -420,30 +420,48 @@ blank — Rumbagh's Ink stops at T8, and an empty cell would read as "you have n
 Untiered materials — Ramparte's combat drops — have no axis to grid against, so they
 render as a list sorted worst-first.
 
-This is tuned for **desktop**. A ten-tier grid is 76 characters wide and will wrap on a
-phone; that trade was made deliberately.
+**Tiers are split into blocks of five, one embed each.** A ten-tier grid is 76 columns
+and wraps inside an embed even on desktop — embeds are narrower than plain message
+content, and their width cannot be set. Five tiers is 46 columns with margin to spare.
+Each block is coloured independently, so a green T1–5 beside a red T6–10 shows where the
+work is at a glance.
+
+Cells are six characters wide. Five is too narrow: abbreviated values reach five
+characters (`+1.3k`) and neighbours end up touching — `+1.3k+1.4k` — which is unreadable.
+
+This is tuned for **desktop**; the grid will still wrap on a phone, which was an accepted
+trade.
 
 Rows are **grouped by `item_desc.tag`**, with tiers collapsed onto one line per family.
 Real output, Alesi at tiers 1–5 and 5 turn-ins, against a live claim:
 
 ```
-Alesi · T1–6
-MATERIAL            T1    T2    T3    T4    T5    T6
-Healing Potion     -96   -99  -100  -100  -200  -200
-Plant Fiber      -6.0k -6.0k -6.0k -6.0k  -12k  -12k
-Baitfish          -195  +320  +440  -200  -270  -400
-Embergrain       -1.3k  +80k  +63k +160k +9.0k -8.0k
-Starbulb          +975  +15k  +12k  +11k +2.6k -1.2k
-[19 of 30 below target · 35 container(s)]
+Rumbagh · T1–5                                    [green when the block is clear]
+MATERIAL            T1    T2    T3    T4    T5
+Parchment          -82  +710  -122   -77  -400
+Brick             -194   +13   +31  -192  -400
+Plank             +842 +1.1k  +715   -76  -559
+Ingot            +1.3k +1.4k +1.8k +1.8k    +1
+[15 of 35 below target]
+
+Rumbagh · T6–10
+MATERIAL            T6    T7    T8    T9   T10
+Parchment         -400   -50   -50   -50   -50
+Ink               -400   -50   -50     -     -
+Plank             -796  -100  -100  -100  -100
+[48 of 68 below target · 35 container(s)]
 ```
 
 Values are abbreviated past 1,000 (`-6.0k`) because tier bands push targets into five and
 six figures, and an unabbreviated number would break the grid. Signs carry the meaning
 where colour cannot: `+` surplus, `-` short.
 
-Real sizes: Rumbagh at ten tiers and seven families is **1,462 of 6,000 characters** and
-76 columns wide. Limits are per *message*, not per bot or channel, so giving each traveler
-its own message means none of them compete for room.
+Only the last embed carries the clock and the overall count; repeating either on every
+block is noise. Any threshold warning lands there too.
+
+Real sizes: Rumbagh at ten tiers and seven families is **1,655 characters across two
+embeds**, 46 columns wide. Limits are per *message*, not per bot or channel, so giving
+each traveler its own message means none of them compete for room.
 
 The timestamp is the embed's native `timestamp` field, never a `<t:…>` tag in the footer
 (§4.16).

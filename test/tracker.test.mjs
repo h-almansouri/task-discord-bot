@@ -8,7 +8,7 @@ import {
 import { computeShortfalls, groupShortfalls } from '../src/tracker/shortfall.mjs';
 import {
   renderTraveler, renderEmpty, renderTable, renderUntiered,
-  formatDiff, embedLength, travelerHash,
+  formatDiff, embedLength, travelerHash, tierBlocks,
 } from '../src/tracker/render.mjs';
 
 const grain = (tier) => ({
@@ -483,6 +483,109 @@ test('one traveler always fits Discord\'s limits', () => {
   assert.ok(embeds.length <= 10);
   assert.ok(embedLength(embeds[0]) <= 6000, `embed was ${embedLength(embeds[0])} characters`);
   assert.ok(embeds[0].description.length <= 4096, 'description must fit its own cap');
+});
+
+// --- tier blocks -----------------------------------------------------------
+
+test('tierBlocks chunks a range into fives', () => {
+  assert.deepEqual(tierBlocks([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]);
+  assert.deepEqual(tierBlocks([1, 2, 3]), [[1, 2, 3]]);
+  assert.deepEqual(tierBlocks([1, 2, 3, 4, 5, 6]), [[1, 2, 3, 4, 5], [6]]);
+  assert.deepEqual(tierBlocks([]), []);
+});
+
+const tenTierTraveler = () => {
+  const rows = [];
+  for (const family of ['Brick', 'Cloth']) {
+    for (let tier = 1; tier <= 10; tier++) {
+      rows.push({
+        key: `item:${family}${tier}`, name: `${family} ${tier}`, tier,
+        tag: family, family, perTurnIn: 10,
+        // low tiers stocked, high tiers short — so the two blocks differ
+        have: tier <= 5 ? 999 : 0, target: 100,
+        diff: tier <= 5 ? 899 : -100, short: tier <= 5 ? 0 : 100,
+      });
+    }
+  }
+  return {
+    name: 'Rumbagh', tiers: [1, 10], rows, groups: groupFor(rows),
+    shortCount: rows.filter((r) => r.diff < 0).length,
+    okCount: rows.filter((r) => r.diff >= 0).length,
+    unconfigured: [],
+  };
+};
+
+test('ten tiers render as two embeds, five each', () => {
+  const { embeds } = renderTraveler(tenTierTraveler(), { storageCount: 3 });
+  assert.equal(embeds.length, 2);
+  assert.equal(embeds[0].title, 'Rumbagh · T1–5');
+  assert.equal(embeds[1].title, 'Rumbagh · T6–10');
+});
+
+test('each block only contains its own tiers', () => {
+  const { embeds } = renderTraveler(tenTierTraveler(), {});
+  const header = (e) => strip(e.description).split('\n')[1];
+  assert.match(header(embeds[0]), /T1\s+T2\s+T3\s+T4\s+T5/);
+  assert.doesNotMatch(header(embeds[0]), /T6/);
+  assert.match(header(embeds[1]), /T6\s+T7\s+T8\s+T9\s+T10/);
+});
+
+test('blocks are coloured independently', () => {
+  // The point of splitting: a green T1-5 beside a red T6-10 shows where the work is.
+  const { embeds } = renderTraveler(tenTierTraveler(), {});
+  assert.equal(embeds[0].color, 0x5cb85c, 'T1-5 is fully stocked here');
+  assert.equal(embeds[1].color, 0xd9534f, 'T6-10 is short here');
+});
+
+test('a five-tier block stays inside the width that wraps at ten', () => {
+  const { embeds } = renderTraveler(tenTierTraveler(), {});
+  for (const e of embeds) {
+    const width = Math.max(...strip(e.description).split('\n').map((l) => l.length));
+    assert.ok(width <= 50, `block was ${width} columns, too wide`);
+  }
+});
+
+test('only the last embed carries the clock and the overall count', () => {
+  const { embeds } = renderTraveler(tenTierTraveler(), { updatedAt: Date.now(), storageCount: 7 });
+  assert.equal(embeds[0].timestamp, undefined, 'a repeated timestamp is noise');
+  assert.ok(embeds.at(-1).timestamp);
+  assert.match(embeds.at(-1).footer.text, /of 20 below target · 7 container\(s\)/);
+  assert.match(embeds[0].footer.text, /of 10 below target/, 'earlier blocks count only themselves');
+});
+
+test('untiered materials get their own embed after the tier blocks', () => {
+  const traveler = tenTierTraveler();
+  const drop = {
+    key: 'item:fur', name: 'Jakyl Fur', tier: -1, tag: 'Hide', family: 'Fur',
+    perTurnIn: null, have: 0, target: 25, diff: -25, short: 25,
+  };
+  traveler.rows.push(drop);
+  traveler.groups = groupFor(traveler.rows);
+  const { embeds } = renderTraveler(traveler, {});
+  assert.equal(embeds.length, 3);
+  assert.match(embeds.at(-1).title, /untiered/);
+  assert.match(strip(embeds.at(-1).description), /Jakyl Fur/);
+});
+
+test('a traveler with only untiered materials gets one embed, no grid', () => {
+  const rows = [{
+    key: 'item:fur', name: 'Jakyl Fur', tier: -1, tag: 'Hide', family: 'Fur',
+    perTurnIn: null, have: 0, target: 25, diff: -25, short: 25,
+  }];
+  const { embeds } = renderTraveler({
+    name: 'Ramparte', tiers: [1, 10], rows, groups: groupFor(rows),
+    shortCount: 1, okCount: 0, unconfigured: [],
+  }, {});
+  assert.equal(embeds.length, 1);
+  assert.match(embeds[0].title, /untiered/);
+});
+
+test('the threshold warning lands on the last embed only', () => {
+  const traveler = tenTierTraveler();
+  traveler.unconfigured = [{ key: 'item:salt', name: 'Salt' }];
+  const { embeds } = renderTraveler(traveler, {});
+  assert.doesNotMatch(embeds[0].description, /Needs a threshold/);
+  assert.match(embeds.at(-1).description, /Needs a threshold: Salt/);
 });
 
 test('renderEmpty explains itself rather than showing a blank grid', () => {

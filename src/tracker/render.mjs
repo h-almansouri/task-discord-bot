@@ -22,7 +22,18 @@ const ANSI = {
 };
 
 const NAME_WIDTH = 16;
+/**
+ * Six is the practical floor. Values reach five characters once abbreviated
+ * (`+1.3k`), and a five-wide column lets neighbours touch — `+1.3k+1.4k` — which
+ * is unreadable.
+ */
 const CELL_WIDTH = 6;
+/**
+ * Ten tiers in one grid is 76 columns, which wraps inside an embed. Five tiers
+ * is 46 and has margin to spare, so a traveler's range is split into blocks of
+ * five, each its own embed (DESIGN.md §8).
+ */
+const TIERS_PER_BLOCK = 5;
 /** Embed descriptions cap at 4096; leave room for the fence and any warning. */
 const DESCRIPTION_BUDGET = 3800;
 
@@ -91,7 +102,25 @@ export function renderUntiered(rows) {
     .join('\n');
 }
 
-/** The message for one traveler. */
+/** Split a sorted tier list into blocks of at most TIERS_PER_BLOCK. */
+export function tierBlocks(tiers, size = TIERS_PER_BLOCK) {
+  const blocks = [];
+  for (let i = 0; i < tiers.length; i += size) blocks.push(tiers.slice(i, i + size));
+  return blocks;
+}
+
+const fence = (body) => {
+  const text = `\`\`\`ansi\n${body}\n\`\`\``;
+  return text.length > DESCRIPTION_BUDGET
+    ? `${text.slice(0, DESCRIPTION_BUDGET)}\n… truncated\n\`\`\``
+    : text;
+};
+
+/**
+ * The message for one traveler: an embed per block of five tiers, plus one for
+ * untiered materials. Each block is coloured independently, so a green T1–5 next
+ * to a red T6–10 says at a glance where the work is.
+ */
 export function renderTraveler(traveler, { updatedAt = null, storageCount = 0 } = {}) {
   const timestamp = new Date(updatedAt ?? Date.now()).toISOString();
 
@@ -99,41 +128,54 @@ export function renderTraveler(traveler, { updatedAt = null, storageCount = 0 } 
     .map((g) => ({ ...g, rows: g.rows.filter((r) => r.tier >= 1) }))
     .filter((g) => g.rows.length);
   const untiered = traveler.rows.filter((r) => !(r.tier >= 1));
-  const tiers = [...new Set(tieredGroups.flatMap((g) => g.rows.map((r) => r.tier)))]
+  const allTiers = [...new Set(tieredGroups.flatMap((g) => g.rows.map((r) => r.tier)))]
     .sort((a, b) => a - b);
 
-  const blocks = [];
-  if (tieredGroups.length) blocks.push(renderTable(tieredGroups, tiers));
-  if (untiered.length) blocks.push(renderUntiered(untiered));
+  const embeds = [];
 
-  let body = blocks.length ? `\`\`\`ansi\n${blocks.join('\n\n')}\n\`\`\`` : '';
-  if (body.length > DESCRIPTION_BUDGET) {
-    body = `${body.slice(0, DESCRIPTION_BUDGET)}\n… truncated\n\`\`\``;
+  for (const tiers of tierBlocks(allTiers)) {
+    const inBlock = tieredGroups
+      .map((g) => ({ ...g, rows: g.rows.filter((r) => tiers.includes(r.tier)) }))
+      .filter((g) => g.rows.length);
+    if (!inBlock.length) continue;
+
+    const short = inBlock.flatMap((g) => g.rows).filter((r) => r.diff < 0).length;
+    const count = inBlock.flatMap((g) => g.rows).length;
+    embeds.push({
+      title: `${traveler.name} · T${tiers[0]}–${tiers.at(-1)}`,
+      description: fence(renderTable(inBlock, tiers)),
+      color: short ? COLOUR_SHORT : COLOUR_OK,
+      footer: { text: `${short} of ${count} below target` },
+    });
   }
 
-  const notes = [];
+  if (untiered.length) {
+    const short = untiered.filter((r) => r.diff < 0).length;
+    embeds.push({
+      title: `${traveler.name} · untiered`,
+      description: fence(renderUntiered(untiered)),
+      color: short ? COLOUR_SHORT : COLOUR_OK,
+      footer: { text: `${short} of ${untiered.length} below target` },
+    });
+  }
+
+  if (!embeds.length) return renderEmpty(traveler.name);
+
+  // The overall summary and the clock belong once, on the last card.
+  const last = embeds.at(-1);
+  last.footer = {
+    text: `${traveler.shortCount} of ${traveler.rows.length} below target · ${storageCount} container(s)`,
+  };
+  last.timestamp = timestamp;
+
   if (traveler.unconfigured.length) {
     const names = traveler.unconfigured.map((m) => m.name).join(', ');
-    notes.push(
-      `⚠️ Needs a threshold: ${names.length > 200 ? `${names.slice(0, 197)}…` : names} ` +
-      '· set with `/config variable` or `/config threshold`',
-    );
+    last.description += `\n⚠️ Needs a threshold: ` +
+      `${names.length > 200 ? `${names.slice(0, 197)}…` : names}` +
+      ' · set with `/config variable` or `/config threshold`';
   }
 
-  const range = traveler.tiers ? ` · T${traveler.tiers[0]}–${traveler.tiers[1]}` : '';
-  return {
-    embeds: [{
-      title: `${traveler.name}${range}`,
-      description: [body, ...notes].filter(Boolean).join('\n'),
-      color: traveler.shortCount ? COLOUR_SHORT : COLOUR_OK,
-      footer: {
-        text: traveler.shortCount
-          ? `${traveler.shortCount} of ${traveler.rows.length} below target · ${storageCount} container(s)`
-          : `all ${traveler.rows.length} at or above target · ${storageCount} container(s)`,
-      },
-      timestamp,
-    }],
-  };
+  return { embeds };
 }
 
 /** Placeholder for a channel whose traveler has nothing to show yet. */
