@@ -152,6 +152,14 @@ Discovered during the spike; several contradict widely-circulated advice.
    clock.** Eight citizens of one claim returned three different values, all in the past,
    the worst 134 days stale. It is a per-player snapshot frozen at that player's last
    sync. Use `traveler_task_loop_timer` from a relay instead.
+10. **`item_desc.tag` is the material-family key.** It groups Alesi's 50 items into 5
+    families, and correctly groups `Baitfish` (Briny Guppi, Muddy Guppi, Greenhorn Guppi,
+    Azure Minni…) which share no common substring and would defeat any name-parsing rule.
+11. **`/api/players/{id}/inventories` is much broader than "that player's stuff".** One
+    character returned **19 containers**: personal (Inventory, Toolbelt, Wallet), two
+    deployables (a wagon and a bird), and bank slots in **14 different claims** they are
+    merely a citizen of. Personal containers are identifiable by
+    `ownerEntityId === playerId`; everything else is owned by some other building.
 
 ---
 
@@ -182,7 +190,12 @@ meaningless. These take a plain absolute number instead. All eight:
 | Ramparte | Deadly Stinger | 1, 5 |
 
 The bot should **refuse to track a variable material until a number is set**, rather than
-guessing.
+guessing. To keep that from being invisible friction, `/traveler add` **prompts for the
+numbers inline** when the traveler has variable-qty materials — so adding Ramparte walks
+you through its seven, rather than silently tracking nothing. Skipping a prompt leaves
+that material untracked and listed by `/traveler list`, never silently defaulted.
+
+Only Svim (1) and Ramparte (7) trigger this. The other four travelers add in one step.
 
 **Resolution order**, first match wins:
 
@@ -205,7 +218,8 @@ Per guild. JSON file to start; SQLite only if multi-guild becomes real.
   "storages": [
     { "type": "claim",  "id": "864691128488445884", "buildings": "all" },
     { "type": "claim",  "id": "…", "buildings": ["Alesi Tasks"] },
-    { "type": "player", "id": "648518346360148383", "housing": true }
+    { "type": "player", "id": "1369094286781181638",
+      "containers": "personal", "housing": true }
   ],
   "travelers": {
     "Alesi": { "tiers": [1, 5] },
@@ -224,7 +238,14 @@ Building-level selection matters: a claim may hold Embergrain set aside for craf
 nobody would ever turn in. Summing all buildings would count it and suppress a warning
 you wanted.
 
-Player storages include housing by default (`"housing": true`).
+Player storages need the same care, for a sharper reason. `/inventories` returns
+**everything a character can reach** — one test character had 19 containers including bank
+slots in 14 claims they are only a citizen of *(verified, §4.11)*. Adding a player with no
+filter would silently count stock sitting in other people's towns.
+
+So `containers` defaults to `"personal"` — the containers where
+`ownerEntityId === playerId`, i.e. Inventory, Toolbelt and Wallet. `"all"` takes
+everything, or name specific containers. Housing is included by default where it exists.
 
 ---
 
@@ -234,7 +255,8 @@ Player storages include housing by default (`"housing": true`).
 /setup channel #channel
 /storage add claim "Mystic Embassy"
 /storage add claim "Mystic Embassy" building "Alesi Tasks"
-/storage add player "Bob"
+/storage add player "Velcruza"                    # personal containers only
+/storage add player "Velcruza" containers all     # incl. claim banks + deployables
 /storage list | /storage remove <n>
 /traveler add Alesi tiers 1-5
 /traveler list | /traveler remove Alesi
@@ -254,6 +276,28 @@ Shortfalls only — materials at or above target are not listed, and a traveler 
 shortfalls gets **no embed at all** rather than an "all stocked" placeholder. One embed
 per traveler that has something to report, all inside one message, edited in place. When
 nothing anywhere is short, the message says so in a single line.
+
+Rows are **grouped by `item_desc.tag`**, with tiers collapsed onto one line per family.
+Real output, Alesi at tiers 1–5 and 5 turn-ins, against a live claim:
+
+```
+**Alesi** · tiers 1-5 · 5 turn-ins
+`Baitfish` — 10/turn-in · target 50/tier
+   short: T1 43 · T2 44 · T3 50 · T4 50 · T5 50
+`Healing Potion` — 5/turn-in · target 25/tier
+   short: T1 21 · T2 25 · T3 25 · T4 25 · T5 25
+`Grain` — 200/turn-in · target 1000/tier
+   short: T3 1000 · T4 1000 · T5 1000
+`Plant Fiber` — 300/turn-in · target 1500/tier
+   short: T1 1360 · T4 1500 · T5 1500
+`Vegetable` — 30/turn-in · target 150/tier
+   short: T3 150 · T4 150 · T5 150
+```
+
+The same data rendered flat is 19 rows and 1,094 characters; grouped it is 5 groups and
+535. Against Discord's 6,000-character budget that is 11 Alesi-sized travelers instead of
+5.5 — so grouping is what keeps the message inside the limit, not just what makes it
+readable.
 
 The binding constraint is Discord's **6,000 characters across all embeds** — not the
 4,096-per-description limit, which is never reached first. At roughly 50 characters per
@@ -317,15 +361,14 @@ Settled since the first draft:
 - **Rotation reminder** — yes, pinging a configurable role a configurable time ahead
   (default 24h), driven by the relay timer. See §9.
 
+- **Material families** — `item_desc.tag` is the grouping key (§4.10, §8).
+- **Variable-qty friction** — `/traveler add` prompts for the numbers inline (§5).
+
 Still open:
 
-- **Does `/api/players/{id}/inventories` already include housing storage?** Unverified —
-  `/housing` returned 404 for all nine players sampled, so no test case was available.
-  If it does, `"housing": true` costs nothing extra; if not, it's a second request per
-  player. Needs one player who actually owns a house.
-- **What counts as a "material family"** for display grouping — Alesi's 50 materials are
-  really 5 families × 10 tiers, and collapsing them would read far better than 50 flat
-  rows. Needs a rule; tier is on `item_desc`, but family is only implied by name.
-- **First-run friction for variable-qty materials** (§5): adding Ramparte does nothing
-  until seven separate thresholds are set. Options are a sensible default, a setup
-  prompt, or leaving them untracked until configured.
+- **Does `/api/players/{id}/inventories` already include housing storage?** Still
+  unverified. Ten players sampled, including Velcruza; none owns a house, so there is no
+  test case. Design assumes a separate `/housing` request and dedupes by container entity
+  id, which is correct either way — just possibly one wasted request per player.
+- **Whether `"personal"` is the right default** for player containers, or whether the
+  common case is actually a shared claim bank someone wants counted.
