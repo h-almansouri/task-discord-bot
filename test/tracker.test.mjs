@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { defaultConfig } from '../src/config/store.mjs';
-import { resolveTarget, inTierRange, unconfiguredMaterials } from '../src/tracker/thresholds.mjs';
+import {
+  resolveTarget, inTierRange, unconfiguredMaterials,
+  isExcluded, watchedMaterials, familiesOf,
+} from '../src/tracker/thresholds.mjs';
 import { computeShortfalls, groupShortfalls } from '../src/tracker/shortfall.mjs';
 import { renderTracker, renderGroup, embedLength, contentHash } from '../src/tracker/render.mjs';
 
@@ -87,6 +90,76 @@ test('unconfiguredMaterials lists exactly what still needs a number', () => {
   const config = withTracked({ Ramparte: { tiers: [1, 5] } });
   const pending = unconfiguredMaterials(config, 'Ramparte', RULEBOOK.travelers.Ramparte);
   assert.deepEqual(pending.map((m) => m.name), ['Jakyl Fur']);
+});
+
+// --- exclusions ------------------------------------------------------------
+
+const withExclusion = (name, families) => withTracked({
+  [name]: { tiers: [1, 10], excluded: families },
+});
+
+test('an excluded family is not watched at any tier', () => {
+  const config = withExclusion('Alesi', ['Grain']);
+  for (const tier of [1, 2, 3]) {
+    assert.equal(isExcluded(config, 'Alesi', grain(tier)), true, `T${tier} should be excluded`);
+  }
+});
+
+test('exclusions are case-insensitive', () => {
+  assert.equal(isExcluded(withExclusion('Alesi', ['grain']), 'Alesi', grain(1)), true);
+  assert.equal(isExcluded(withExclusion('Alesi', ['GRAIN']), 'Alesi', grain(1)), true);
+});
+
+test('exclusions apply only to the traveler they were set on', () => {
+  const config = withTracked({
+    Alesi: { tiers: [1, 10], excluded: ['Grain'] },
+    Svim: { tiers: [1, 10] },
+  });
+  assert.equal(isExcluded(config, 'Alesi', grain(1)), true);
+  assert.equal(isExcluded(config, 'Svim', grain(1)), false);
+});
+
+test('an excluded family produces no shortfalls', () => {
+  const stock = new Map();
+  const before = computeShortfalls({
+    rulebook: RULEBOOK, config: withTracked({ Alesi: { tiers: [1, 10] } }), stock,
+  });
+  assert.equal(before.totalShort, 3);
+
+  const after = computeShortfalls({
+    rulebook: RULEBOOK, config: withExclusion('Alesi', ['Grain']), stock,
+  });
+  assert.equal(after.totalShort, 0);
+  assert.equal(after.travelers.length, 0, 'a traveler with everything excluded should vanish');
+});
+
+test('excluding a variable material stops it asking for a threshold', () => {
+  const tracked = withTracked({ Svim: { tiers: [1, 10] } });
+  assert.equal(unconfiguredMaterials(tracked, 'Svim', RULEBOOK.travelers.Svim).length, 1);
+
+  const excluded = withExclusion('Svim', ['Salt']);
+  assert.equal(unconfiguredMaterials(excluded, 'Svim', RULEBOOK.travelers.Svim).length, 0);
+});
+
+test('watchedMaterials reflects both the tier range and exclusions', () => {
+  const all = withTracked({ Alesi: { tiers: [1, 10] } });
+  assert.equal(watchedMaterials(all, 'Alesi', RULEBOOK.travelers.Alesi).length, 3);
+
+  const narrow = withTracked({ Alesi: { tiers: [1, 2] } });
+  assert.equal(watchedMaterials(narrow, 'Alesi', RULEBOOK.travelers.Alesi).length, 2);
+
+  const none = withExclusion('Alesi', ['Grain']);
+  assert.equal(watchedMaterials(none, 'Alesi', RULEBOOK.travelers.Alesi).length, 0);
+});
+
+test('no exclusions configured means nothing is excluded', () => {
+  assert.equal(isExcluded(withTracked({ Alesi: { tiers: [1, 10] } }), 'Alesi', grain(1)), false);
+  assert.equal(isExcluded(defaultConfig(), 'Alesi', grain(1)), false);
+});
+
+test('familiesOf lists each family once with its tier count', () => {
+  const families = familiesOf(RULEBOOK.travelers.Alesi);
+  assert.deepEqual(families, [{ name: 'Grain', count: 3 }]);
 });
 
 // --- shortfalls ------------------------------------------------------------

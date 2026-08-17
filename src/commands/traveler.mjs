@@ -13,7 +13,9 @@ import {
 } from 'discord.js';
 import { findTraveler, groupByTag } from '../rulebook/load.mjs';
 import { loadGuildConfig, updateGuildConfig } from '../config/store.mjs';
-import { unconfiguredMaterials, resolveTarget, inTierRange } from '../tracker/thresholds.mjs';
+import {
+  unconfiguredMaterials, watchedMaterials, familiesOf, inTierRange,
+} from '../tracker/thresholds.mjs';
 import { invalidate } from '../tracker/poll.mjs';
 
 export const PREFIX = 'tv';
@@ -44,6 +46,18 @@ export function travelerCommands(rulebook) {
           .setRequired(true).setAutocomplete(true)))
       .addSubcommand((s) => s.setName('list')
         .setDescription('Show which travelers are tracked'))
+      .addSubcommand((s) => s.setName('ignore')
+        .setDescription('Stop watching one material family for a traveler')
+        .addStringOption((o) => o.setName('traveler').setDescription('Which traveler')
+          .setRequired(true).setAutocomplete(true))
+        .addStringOption((o) => o.setName('family').setDescription('Which material family')
+          .setRequired(true).setAutocomplete(true)))
+      .addSubcommand((s) => s.setName('unignore')
+        .setDescription('Watch a material family again')
+        .addStringOption((o) => o.setName('traveler').setDescription('Which traveler')
+          .setRequired(true).setAutocomplete(true))
+        .addStringOption((o) => o.setName('family').setDescription('Which material family')
+          .setRequired(true).setAutocomplete(true)))
       .addSubcommand((s) => s.setName('info')
         .setDescription('Show everything a traveler can ask for')
         .addStringOption((o) => o.setName('name').setDescription('Which traveler')
@@ -51,19 +65,45 @@ export function travelerCommands(rulebook) {
 
     async autocomplete(interaction) {
       const sub = interaction.options.getSubcommand();
-      const typed = interaction.options.getFocused().toLowerCase();
+      const focused = interaction.options.getFocused(true);
+      const typed = String(focused.value ?? '').toLowerCase();
       const config = await loadGuildConfig(interaction.guildId);
-      const tracked = new Set(Object.keys(config.travelers ?? {}));
+      const tracked = Object.keys(config.travelers ?? {});
 
-      let pool = Object.keys(rulebook.travelers).sort();
-      if (sub === 'add') pool = pool.filter((n) => !tracked.has(n));
-      if (sub === 'remove') pool = pool.filter((n) => tracked.has(n));
-
-      await interaction.respond(
-        pool.filter((n) => n.toLowerCase().includes(typed))
-          .slice(0, 25)
-          .map((n) => ({ name: n, value: n })),
+      const respond = (values) => interaction.respond(
+        values.filter((v) => v.name.toLowerCase().includes(typed))
+          .slice(0, 25),
       );
+
+      if (focused.name === 'family') {
+        // Families of whichever traveler was picked in the other option.
+        const who = interaction.options.getString('traveler');
+        const traveler = who ? rulebook.travelers[who] : null;
+        if (!traveler) {
+          await interaction.respond([]);
+          return;
+        }
+        const excluded = new Set(
+          (config.travelers?.[who]?.excluded ?? []).map((e) => String(e).toLowerCase()),
+        );
+        const families = familiesOf(traveler)
+          .filter(({ name }) => (sub === 'ignore'
+            ? !excluded.has(name.toLowerCase())
+            : excluded.has(name.toLowerCase())));
+        await respond(families.map(({ name, count }) => ({
+          name: `${name} (${count} tiers)`.slice(0, 100),
+          value: name,
+        })));
+        return;
+      }
+
+      // Traveler pickers: the useful list depends on the subcommand.
+      let pool = Object.keys(rulebook.travelers).sort();
+      if (sub === 'add') pool = pool.filter((n) => !tracked.includes(n));
+      if (sub === 'remove' || sub === 'ignore' || sub === 'unignore') {
+        pool = pool.filter((n) => tracked.includes(n));
+      }
+      await respond(pool.map((n) => ({ name: n, value: n })));
     },
 
     async run(interaction) {
@@ -76,6 +116,7 @@ export function travelerCommands(rulebook) {
       if (sub === 'remove') return runRemove(interaction, rulebook);
       if (sub === 'list') return runList(interaction, rulebook);
       if (sub === 'info') return runInfo(interaction, rulebook);
+      if (sub === 'ignore' || sub === 'unignore') return runIgnore(interaction, rulebook, sub === 'ignore');
     },
   }];
 }
@@ -174,6 +215,72 @@ async function runRemove(interaction, rulebook) {
   await interaction.reply({ content: `Stopped tracking **${name}**.`, flags: MessageFlags.Ephemeral });
 }
 
+async function runIgnore(interaction, rulebook, ignoring) {
+  const who = interaction.options.getString('traveler');
+  const family = interaction.options.getString('family');
+  const traveler = findTraveler(rulebook, who);
+
+  if (!traveler) {
+    await interaction.reply({ content: `No traveler called "${who}".`, flags: MessageFlags.Ephemeral });
+    return;
+  }
+
+  const config = await loadGuildConfig(interaction.guildId);
+  if (!config.travelers?.[traveler.name]) {
+    await interaction.reply({
+      content: `**${traveler.name}** is not tracked. Add them with \`/traveler add\` first.`,
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  // Match case-insensitively against what the rulebook actually has, so a typed
+  // name that differs only in case still works.
+  const known = familiesOf(traveler).find(
+    (f) => f.name.toLowerCase() === String(family).toLowerCase(),
+  );
+  if (!known) {
+    await interaction.reply({
+      content: `**${traveler.name}** has no material family called "${family}". ` +
+        'Pick from the suggestions.',
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  const current = config.travelers[traveler.name].excluded ?? [];
+  const already = current.some((e) => String(e).toLowerCase() === known.name.toLowerCase());
+  if (ignoring === already) {
+    await interaction.reply({
+      content: already
+        ? `**${known.name}** is already ignored for ${traveler.name}.`
+        : `**${known.name}** is already being watched for ${traveler.name}.`,
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  const excluded = ignoring
+    ? [...current, known.name]
+    : current.filter((e) => String(e).toLowerCase() !== known.name.toLowerCase());
+
+  await updateGuildConfig(interaction.guildId, (c) => ({
+    ...c,
+    travelers: {
+      ...c.travelers,
+      [traveler.name]: { ...c.travelers[traveler.name], excluded },
+    },
+  }));
+  invalidate(interaction.guildId);
+
+  await interaction.reply({
+    content: ignoring
+      ? `Ignoring **${known.name}** for ${traveler.name} — all ${known.count} tier(s) dropped from the tracker.`
+      : `Watching **${known.name}** for ${traveler.name} again.`,
+    flags: MessageFlags.Ephemeral,
+  });
+}
+
 async function runList(interaction, rulebook) {
   const config = await loadGuildConfig(interaction.guildId);
   const entries = Object.entries(config.travelers ?? {});
@@ -188,11 +295,13 @@ async function runList(interaction, rulebook) {
   const lines = entries.map(([name, settings]) => {
     const traveler = rulebook.travelers[name];
     if (!traveler) return `**${name}** — not in the rulebook (regenerate it?)`;
-    const inRange = traveler.materials.filter((m) => inTierRange(m, settings.tiers));
+    const watched = watchedMaterials(config, name, traveler);
     const pending = unconfiguredMaterials(config, name, traveler);
     const turnIns = config.overrides?.[name]?.turnIns ?? config.turnIns;
+    const ignored = settings.excluded ?? [];
     return `**${name}** — tiers ${settings.tiers?.[0] ?? 1}–${settings.tiers?.[1] ?? 10} · ` +
-      `${inRange.length} materials · ${turnIns} turn-ins` +
+      `${watched.length} materials · ${turnIns} turn-ins` +
+      (ignored.length ? `\n   🚫 ignoring: ${ignored.join(', ')}` : '') +
       (pending.length ? `\n   ⚠️ ${pending.length} awaiting a threshold: ${pending.map((m) => m.name).join(', ')}` : '');
   });
 

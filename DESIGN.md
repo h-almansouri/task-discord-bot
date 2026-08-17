@@ -251,6 +251,20 @@ Only Svim (1) and Ramparte (7) trigger this. The other four travelers add in one
 3. Per-traveler turn-ins override
 4. Global turn-ins default
 
+### Switching materials off
+
+Some families are not worth watching — Rumbagh's Experimental Compounds, say. Two
+granularities, because they answer different questions:
+
+| | Command | Effect |
+|---|---|---|
+| A whole family | `/traveler ignore` | drops all ten tiers at once |
+| A single tier | `/config threshold <material> 0` | that one material is never short |
+
+Exclusions are stored per traveler as family names, so ignoring a family for Rumbagh
+leaves it watched for anyone else who wants it. They also suppress the
+awaiting-a-threshold warning: ignoring Salt stops Svim asking for a number for it.
+
 ---
 
 ## 6. Configuration
@@ -280,7 +294,11 @@ Per guild. JSON file to start; SQLite only if multi-guild becomes real.
   ],
   "travelers": {
     "Alesi": { "tiers": [1, 5] },
-    "Svim":  { "tiers": [1, 3] }
+    "Svim":  { "tiers": [1, 3] },
+    "Rumbagh": {
+      "tiers": [1, 10],
+      "excluded": ["Experimental Compounds"]   // whole family, every tier
+    }
   },
   "turnIns": 5,
   "overrides": { "Alesi": { "turnIns": 8 } },

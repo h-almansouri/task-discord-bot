@@ -47,10 +47,41 @@ export function inTierRange(material, tiers) {
   return material.tier >= min && material.tier <= max;
 }
 
-/** Materials of a tracked traveler that still need an absolute number. */
-export function unconfiguredMaterials(config, travelerName, traveler) {
+/**
+ * Whether a material family has been switched off for this traveler.
+ *
+ * Exclusions are by family, the unit the tracker displays, so dropping
+ * "Experimental Compounds" removes all ten of its tiers at once. To hide a
+ * single tier instead, give that one material a threshold of 0.
+ */
+export function isExcluded(config, travelerName, material) {
+  const excluded = config.travelers?.[travelerName]?.excluded;
+  if (!Array.isArray(excluded) || !excluded.length) return false;
+  const family = String(material.family ?? material.tag ?? '').toLowerCase();
+  return excluded.some((e) => String(e).toLowerCase() === family);
+}
+
+/** Materials of a tracked traveler that are actually being watched. */
+export function watchedMaterials(config, travelerName, traveler) {
   const tiers = config.travelers?.[travelerName]?.tiers;
   return traveler.materials
-    .filter((m) => inTierRange(m, tiers))
+    .filter((m) => !isExcluded(config, travelerName, m))
+    .filter((m) => inTierRange(m, tiers));
+}
+
+/** Materials of a tracked traveler that still need an absolute number. */
+export function unconfiguredMaterials(config, travelerName, traveler) {
+  return watchedMaterials(config, travelerName, traveler)
     .filter((m) => !resolveTarget(config, travelerName, m).configured);
+}
+
+/** Every distinct family a traveler can ask for, in display order. */
+export function familiesOf(traveler) {
+  const seen = new Map();
+  for (const m of traveler.materials ?? []) {
+    const family = m.family ?? m.tag ?? 'Other';
+    seen.set(family, (seen.get(family) ?? 0) + 1);
+  }
+  return [...seen.entries()].map(([name, count]) => ({ name, count }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 }

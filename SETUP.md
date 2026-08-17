@@ -151,6 +151,8 @@ the numbers actually change, so a quiet claim costs nothing.
 | `/traveler info name:Alesi` | one traveler's materials grouped by family |
 | `/traveler add name:… tier_min:… tier_max:…` | start tracking a traveler |
 | `/traveler list` / `/traveler remove` | manage tracked travelers |
+| `/traveler ignore traveler:… family:…` | stop watching one material family entirely |
+| `/traveler unignore traveler:… family:…` | watch it again |
 | `/storage add name:…` | pick which containers count as traveler supply |
 | `/storage list` / `/storage remove number:1` | manage tracked storage |
 | `/config turnins count:5 [traveler:…]` | how many turn-ins to keep stocked |
@@ -172,6 +174,12 @@ picks ticked so you can edit rather than start over.
 
 Only the person who ran the command sees the picker, and it expires after 14 minutes
 (Discord invalidates the interaction after 15).
+
+**Not interested in a whole material family?** `/traveler ignore traveler:Rumbagh
+family:Experimental Compounds` drops all ten of its tiers at once, rather than setting
+each to zero. Only that traveler is affected, and `/traveler list` shows what's ignored.
+To hide a single tier instead, give it a threshold of zero:
+`/config threshold material:Flawless Brick amount:0`.
 
 Adding **Svim** or **Ramparte** will prompt you for extra numbers. Those two ask for some
 materials at several different quantities — Salt anywhere from 10 to 55 — so "5 turn-ins"
