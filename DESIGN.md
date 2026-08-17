@@ -305,9 +305,11 @@ house      Metal · Logs · Planks · Leather · Cloth · Foraging · Fishing ·
            Seeds N Fert · Raw Mats · Cooked Mats · Foods · Dropbox · … (35 chests)
 ```
 
-**Discord caps a select menu at 25 options**, and 54 containers exceeds that. So the
-picker pages, or filters by origin group first (personal / banks / house) and then lists
-within it. Worth settling before building the command.
+**Discord caps a select menu at 25 options**, and 54 containers exceeds that. The picker
+therefore asks for an **origin group first** — personal / banks / house — then lists
+within it. Paging is only added if a single group exceeds 25, which today only `house`
+could (35 for the test character). Group-first is the better default regardless: paging a
+flat list of 35 similarly-named chests is miserable to use.
 
 ---
 
@@ -409,10 +411,12 @@ Settled since the first draft:
   (§4.11). A player with a house costs `1 + 1 + houses` requests rather than 1.
 - **Container selection** — always explicit, via a picker. No defaults (§7).
 
-Still open:
+- **Picker layout** — group first (personal / banks / house), page only if one group
+  exceeds 25 (§7).
+- **Housing refresh cost** — a non-issue at realistic scale. Expected usage is at most
+  ~3 tracked players. Cache each player's house *list* and refetch only
+  `/housing/{houseId}` for contents: 2 requests per player per poll. Three players plus a
+  claim is ~21 requests/min against a 250/min limit, and roughly 420 KB per poll. Revisit
+  only if someone tracks players in double digits.
 
-- **Picker layout for >25 containers.** Discord's select-menu cap is 25; one character
-  has 54. Page, or filter by origin group first?
-- **Refresh cost for house-backed storages.** `/housing/{houseId}` is 141 KB against
-  38 KB for a whole claim. If several tracked players own houses, the 20s poll gets
-  noticeably heavier — may want housing on a slower cycle than claim storage.
+Nothing blocking remains. Next step is the scaffold.
