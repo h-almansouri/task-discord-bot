@@ -75,7 +75,12 @@ Tables: `traveler_task_desc` (321), `npc_desc` (7), `item_desc` (8,281), `cargo_
 The bitjita REST API does not expose these; only a relay does. *(verified)*
 
 This is static game data that changes on patches. We fetch it once, commit the result, and
-refresh deliberately. The bot never touches a relay at runtime.
+refresh deliberately.
+
+**One runtime exception:** the weekly rotation reminder (§9) needs
+`traveler_task_loop_timer`, which is live and only available from a relay. That's a
+single-row subscription checked a few times a day — negligible, but it does mean the
+bot is not entirely relay-free at runtime.
 
 Primary **relay.bitjita.com**, fallback **relay.bitcraftsync.app**:
 
@@ -122,11 +127,31 @@ Discovered during the spike; several contradict widely-circulated advice.
 4. **The `items` map in a response is not a full catalogue.** One claim held 131 distinct
    items but returned only 119 names. Resolve names from the cached rulebook instead.
 5. **u64 entity ids** come back from bitjita already as JSON strings. The regex-quoting
-   workaround is only needed when reading a relay directly.
+   workaround is only needed when reading a relay directly — and the usual advice for
+   doing it is wrong. Relay rows arrive as **JSON-encoded strings inside** the envelope:
+   ```
+   "inserts":["[49154,[1,[1787237181395131]]]"]
+   ```
+   Running the big-int regex over the whole message injects quotes *inside* that string
+   and corrupts the envelope:
+   ```
+   "inserts":["[49154,[1,["1787237181395131"]]]"]   <- unparseable
+   ```
+   Parse the envelope first with no substitution, then apply the regex to each row string
+   individually. This only looks harmless on `traveler_task_desc`, whose ids are 10
+   digits, making the regex a no-op; on any table carrying u64 ids it destroys the
+   payload.
 6. **A claim costs one request** regardless of building count — 22 buildings arrived in a
    single 38 KB response.
 7. **bitjita sets `cache-control: public, s-maxage=5`** on inventories, so ~5s is the
    freshness the source itself targets.
+8. **Claim and player ids are region-agnostic.** Claims in regions 18 and 19 were fetched
+   with no region parameter at all. Region never needs to be stored or supplied — it only
+   comes back as metadata on the response.
+9. **`expirationTimestamp` on the per-player traveler-tasks endpoint is not a global
+   clock.** Eight citizens of one claim returned three different values, all in the past,
+   the worst 134 days stale. It is a per-player snapshot frozen at that player's last
+   sync. Use `traveler_task_loop_timer` from a relay instead.
 
 ---
 
@@ -176,10 +201,11 @@ Per guild. JSON file to start; SQLite only if multi-guild becomes real.
 {
   "channelId": "…",
   "messageId": "…",                 // the message edited in place
+  "reminder": { "roleId": "…", "hoursBefore": 24 },
   "storages": [
-    { "type": "claim",  "id": "864691128488445884", "region": 12, "buildings": "all" },
-    { "type": "claim",  "id": "…", "region": 12, "buildings": ["Alesi Tasks"] },
-    { "type": "player", "id": "648518346360148383", "region": 12 }
+    { "type": "claim",  "id": "864691128488445884", "buildings": "all" },
+    { "type": "claim",  "id": "…", "buildings": ["Alesi Tasks"] },
+    { "type": "player", "id": "648518346360148383", "housing": true }
   ],
   "travelers": {
     "Alesi": { "tiers": [1, 5] },
@@ -191,11 +217,14 @@ Per guild. JSON file to start; SQLite only if multi-guild becomes real.
 }
 ```
 
-Storages are region-scoped; bitjita returns `regionId` on every inventory response.
+No region field — ids are region-agnostic *(verified)*. Region arrives as metadata on
+responses and is only worth surfacing in `/storage list` for human recognition.
 
 Building-level selection matters: a claim may hold Embergrain set aside for crafting that
 nobody would ever turn in. Summing all buildings would count it and suppress a warning
 you wanted.
+
+Player storages include housing by default (`"housing": true`).
 
 ---
 
@@ -212,6 +241,7 @@ you wanted.
 /config turnins 5
 /config turnins Alesi 8
 /config threshold Salt 500
+/config reminder @task-reminder 24h
 /refresh
 /rulebook refresh
 ```
@@ -220,8 +250,10 @@ you wanted.
 
 ## 8. Display
 
-Shortfalls only — materials at or above target are not listed. One embed per tracked
-traveler, all inside one message, edited in place.
+Shortfalls only — materials at or above target are not listed, and a traveler with no
+shortfalls gets **no embed at all** rather than an "all stocked" placeholder. One embed
+per traveler that has something to report, all inside one message, edited in place. When
+nothing anywhere is short, the message says so in a single line.
 
 The binding constraint is Discord's **6,000 characters across all embeds** — not the
 4,096-per-description limit, which is never reached first. At roughly 50 characters per
@@ -250,13 +282,50 @@ Alesi · tiers 1-5 · 5 turn-ins
 If sub-20s freshness is ever wanted, that is the point where a live relay subscription
 starts to earn its complexity. Not before.
 
+### Weekly rotation reminder
+
+Travelers reroll their tasks on a fixed schedule. The bot pings a configured role a
+configurable interval before it happens (default 24h), as a **new message** — not an edit
+of the tracker, since a silent edit is exactly what nobody notices.
+
+The clock comes from `traveler_task_loop_timer` on a relay. A sample read:
+
+```
+[49154,[1,["1787237181395131"]]]        // scheduled_id, then micros since epoch
+  -> 2026-08-20T14:46:21Z
+```
+
+Note the value is **microseconds**, and it exceeds `Number.MAX_SAFE_INTEGER`, so it needs
+the per-row big-int handling from §4.
+
+Do **not** use `expirationTimestamp` from the per-player traveler-tasks endpoint for this.
+It is a stale per-player snapshot *(verified — see §4.9)*.
+
+Poll the timer a few times a day, fire once per rotation, and persist which rotation was
+last announced so a bot restart doesn't re-ping.
+
 ---
 
-## 10. Open questions
+## 10. Resolved, and still open
 
-- Which region(s) to support at launch — config allows several, untested across more
-  than one.
-- Whether `/storage add player` should include housing storage by default.
-- What to show when a traveler has no shortfalls: omit the embed, or show "all stocked"?
-- Whether to warn when the weekly task rotation resets (`expirationTimestamp` is
-  available on the per-player endpoint, though the bot is not player-oriented).
+Settled since the first draft:
+
+- **Regions** — a non-issue. Ids are region-agnostic *(verified)*, so there is nothing to
+  configure and nothing to "support at launch".
+- **Housing** — included by default for player storages.
+- **Travelers with no shortfalls** — omitted entirely, no placeholder.
+- **Rotation reminder** — yes, pinging a configurable role a configurable time ahead
+  (default 24h), driven by the relay timer. See §9.
+
+Still open:
+
+- **Does `/api/players/{id}/inventories` already include housing storage?** Unverified —
+  `/housing` returned 404 for all nine players sampled, so no test case was available.
+  If it does, `"housing": true` costs nothing extra; if not, it's a second request per
+  player. Needs one player who actually owns a house.
+- **What counts as a "material family"** for display grouping — Alesi's 50 materials are
+  really 5 families × 10 tiers, and collapsing them would read far better than 50 flat
+  rows. Needs a rule; tier is on `item_desc`, but family is only implied by name.
+- **First-run friction for variable-qty materials** (§5): adding Ramparte does nothing
+  until seven separate thresholds are set. Options are a sensible default, a setup
+  prompt, or leaving them untracked until configured.
