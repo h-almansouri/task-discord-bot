@@ -18,14 +18,18 @@ export function configCommands(rulebook) {
         .setDescription('Choose where the tracker message lives')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
         .addSubcommand((s) => s.setName('channel')
-          .setDescription('Post the tracker in a channel')
+          .setDescription('Where the tracker posts — a default, or one traveler’s own channel')
           .addChannelOption((o) => o.setName('channel')
             .setDescription('Where to post')
             .addChannelTypes(ChannelType.GuildText)
-            .setRequired(true))),
+            .setRequired(true))
+          .addStringOption((o) => o.setName('traveler')
+            .setDescription('Give just this traveler its own channel')
+            .addChoices(...travelerChoices))),
 
       async run(interaction) {
         const channel = interaction.options.getChannel('channel');
+        const traveler = interaction.options.getString('traveler');
         const me = interaction.guild.members.me;
         const perms = channel.permissionsFor(me);
         const needed = [
@@ -42,20 +46,43 @@ export function configCommands(rulebook) {
           return;
         }
 
-        // A new channel means the old message is orphaned — start fresh.
-        await updateGuildConfig(interaction.guildId, (c) => ({
-          ...c, channelId: channel.id, messageId: null,
-        }));
+        // Moving channel orphans the old message, so forget its id and post anew.
+        await updateGuildConfig(interaction.guildId, (c) => {
+          if (traveler) {
+            return {
+              ...c,
+              travelers: {
+                ...c.travelers,
+                [traveler]: { ...c.travelers?.[traveler], channelId: channel.id, messageId: null },
+              },
+            };
+          }
+          // Travelers with their own channel keep it; the rest follow the default.
+          const travelers = Object.fromEntries(
+            Object.entries(c.travelers ?? {}).map(([name, t]) => [
+              name, t.channelId ? t : { ...t, messageId: null },
+            ]),
+          );
+          return { ...c, channelId: channel.id, travelers };
+        });
         invalidate(interaction.guildId);
 
         await interaction.reply({
-          content: `Tracker will post in ${channel}. Drawing it now…`,
+          content: traveler
+            ? `**${traveler}** will post in ${channel}. Drawing it now…`
+            : `Tracker will post in ${channel} unless a traveler has its own. Drawing now…`,
           flags: MessageFlags.Ephemeral,
         });
+
         const r = await runOnce(interaction.client, interaction.guildId, { rulebook, force: true });
-        if (r.status !== 'updated') {
+        if (r.status === 'no-travelers') {
           await interaction.followUp({
-            content: `Couldn't draw the tracker (${r.status}).`,
+            content: 'No travelers tracked yet — add one with `/traveler add`.',
+            flags: MessageFlags.Ephemeral,
+          });
+        } else if (r.problems?.length) {
+          await interaction.followUp({
+            content: `Some travelers couldn't be drawn: ${r.problems.join('; ')}`,
             flags: MessageFlags.Ephemeral,
           });
         }
@@ -84,6 +111,20 @@ export function configCommands(rulebook) {
             .setDescription('How many to keep of each').setRequired(true).setMinValue(0))
           .addStringOption((o) => o.setName('traveler')
             .setDescription('Apply to one traveler only').addChoices(...travelerChoices)))
+        .addSubcommand((s) => s.setName('band')
+          .setDescription('Turn-ins for a tier range, e.g. 250 for T1–T4')
+          .addIntegerOption((o) => o.setName('tier_min')
+            .setDescription('Lowest tier in the band').setRequired(true).setMinValue(1).setMaxValue(10))
+          .addIntegerOption((o) => o.setName('tier_max')
+            .setDescription('Highest tier in the band').setRequired(true).setMinValue(1).setMaxValue(10))
+          .addIntegerOption((o) => o.setName('turnins')
+            .setDescription('Turn-ins to keep stocked in that range').setRequired(true).setMinValue(1).setMaxValue(100000))
+          .addStringOption((o) => o.setName('traveler')
+            .setDescription('Apply to one traveler only').addChoices(...travelerChoices)))
+        .addSubcommand((s) => s.setName('bands-clear')
+          .setDescription('Remove tier bands and fall back to the plain turn-in count')
+          .addStringOption((o) => o.setName('traveler')
+            .setDescription('Clear one traveler’s bands only').addChoices(...travelerChoices)))
         .addSubcommand((s) => s.setName('show')
           .setDescription('Show the current settings')),
 
@@ -113,6 +154,8 @@ export function configCommands(rulebook) {
         if (sub === 'turnins') return setTurnIns(interaction);
         if (sub === 'threshold') return setThreshold(interaction, rulebook);
         if (sub === 'variable') return setVariableDefault(interaction, rulebook);
+        if (sub === 'band') return setBand(interaction, rulebook);
+        if (sub === 'bands-clear') return clearBands(interaction);
         if (sub === 'show') return showConfig(interaction, rulebook);
       },
     },
@@ -124,13 +167,19 @@ export function configCommands(rulebook) {
       async run(interaction) {
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
         const r = await runOnce(interaction.client, interaction.guildId, { rulebook, force: true });
-        const messages = {
-          updated: `Redrawn — ${r.totalShort} material(s) below target.`,
-          'no-channel': 'No channel set. Use `/setup channel` first.',
-          'channel-missing': 'The configured channel is gone. Set it again with `/setup channel`.',
-          'send-failed': "I couldn't post there — check my permissions in that channel.",
-        };
-        await interaction.editReply(messages[r.status] ?? `Nothing to do (${r.status}).`);
+
+        if (r.status === 'no-travelers') {
+          await interaction.editReply('No travelers tracked. Add one with `/traveler add`.');
+          return;
+        }
+        if (r.status === 'no-channel') {
+          await interaction.editReply('No channel set. Use `/setup channel` first.');
+          return;
+        }
+        await interaction.editReply(
+          `Redrew ${r.updated} message(s) — ${r.totalShort} material(s) below target.` +
+          (r.problems?.length ? `\nProblems: ${r.problems.join('; ')}` : ''),
+        );
       },
     },
   ];
@@ -149,6 +198,78 @@ async function setTurnIns(interaction) {
     content: traveler
       ? `**${traveler}** now targets **${count}** turn-ins.`
       : `Default is now **${count}** turn-ins. Per-traveler overrides still apply.`,
+    flags: MessageFlags.Ephemeral,
+  });
+}
+
+/** Replace any band covering the same range, then keep the list sorted. */
+function withBand(bands, tiers, turnIns) {
+  const kept = (bands ?? []).filter(
+    (b) => !(b?.tiers?.[0] === tiers[0] && b?.tiers?.[1] === tiers[1]),
+  );
+  return [...kept, { tiers, turnIns }].sort((a, b) => a.tiers[0] - b.tiers[0]);
+}
+
+async function setBand(interaction, rulebook) {
+  const min = interaction.options.getInteger('tier_min');
+  const max = interaction.options.getInteger('tier_max');
+  const turnIns = interaction.options.getInteger('turnins');
+  const traveler = interaction.options.getString('traveler');
+
+  if (min > max) {
+    await interaction.reply({
+      content: `Tier range ${min}–${max} is backwards.`,
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  await updateGuildConfig(interaction.guildId, (c) => (traveler
+    ? {
+      ...c,
+      overrides: {
+        ...c.overrides,
+        [traveler]: {
+          ...c.overrides?.[traveler],
+          tierBands: withBand(c.overrides?.[traveler]?.tierBands, [min, max], turnIns),
+        },
+      },
+    }
+    : { ...c, tierBands: withBand(c.tierBands, [min, max], turnIns) }));
+  invalidate(interaction.guildId);
+
+  // A band is turn-ins, not an amount, so what it costs varies by material.
+  // Showing two real examples makes the scale obvious before it surprises anyone.
+  const pool = Object.entries(rulebook.travelers)
+    .filter(([name]) => !traveler || name === traveler)
+    .flatMap(([, t]) => t.materials)
+    .filter((m) => m.fixed && m.tier >= min && m.tier <= max);
+  const costs = [...new Set(pool.map((m) => m.perTurnIn))].sort((a, b) => a - b);
+  const example = costs.length
+    ? ` For T${min}–T${max} that is ${(costs[0] * turnIns).toLocaleString()}` +
+      (costs.length > 1 ? ` to ${(costs.at(-1) * turnIns).toLocaleString()}` : '') +
+      ' of each material, depending on how many a task asks for.'
+    : '';
+
+  await interaction.reply({
+    content: (traveler
+      ? `**${traveler}**: tiers ${min}–${max} now target **${turnIns}** turn-ins.`
+      : `Tiers ${min}–${max} now target **${turnIns}** turn-ins by default.`) + example,
+    flags: MessageFlags.Ephemeral,
+  });
+}
+
+async function clearBands(interaction) {
+  const traveler = interaction.options.getString('traveler');
+  await updateGuildConfig(interaction.guildId, (c) => (traveler
+    ? { ...c, overrides: { ...c.overrides, [traveler]: { ...c.overrides?.[traveler], tierBands: [] } } }
+    : { ...c, tierBands: [] }));
+  invalidate(interaction.guildId);
+
+  await interaction.reply({
+    content: traveler
+      ? `Cleared **${traveler}**'s tier bands — back to the plain turn-in count.`
+      : 'Cleared the default tier bands. Per-traveler bands still apply.',
     flags: MessageFlags.Ephemeral,
   });
 }
@@ -224,10 +345,15 @@ async function showConfig(interaction, rulebook) {
     return n + (t ? t.materials.filter((m) => inTierRange(m, s.tiers)).length : 0);
   }, 0);
 
+  const bandText = (bands) => (bands ?? []).length
+    ? bands.map((b) => `T${b.tiers[0]}–T${b.tiers[1]}: ${b.turnIns}`).join(' · ')
+    : null;
+
   const embed = new EmbedBuilder()
     .setTitle('Settings')
     .addFields(
-      { name: 'Channel', value: c.channelId ? `<#${c.channelId}>` : '*not set — `/setup channel`*' },
+      { name: 'Default channel', value: c.channelId ? `<#${c.channelId}>` : '*not set — `/setup channel`*' },
+      { name: 'Tier bands', value: bandText(c.tierBands) ?? '*none — every tier uses the turn-in count*' },
       { name: 'Turn-ins', value: String(c.turnIns ?? 5), inline: true },
       {
         name: 'Varying-qty default',
@@ -240,7 +366,9 @@ async function showConfig(interaction, rulebook) {
         name: 'Travelers',
         value: travelers.length
           ? travelers.map(([n, s]) => `${n} (T${s.tiers?.[0] ?? 1}–${s.tiers?.[1] ?? 10})` +
+            (s.channelId ? ` → <#${s.channelId}>` : '') +
             (c.overrides?.[n]?.turnIns ? ` · ${c.overrides[n].turnIns} turn-ins` : '') +
+            (bandText(c.overrides?.[n]?.tierBands) ? ` · bands ${bandText(c.overrides[n].tierBands)}` : '') +
             (Number.isFinite(c.overrides?.[n]?.variableDefault) ? ` · varying ${c.overrides[n].variableDefault}` : '') +
             (s.excluded?.length ? ` · ignoring ${s.excluded.join(', ')}` : '')).join('\n')
           : '*none — `/traveler add`*',

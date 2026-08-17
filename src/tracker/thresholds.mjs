@@ -7,6 +7,25 @@
  * and are reported as unconfigured until one is set rather than guessed at.
  */
 
+/**
+ * The band covering a tier, or null.
+ *
+ * Bands hold a turn-in count, not an amount, so "250 turn-ins for T1-T4" costs
+ * 2,500 of a material asked for 10 at a time and 75,000 of one asked for 300 at
+ * a time. That is the intent: a band says how many turn-ins' worth to keep,
+ * whatever that happens to cost.
+ *
+ * Untiered materials — Ramparte's fifteen combat drops are all tier -1 — match
+ * no band and fall through, so bands never apply to him without special-casing.
+ */
+export function bandFor(bands, tier) {
+  if (!Array.isArray(bands) || tier == null || tier < 1) return null;
+  return [...bands]
+    .filter((b) => Array.isArray(b?.tiers) && b.tiers.length === 2)
+    .sort((a, b) => a.tiers[0] - b.tiers[0])
+    .find((b) => tier >= b.tiers[0] && tier <= b.tiers[1]) ?? null;
+}
+
 /** Resolution order, first match wins. */
 export function resolveTarget(config, travelerName, material) {
   const absolute = config.absolute?.[material.key];
@@ -34,8 +53,24 @@ export function resolveTarget(config, travelerName, material) {
     return { target: perMaterial * material.perTurnIn, basis: 'material', turnIns: perMaterial, configured: true };
   }
 
+  const travelerBand = bandFor(override?.tierBands, material.tier);
+  if (Number.isFinite(travelerBand?.turnIns)) {
+    return {
+      target: travelerBand.turnIns * material.perTurnIn,
+      basis: 'band-traveler', turnIns: travelerBand.turnIns, band: travelerBand.tiers, configured: true,
+    };
+  }
+
   if (Number.isFinite(override?.turnIns)) {
     return { target: override.turnIns * material.perTurnIn, basis: 'traveler', turnIns: override.turnIns, configured: true };
+  }
+
+  const globalBand = bandFor(config.tierBands, material.tier);
+  if (Number.isFinite(globalBand?.turnIns)) {
+    return {
+      target: globalBand.turnIns * material.perTurnIn,
+      basis: 'band-global', turnIns: globalBand.turnIns, band: globalBand.tiers, configured: true,
+    };
   }
 
   const global = Number.isFinite(config.turnIns) ? config.turnIns : 5;

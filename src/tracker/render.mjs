@@ -1,25 +1,30 @@
 /**
- * Rendering the tracker message.
+ * Rendering one traveler's supply table.
  *
  * Returns plain embed objects rather than builders, so this can be tested
  * without a gateway. discord.js accepts either.
  *
- * The binding constraint is Discord's 6,000-character budget across *all*
- * embeds — not the 4,096-per-description limit, which is never hit first
- * (DESIGN.md §8). Exceeding it makes the edit fail outright, so the budget is
- * enforced here rather than hoped for.
+ * The table is an ANSI code block: Discord renders colour inside ```ansi
+ * fences, and monospace is what makes a family × tier grid line up. This is
+ * tuned for desktop — a ten-tier grid will wrap on a phone, which is an
+ * accepted trade (DESIGN.md §8).
  */
-const TOTAL_BUDGET = 6000;
-const SAFETY_MARGIN = 200;   // headroom for the footer and any rounding
-/**
- * Discord rejects a message carrying more than ten embeds. This is a separate
- * ceiling from the character budget, and the tighter layout made it reachable:
- * once each traveler costs fewer characters, more of them fit in 6,000 and the
- * count becomes the binding limit instead.
- */
-const MAX_EMBEDS = 10;
 const COLOUR_SHORT = 0xd9534f;
 const COLOUR_OK = 0x5cb85c;
+
+/** Discord's ANSI subset. Anything outside this renders as plain text. */
+const ANSI = {
+  reset: '[0m',
+  head: '[1;37m',
+  short: '[0;31m',
+  ok: '[0;32m',
+  none: '[0;30m',
+};
+
+const NAME_WIDTH = 16;
+const CELL_WIDTH = 6;
+/** Embed descriptions cap at 4096; leave room for the fence and any warning. */
+const DESCRIPTION_BUDGET = 3800;
 
 /** Discord counts title, description, footer, author and field text together. */
 export function embedLength(embed) {
@@ -30,164 +35,129 @@ export function embedLength(embed) {
     + (embed.fields ?? []).reduce((n, f) => n + f.name.length + f.value.length, 0);
 }
 
-const num = (n) => n.toLocaleString('en-US');
-
-const isTiered = (row) => row.tier != null && row.tier >= 1;
-
 /**
- * One family. Every number shown is a deficit, which the embed footer states
- * once, so rows carry no repeated "short" label — with a dozen families that
- * word alone was costing a line's worth of width each time.
- *
- * Targets are deliberately absent: the tracker answers "what do I need to go
- * get", and the target is available from /config show when it is wanted.
+ * A signed count that fits a narrow column. Targets reach five and six figures
+ * once tier bands are in use, so large values are abbreviated rather than
+ * allowed to break the grid.
  */
-export function renderGroup(group) {
-  const label = group.label ?? group.tag;
-  const tiers = group.rows.map((r) => r.tier);
-  const tiersUnique = tiers.length === new Set(tiers).size;
-
-  // A tier row only makes sense when every row is tiered and no tier repeats.
-  // Two materials on the same tier would render as "T1 40 | T1 46", which reads
-  // as a single family having two values for one tier.
-  if (group.rows.every(isTiered) && tiersUnique) {
-    const cells = group.rows.map((r) => `T${r.tier} ${num(r.short)}`).join(' | ');
-    // A lone tier reads better on one line than split across two.
-    return group.rows.length === 1 ? `**${label}** ${cells}` : `**${label}**\n${cells}`;
-  }
-
-  // Untiered materials (combat drops), or a family whose tiers collide.
-  return group.rows.map((r) => {
-    const name = isTiered(r) ? `${r.name} (T${r.tier})` : r.name;
-    return `**${name}** ${num(r.short)}`;
-  }).join('\n');
+export function formatDiff(diff) {
+  const sign = diff < 0 ? '-' : '+';
+  const n = Math.abs(diff);
+  if (n === 0) return '0';
+  if (n < 1000) return sign + n;
+  if (n < 10000) return `${sign}${(n / 1000).toFixed(1)}k`;
+  return `${sign}${Math.round(n / 1000)}k`;
 }
 
-function travelerEmbed(traveler) {
-  const parts = traveler.groups.map(renderGroup);
+/**
+ * One family × tier grid. Surplus is green, shortfall red, and a tier the
+ * family does not have is a grey dash — Rumbagh's Ink stops at T8.
+ */
+export function renderTable(groups, tiers) {
+  const lines = [];
+  lines.push(
+    ANSI.head + 'MATERIAL'.padEnd(NAME_WIDTH)
+    + tiers.map((t) => `T${t}`.padStart(CELL_WIDTH)).join('')
+    + ANSI.reset,
+  );
 
+  for (const group of groups) {
+    const byTier = new Map(group.rows.map((r) => [r.tier, r]));
+    let line = String(group.label).slice(0, NAME_WIDTH - 1).padEnd(NAME_WIDTH);
+    for (const tier of tiers) {
+      const row = byTier.get(tier);
+      if (!row) {
+        line += ANSI.none + '-'.padStart(CELL_WIDTH) + ANSI.reset;
+        continue;
+      }
+      const colour = row.diff < 0 ? ANSI.short : ANSI.ok;
+      line += colour + formatDiff(row.diff).padStart(CELL_WIDTH) + ANSI.reset;
+    }
+    lines.push(line);
+  }
+  return lines.join('\n');
+}
+
+/** Untiered materials — combat drops — as a plain list, since a grid has no axis. */
+export function renderUntiered(rows) {
+  return rows
+    .slice()
+    .sort((a, b) => a.diff - b.diff)
+    .map((r) => {
+      const colour = r.diff < 0 ? ANSI.short : ANSI.ok;
+      return String(r.name).slice(0, 24).padEnd(25)
+        + colour + formatDiff(r.diff).padStart(7) + ANSI.reset;
+    })
+    .join('\n');
+}
+
+/** The message for one traveler. */
+export function renderTraveler(traveler, { updatedAt = null, storageCount = 0 } = {}) {
+  const timestamp = new Date(updatedAt ?? Date.now()).toISOString();
+
+  const tieredGroups = traveler.groups
+    .map((g) => ({ ...g, rows: g.rows.filter((r) => r.tier >= 1) }))
+    .filter((g) => g.rows.length);
+  const untiered = traveler.rows.filter((r) => !(r.tier >= 1));
+  const tiers = [...new Set(tieredGroups.flatMap((g) => g.rows.map((r) => r.tier)))]
+    .sort((a, b) => a - b);
+
+  const blocks = [];
+  if (tieredGroups.length) blocks.push(renderTable(tieredGroups, tiers));
+  if (untiered.length) blocks.push(renderUntiered(untiered));
+
+  let body = blocks.length ? `\`\`\`ansi\n${blocks.join('\n\n')}\n\`\`\`` : '';
+  if (body.length > DESCRIPTION_BUDGET) {
+    body = `${body.slice(0, DESCRIPTION_BUDGET)}\n… truncated\n\`\`\``;
+  }
+
+  const notes = [];
   if (traveler.unconfigured.length) {
     const names = traveler.unconfigured.map((m) => m.name).join(', ');
-    parts.push(
+    notes.push(
       `⚠️ Needs a threshold: ${names.length > 200 ? `${names.slice(0, 197)}…` : names} ` +
-      '· set with `/config threshold`',
+      '· set with `/config variable` or `/config threshold`',
     );
   }
 
-  const tiers = traveler.tiers ? ` · T${traveler.tiers[0]}–${traveler.tiers[1]}` : '';
+  const range = traveler.tiers ? ` · T${traveler.tiers[0]}–${traveler.tiers[1]}` : '';
   return {
-    title: `${traveler.name}${tiers}`,
-    description: parts.join('\n'),
-    color: traveler.shortCount ? COLOUR_SHORT : COLOUR_OK,
+    embeds: [{
+      title: `${traveler.name}${range}`,
+      description: [body, ...notes].filter(Boolean).join('\n'),
+      color: traveler.shortCount ? COLOUR_SHORT : COLOUR_OK,
+      footer: {
+        text: traveler.shortCount
+          ? `${traveler.shortCount} of ${traveler.rows.length} below target · ${storageCount} container(s)`
+          : `all ${traveler.rows.length} at or above target · ${storageCount} container(s)`,
+      },
+      timestamp,
+    }],
   };
 }
 
-/** Trim an embed's description to fit, noting what was cut. */
-function truncateTo(embed, allowance) {
-  const overhead = embedLength(embed) - (embed.description?.length ?? 0);
-  const room = allowance - overhead;
-  if (room <= 0) return null;
-
-  const lines = embed.description.split('\n');
-  const kept = [];
-  let used = 0;
-  const NOTE = '\n… truncated to fit Discord’s limit';
-  for (const line of lines) {
-    if (used + line.length + 1 + NOTE.length > room) break;
-    kept.push(line);
-    used += line.length + 1;
-  }
-  if (!kept.length) return null;
-  return { ...embed, description: kept.join('\n') + NOTE };
+/** Placeholder for a channel whose traveler has nothing to show yet. */
+export function renderEmpty(name) {
+  return {
+    embeds: [{
+      title: name,
+      description: 'Nothing to show yet — add storage with `/storage add`.',
+      color: COLOUR_OK,
+      timestamp: new Date().toISOString(),
+    }],
+  };
 }
 
 /**
- * Build the tracker message.
- *
- * @param result   output of computeShortfalls
- * @param options  { updatedAt, storageCount }
+ * Stable fingerprint of one traveler's rendered content, so the poll only edits
+ * when something changed. Excludes the timestamp, which would otherwise differ
+ * every pass and defeat the check entirely.
  */
-export function renderTracker(result, { updatedAt = null, storageCount = 0 } = {}) {
-  // Discord renders this natively beside the footer and localises it per viewer.
-  // A <t:…> tag cannot be used here: footer text is plain, so the tag would show
-  // literally rather than as a time.
-  const timestamp = new Date(updatedAt ?? Date.now()).toISOString();
-  const footer = { text: `${storageCount} container(s) tracked` };
-
-  if (!result.anyTracked) {
-    return {
-      embeds: [{
-        title: 'Traveler supply',
-        description: 'No travelers tracked yet. Add one with `/traveler add`.',
-        color: COLOUR_OK,
-        footer,
-        timestamp,
-      }],
-    };
-  }
-
-  if (!result.travelers.length) {
-    return {
-      embeds: [{
-        title: 'Traveler supply — all stocked',
-        description: 'Every tracked material is at or above target.',
-        color: COLOUR_OK,
-        footer,
-        timestamp,
-      }],
-    };
-  }
-
-  const embeds = [];
-  let used = 0;
-  let dropped = 0;
-
-  for (const traveler of result.travelers) {
-    if (embeds.length >= MAX_EMBEDS) {
-      dropped++;
-      continue;
-    }
-
-    const embed = travelerEmbed(traveler);
-    const length = embedLength(embed);
-
-    if (used + length <= TOTAL_BUDGET - SAFETY_MARGIN) {
-      embeds.push(embed);
-      used += length;
-      continue;
-    }
-
-    // Try to fit a trimmed version; otherwise count it as dropped.
-    const trimmed = truncateTo(embed, TOTAL_BUDGET - SAFETY_MARGIN - used);
-    if (trimmed) {
-      embeds.push(trimmed);
-      used += embedLength(trimmed);
-    } else {
-      dropped++;
-    }
-  }
-
-  const summary = `${result.totalShort} below target · ${footer.text}` +
-    (dropped ? ` · ${dropped} traveler(s) omitted for length` : '');
-  if (embeds.length) {
-    const last = embeds[embeds.length - 1];
-    last.footer = { text: summary };
-    last.timestamp = timestamp;
-  }
-
-  return { embeds };
-}
-
-/**
- * Stable fingerprint of the rendered content, so the poll only edits when
- * something actually changed. Excludes the relative timestamp, which would
- * otherwise differ on every pass and defeat the check entirely.
- */
-export function contentHash(result) {
-  const shape = result.travelers.map((t) => [
-    t.name,
-    t.unconfigured.map((m) => m.key),
-    t.groups.map((g) => [g.tag, g.rows.map((r) => [r.key, r.have, r.target])]),
+export function travelerHash(traveler) {
+  return JSON.stringify([
+    traveler.name,
+    traveler.tiers,
+    traveler.unconfigured.map((m) => m.key),
+    traveler.rows.map((r) => [r.key, r.have, r.target]),
   ]);
-  return JSON.stringify(shape);
 }

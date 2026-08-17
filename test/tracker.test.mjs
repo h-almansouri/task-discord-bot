@@ -3,10 +3,13 @@ import assert from 'node:assert/strict';
 import { defaultConfig } from '../src/config/store.mjs';
 import {
   resolveTarget, inTierRange, unconfiguredMaterials,
-  isExcluded, watchedMaterials, familiesOf,
+  isExcluded, watchedMaterials, familiesOf, bandFor,
 } from '../src/tracker/thresholds.mjs';
 import { computeShortfalls, groupShortfalls } from '../src/tracker/shortfall.mjs';
-import { renderTracker, renderGroup, embedLength, contentHash } from '../src/tracker/render.mjs';
+import {
+  renderTraveler, renderEmpty, renderTable, renderUntiered,
+  formatDiff, embedLength, travelerHash,
+} from '../src/tracker/render.mjs';
 
 const grain = (tier) => ({
   key: `item:grain${tier}`, name: `T${tier} Embergrain`, tier, tag: 'Grain',
@@ -225,21 +228,101 @@ test('familiesOf lists each family once with its tier count', () => {
   assert.deepEqual(families, [{ name: 'Grain', count: 3 }]);
 });
 
-// --- shortfalls ------------------------------------------------------------
+// --- tier bands ------------------------------------------------------------
 
-test('only materials below target are reported', () => {
-  const stock = new Map([['item:grain1', 1000], ['item:grain2', 300]]);
-  const r = computeShortfalls({ rulebook: RULEBOOK, config: withTracked({ Alesi: { tiers: [1, 10] } }), stock });
-  const rows = r.travelers[0].groups.flatMap((g) => g.rows);
-  assert.deepEqual(rows.map((x) => x.tier).sort(), [2, 3]);   // T1 is stocked
-  assert.equal(rows.find((x) => x.tier === 2).short, 700);
+const BANDS = [{ tiers: [1, 4], turnIns: 250 }, { tiers: [5, 6], turnIns: 500 }];
+
+test('a band applies its turn-ins to tiers inside its range', () => {
+  const config = withTracked({}, { tierBands: BANDS, turnIns: 5 });
+  assert.equal(resolveTarget(config, 'Alesi', grain(1)).target, 250 * 200);
+  assert.equal(resolveTarget(config, 'Alesi', grain(3)).target, 250 * 200);
 });
 
-test('a fully stocked traveler produces no section', () => {
+test('a second band covers its own range', () => {
+  const config = withTracked({}, { tierBands: BANDS, turnIns: 5 });
+  const r = resolveTarget(config, 'Alesi', { ...grain(5), tier: 5 });
+  assert.equal(r.target, 500 * 200);
+  assert.deepEqual(r.band, [5, 6]);
+});
+
+test('tiers outside every band fall back to the plain turn-in count', () => {
+  const config = withTracked({}, { tierBands: BANDS, turnIns: 5 });
+  const r = resolveTarget(config, 'Alesi', { ...grain(9), tier: 9 });
+  assert.equal(r.target, 5 * 200);
+  assert.equal(r.basis, 'global');
+});
+
+test('a band costs different amounts per material, by design', () => {
+  // "250 turn-ins" means 250 turn-ins' worth, whatever that costs.
+  const config = withTracked({}, { tierBands: [{ tiers: [1, 4], turnIns: 250 }] });
+  const cheap = { ...grain(1), perTurnIn: 10 };
+  const dear = { ...grain(1), perTurnIn: 300 };
+  assert.equal(resolveTarget(config, 'Rumbagh', cheap).target, 2500);
+  assert.equal(resolveTarget(config, 'Alesi', dear).target, 75000);
+});
+
+test('bands never apply to untiered materials', () => {
+  // All 15 of Ramparte's materials are tier -1, so no band can match them and
+  // he needs no special-casing.
+  const config = withTracked({}, { tierBands: BANDS, variableDefault: 25 });
+  const r = resolveTarget(config, 'Ramparte', fur);
+  assert.equal(r.basis, 'variable-global');
+  assert.equal(r.target, 25);
+});
+
+test('a per-traveler band beats the global band', () => {
+  const config = withTracked({}, {
+    tierBands: BANDS,
+    overrides: { Alesi: { tierBands: [{ tiers: [1, 4], turnIns: 2 }] } },
+  });
+  assert.equal(resolveTarget(config, 'Alesi', grain(1)).target, 2 * 200);
+  assert.equal(resolveTarget(config, 'Svim', grain(1)).target, 250 * 200);
+});
+
+test('a per-traveler turn-in count beats the global band', () => {
+  const config = withTracked({}, { tierBands: BANDS, overrides: { Alesi: { turnIns: 3 } } });
+  assert.equal(resolveTarget(config, 'Alesi', grain(1)).target, 3 * 200);
+});
+
+test('a per-material threshold still beats every band', () => {
+  const config = withTracked({}, { tierBands: BANDS, absolute: { 'item:grain1': 7 } });
+  assert.equal(resolveTarget(config, 'Alesi', grain(1)).target, 7);
+});
+
+test('bandFor picks the band containing a tier, and nothing for untiered', () => {
+  assert.deepEqual(bandFor(BANDS, 2)?.tiers, [1, 4]);
+  assert.deepEqual(bandFor(BANDS, 6)?.tiers, [5, 6]);
+  assert.equal(bandFor(BANDS, 9), null);
+  assert.equal(bandFor(BANDS, -1), null);
+  assert.equal(bandFor(undefined, 2), null);
+});
+
+// --- reporting -------------------------------------------------------------
+
+test('stocked materials are reported alongside short ones', () => {
+  const stock = new Map([['item:grain1', 1000], ['item:grain2', 300]]);
+  const r = computeShortfalls({ rulebook: RULEBOOK, config: withTracked({ Alesi: { tiers: [1, 10] } }), stock });
+  const rows = r.travelers[0].rows;
+  assert.equal(rows.length, 3, 'every watched material should appear');
+  assert.equal(rows.find((x) => x.tier === 1).diff, 0);      // exactly on target
+  assert.equal(rows.find((x) => x.tier === 2).diff, -700);
+  assert.equal(r.travelers[0].shortCount, 2);
+  assert.equal(r.travelers[0].okCount, 1);
+});
+
+test('surplus is a positive diff', () => {
+  const stock = new Map([['item:grain1', 4005]]);
+  const r = computeShortfalls({ rulebook: RULEBOOK, config: withTracked({ Alesi: { tiers: [1, 1] } }), stock });
+  assert.equal(r.travelers[0].rows[0].diff, 3005);
+  assert.equal(r.travelers[0].shortCount, 0);
+});
+
+test('a fully stocked traveler still gets a section', () => {
   const stock = new Map([['item:grain1', 9999], ['item:grain2', 9999], ['item:grain3', 9999]]);
   const r = computeShortfalls({ rulebook: RULEBOOK, config: withTracked({ Alesi: { tiers: [1, 10] } }), stock });
-  assert.equal(r.travelers.length, 0);
+  assert.equal(r.travelers.length, 1, 'its channel should still show the grid');
   assert.equal(r.totalShort, 0);
+  assert.equal(r.travelers[0].okCount, 3);
 });
 
 test('tier range narrows what is checked', () => {
@@ -247,6 +330,7 @@ test('tier range narrows what is checked', () => {
     rulebook: RULEBOOK, config: withTracked({ Alesi: { tiers: [1, 2] } }), stock: new Map(),
   });
   assert.equal(r.travelers[0].shortCount, 2);
+  assert.equal(r.travelers[0].rows.length, 2);
 });
 
 test('unconfigured materials are surfaced, not counted as shortfalls', () => {
@@ -257,256 +341,176 @@ test('unconfigured materials are surfaced, not counted as shortfalls', () => {
   assert.deepEqual(r.travelers[0].unconfigured.map((m) => m.name), ['Salt']);
 });
 
-test('travelers with the most shortfalls come first', () => {
-  const config = withTracked({ Alesi: { tiers: [1, 10] }, Svim: { tiers: [1, 10] } },
-    { absolute: { 'item:1110015': 10 } });
-  const r = computeShortfalls({ rulebook: RULEBOOK, config, stock: new Map() });
-  assert.equal(r.travelers[0].name, 'Alesi');
-});
-
 test('an untracked traveler contributes nothing', () => {
   const r = computeShortfalls({ rulebook: RULEBOOK, config: defaultConfig(), stock: new Map() });
   assert.equal(r.anyTracked, false);
   assert.equal(r.travelers.length, 0);
 });
 
-test('groupShortfalls marks a family with one shared target as uniform', () => {
-  const rows = [1, 2, 3].map((t) => ({ ...grain(t), have: 0, target: 1000, short: 1000 }));
-  const [group] = groupShortfalls(rows);
-  assert.equal(group.uniformTarget, 1000);
-  assert.equal(group.perTurnIn, 200);
+test('families with the most gaps are listed first', () => {
+  const rows = [
+    { key: 'a', name: 'A', tier: 1, tag: 'Fine', family: 'Fine', have: 10, target: 1, diff: 9, short: 0, perTurnIn: 1 },
+    { key: 'b', name: 'B', tier: 1, tag: 'Bad', family: 'Bad', have: 0, target: 5, diff: -5, short: 5, perTurnIn: 1 },
+    { key: 'c', name: 'C', tier: 2, tag: 'Bad', family: 'Bad', have: 0, target: 5, diff: -5, short: 5, perTurnIn: 1 },
+  ];
+  assert.deepEqual(groupShortfalls(rows).map((g) => g.label), ['Bad', 'Fine']);
 });
 
 // --- rendering -------------------------------------------------------------
 
-test('a family is a name line plus one pipe-separated row of tiers', () => {
-  const rows = [1, 2, 3].map((t) => ({ ...grain(t), have: 0, target: 1000, short: 1000 }));
-  const text = renderGroup(groupShortfalls(rows)[0]);
-  assert.equal(text.split('\n').length, 2);
-  assert.match(text, /^\*\*Grain\*\*$/m);
-  assert.match(text, /T1 1,000 \| T2 1,000 \| T3 1,000/);
+const rowFor = (tier, diff, extra = {}) => ({
+  key: `item:grain${tier}`, name: `T${tier} Embergrain`, tier, tag: 'Grain', family: 'Embergrain',
+  perTurnIn: 200, have: 0, target: 0, diff, short: Math.max(0, -diff), ...extra,
+});
+const groupFor = (rows) => groupShortfalls(rows);
+
+const strip = (s) => s.replace(/\u001b\[[0-9;]*m/g, '');
+
+test('formatDiff signs the number and abbreviates large values', () => {
+  assert.equal(formatDiff(-500), '-500');
+  assert.equal(formatDiff(3005), '+3.0k');
+  assert.equal(formatDiff(-1480), '-1.5k');
+  assert.equal(formatDiff(75000), '+75k');
+  assert.equal(formatDiff(0), '0');
 });
 
-test('deficits are plain numbers, with no minus sign', () => {
-  const rows = [1, 2].map((t) => ({ ...grain(t), have: 0, target: 1000, short: 1000 }));
-  const text = renderGroup(groupShortfalls(rows)[0]);
-  assert.doesNotMatch(text, /[−-]\s*1,000/, 'numbers should not be prefixed with a minus');
+test('formatDiff stays inside the column width', () => {
+  for (const n of [0, -9, 999, -1000, 9999, -75000, 999999]) {
+    assert.ok(formatDiff(n).length <= 6, `${n} formatted too wide: ${formatDiff(n)}`);
+  }
 });
 
-test('a family with a single tier stays on one line', () => {
-  const text = renderGroup(groupShortfalls([{ ...grain(3), have: 900, target: 1000, short: 100 }])[0]);
-  assert.equal(text.split('\n').length, 1);
-  assert.match(text, /\*\*Grain\*\* T3 100/);
+test('the table has a header row and one row per family', () => {
+  const rows = [rowFor(1, -100), rowFor(2, 50)];
+  const text = strip(renderTable(groupFor(rows), [1, 2]));
+  const lines = text.split('\n');
+  assert.equal(lines.length, 2);
+  assert.match(lines[0], /MATERIAL\s+T1\s+T2/);
+  assert.match(lines[1], /Embergrain/);
 });
 
-test('the word "short" is not repeated on every row', () => {
-  const rows = [1, 2, 3].map((t) => ({ ...grain(t), have: 0, target: 1000, short: 1000 }));
-  const text = renderGroup(groupShortfalls(rows)[0]);
-  assert.doesNotMatch(text, /short/i, 'the footer states this once; rows should not repeat it');
+test('surplus and shortfall are coloured differently', () => {
+  // Padding sits between the colour code and the number, so match loosely.
+  const text = renderTable(groupFor([rowFor(1, -100), rowFor(2, 50)]), [1, 2]);
+  assert.match(text, /\[0;31m\s*-100/, 'a shortfall should be red');
+  assert.match(text, /\[0;32m\s*\+50/, 'a surplus should be green');
 });
 
-test('targets are not shown anywhere in a family line', () => {
-  const rows = [1, 2].map((t) => ({ ...grain(t), have: 0, target: 1000, short: 1000 }));
-  const text = renderGroup(groupShortfalls(rows)[0]);
-  assert.doesNotMatch(text, /\/tier/, 'the per-tier target should be gone');
-  assert.doesNotMatch(text, /0\/1,000/, 'the have/target pair should be gone');
+test('a tier a family does not have renders as a dash, not a zero', () => {
+  // Rumbagh's Ink stops at T8; a blank must not read as "you have none".
+  const text = renderTable(groupFor([rowFor(1, -5)]), [1, 2]);
+  assert.match(strip(text), /-\s*$/m);
+  assert.ok(text.includes('[0;30m'), 'the gap should use the dim colour');
 });
 
-test('tiers still share a line when their targets differ', () => {
-  // Targets are no longer rendered, so uniformity of target no longer matters —
-  // only whether every row is tiered and no tier repeats.
-  const rows = [
-    { ...grain(1), have: 0, target: 1000, short: 1000 },
-    { ...grain(2), have: 0, target: 400, short: 400 },
-  ];
-  const text = renderGroup(groupShortfalls(rows)[0]);
-  assert.equal(text.split('\n').length, 2);
-  assert.match(text, /T1 1,000 \| T2 400/);
+test('columns line up regardless of number width', () => {
+  const rows = [rowFor(1, -75000), rowFor(2, 5)];
+  const lines = strip(renderTable(groupFor(rows), [1, 2])).split('\n');
+  assert.equal(new Set(lines.map((l) => l.length)).size, 1, 'every row should be the same width');
 });
 
-test('untiered materials render by name, one per line', () => {
-  const text = renderGroup(groupShortfalls([{ ...fur, have: 0, target: 50, short: 50 }])[0]);
-  assert.match(text, /\*\*Jakyl Fur\*\* 50/);
+test('untiered materials render as a list, not a grid', () => {
+  const text = strip(renderUntiered([
+    { name: 'Jakyl Fur', tier: -1, diff: -50 },
+    { name: 'Chitin', tier: -1, diff: 12 },
+  ]));
+  assert.match(text, /Jakyl Fur/);
+  assert.match(text, /Chitin/);
   assert.doesNotMatch(text, /T-1/);
 });
 
-test('a family whose tiers repeat falls back to naming each material', () => {
-  // Heimlich's foods all share one tag and five of them sit on every tier.
-  // Collapsing those into a tier row would read as one family holding two
-  // values for T1.
-  const rows = [
-    { key: 'a', name: 'Plain Cooked Berries', tier: 1, tag: 'Basic Food', family: 'Food', have: 0, target: 50, short: 40 },
-    { key: 'b', name: 'Plain Mashed Bulbs', tier: 1, tag: 'Basic Food', family: 'Food', have: 0, target: 50, short: 46 },
-  ];
-  const text = renderGroup(groupShortfalls(rows)[0]);
-  assert.doesNotMatch(text, /T1 40 \| T1 46/, 'a repeated tier must not collapse into one row');
-  assert.match(text, /Plain Cooked Berries/);
-  assert.match(text, /Plain Mashed Bulbs/);
+test('renderTraveler wraps the table in an ansi fence', () => {
+  const traveler = {
+    name: 'Alesi', tiers: [1, 2], rows: [rowFor(1, -100), rowFor(2, 50)],
+    groups: groupFor([rowFor(1, -100), rowFor(2, 50)]), shortCount: 1, okCount: 1, unconfigured: [],
+  };
+  const { embeds } = renderTraveler(traveler, { storageCount: 3 });
+  assert.equal(embeds.length, 1);
+  assert.match(embeds[0].description, /^```ansi\n/);
+  assert.match(embeds[0].description, /```$/);
+  assert.match(embeds[0].title, /^Alesi · T1–2$/);
 });
 
-test('one tag covering several product lines splits into separate families', () => {
-  const rows = [
-    { key: 'a', name: 'Plain Cooked Berries', tier: 1, tag: 'Basic Food', family: 'Cooked Berries', have: 0, target: 50, short: 40 },
-    { key: 'b', name: 'Savory Cooked Berries', tier: 2, tag: 'Basic Food', family: 'Cooked Berries', have: 0, target: 50, short: 41 },
-    { key: 'c', name: 'Plain Mashed Bulbs', tier: 1, tag: 'Basic Food', family: 'Mashed Bulbs', have: 0, target: 50, short: 46 },
-  ];
-  const groups = groupShortfalls(rows);
-  assert.equal(groups.length, 2, 'the shared tag should not merge two product lines');
-  assert.deepEqual(groups.map((g) => g.label).sort(), ['Cooked Berries', 'Mashed Bulbs']);
+test('the embed is red when short and green when stocked', () => {
+  const base = {
+    name: 'Alesi', tiers: [1, 1], rows: [rowFor(1, -100)],
+    groups: groupFor([rowFor(1, -100)]), shortCount: 1, okCount: 0, unconfigured: [],
+  };
+  assert.equal(renderTraveler(base, {}).embeds[0].color, 0xd9534f);
+
+  const ok = { ...base, rows: [rowFor(1, 100)], groups: groupFor([rowFor(1, 100)]), shortCount: 0, okCount: 1 };
+  assert.equal(renderTraveler(ok, {}).embeds[0].color, 0x5cb85c);
 });
 
-test('the family label is preferred over the raw tag', () => {
-  // "Vegetable" is the tag that groups Starbulb; players know it as Starbulb.
-  const rows = [1, 2].map((t) => ({
-    ...grain(t), tag: 'Vegetable', family: 'Starbulb', have: 0, target: 150, short: 150,
-  }));
-  const text = renderGroup(groupShortfalls(rows)[0]);
-  assert.match(text, /\*\*Starbulb\*\*/);
-  assert.doesNotMatch(text, /Vegetable/);
+test('the footer counts short against total, and the timestamp is native', () => {
+  const traveler = {
+    name: 'Alesi', tiers: [1, 2], rows: [rowFor(1, -100), rowFor(2, 50)],
+    groups: groupFor([rowFor(1, -100), rowFor(2, 50)]), shortCount: 1, okCount: 1, unconfigured: [],
+  };
+  const { embeds } = renderTraveler(traveler, { updatedAt: Date.parse('2026-08-17T02:00:00Z'), storageCount: 3 });
+  assert.match(embeds[0].footer.text, /1 of 2 below target · 3 container\(s\)/);
+  assert.equal(embeds[0].timestamp, '2026-08-17T02:00:00.000Z');
+  assert.doesNotMatch(embeds[0].footer.text, /<t:/);
 });
 
-// --- timestamp -------------------------------------------------------------
-
-test('the tracker carries a native timestamp Discord can render', () => {
-  const stock = new Map();
-  const { embeds } = renderTracker(
-    computeShortfalls({ rulebook: RULEBOOK, config: withTracked({ Alesi: { tiers: [1, 10] } }), stock }),
-    { updatedAt: Date.parse('2026-08-17T02:00:00Z'), storageCount: 3 },
-  );
-  const last = embeds[embeds.length - 1];
-  assert.equal(last.timestamp, '2026-08-17T02:00:00.000Z');
+test('a traveler awaiting a threshold says so outside the code block', () => {
+  const traveler = {
+    name: 'Svim', tiers: [1, 1], rows: [rowFor(1, -5)], groups: groupFor([rowFor(1, -5)]),
+    shortCount: 1, okCount: 0, unconfigured: [{ key: 'item:1110015', name: 'Salt' }],
+  };
+  const { description } = renderTraveler(traveler, {}).embeds[0];
+  assert.match(description, /Needs a threshold: Salt/);
+  assert.ok(description.indexOf('Salt') > description.lastIndexOf('```'), 'the note belongs after the fence');
 });
 
-test('regression: no <t:…> tag is placed where Discord renders it literally', () => {
-  // Footer and author text are plain — a timestamp tag there shows as raw
-  // characters, which is exactly the bug this replaced.
-  const cases = [
-    computeShortfalls({ rulebook: RULEBOOK, config: defaultConfig(), stock: new Map() }),
-    computeShortfalls({
-      rulebook: RULEBOOK, config: withTracked({ Alesi: { tiers: [1, 10] } }),
-      stock: new Map([['item:grain1', 9e9], ['item:grain2', 9e9], ['item:grain3', 9e9]]),
-    }),
-    computeShortfalls({ rulebook: RULEBOOK, config: withTracked({ Alesi: { tiers: [1, 10] } }), stock: new Map() }),
-  ];
-  for (const result of cases) {
-    for (const e of renderTracker(result, { updatedAt: Date.now(), storageCount: 1 }).embeds) {
-      assert.doesNotMatch(e.footer?.text ?? '', /<t:/, 'timestamp tag in footer text');
-      assert.doesNotMatch(e.description ?? '', /<t:/, 'timestamp tag left in description');
-      assert.doesNotMatch(e.title ?? '', /<t:/, 'timestamp tag in title');
+test('one traveler always fits Discord\'s limits', () => {
+  // Rumbagh at ten tiers with eight families is the widest real case.
+  const rows = [];
+  for (let f = 0; f < 8; f++) {
+    for (let tier = 1; tier <= 10; tier++) {
+      rows.push({
+        key: `item:f${f}t${tier}`, name: `Material ${f}-${tier}`, tier,
+        tag: `Family${f}`, family: `Family Number ${f}`, perTurnIn: 100,
+        have: 0, target: 75000, diff: -75000, short: 75000,
+      });
     }
   }
+  const traveler = {
+    name: 'Rumbagh', tiers: [1, 10], rows, groups: groupFor(rows),
+    shortCount: rows.length, okCount: 0, unconfigured: [],
+  };
+  const { embeds } = renderTraveler(traveler, { storageCount: 1 });
+  assert.ok(embeds.length <= 10);
+  assert.ok(embedLength(embeds[0]) <= 6000, `embed was ${embedLength(embeds[0])} characters`);
+  assert.ok(embeds[0].description.length <= 4096, 'description must fit its own cap');
 });
 
-test('every embed variant sets a timestamp', () => {
-  const variants = [
-    computeShortfalls({ rulebook: RULEBOOK, config: defaultConfig(), stock: new Map() }),
-    computeShortfalls({
-      rulebook: RULEBOOK, config: withTracked({ Alesi: { tiers: [1, 10] } }),
-      stock: new Map([['item:grain1', 9e9], ['item:grain2', 9e9], ['item:grain3', 9e9]]),
-    }),
-    computeShortfalls({ rulebook: RULEBOOK, config: withTracked({ Alesi: { tiers: [1, 10] } }), stock: new Map() }),
-  ];
-  for (const result of variants) {
-    const { embeds } = renderTracker(result, { storageCount: 1 });
-    assert.ok(embeds[embeds.length - 1].timestamp, 'last embed should carry a timestamp');
-  }
+test('renderEmpty explains itself rather than showing a blank grid', () => {
+  const { embeds } = renderEmpty('Alesi');
+  assert.match(embeds[0].title, /Alesi/);
+  assert.match(embeds[0].description, /storage add/);
 });
 
-test('nothing tracked yields a prompt to add a traveler', () => {
-  const { embeds } = renderTracker(computeShortfalls({
-    rulebook: RULEBOOK, config: defaultConfig(), stock: new Map(),
-  }));
-  assert.match(embeds[0].description, /No travelers tracked/);
+// --- change detection ------------------------------------------------------
+
+const travelerFor = (diff) => {
+  const rows = [rowFor(1, diff)];
+  return { name: 'Alesi', tiers: [1, 1], rows, groups: groupFor(rows), shortCount: diff < 0 ? 1 : 0, okCount: 0, unconfigured: [] };
+};
+
+test('travelerHash ignores the clock so unchanged stock does not redraw', () => {
+  assert.equal(travelerHash(travelerFor(-100)), travelerHash(travelerFor(-100)));
 });
 
-test('everything stocked yields one all-clear embed', () => {
-  const stock = new Map([['item:grain1', 9999], ['item:grain2', 9999], ['item:grain3', 9999]]);
-  const { embeds } = renderTracker(computeShortfalls({
-    rulebook: RULEBOOK, config: withTracked({ Alesi: { tiers: [1, 10] } }), stock,
-  }));
-  assert.equal(embeds.length, 1);
-  assert.match(embeds[0].title, /all stocked/);
+test('travelerHash changes when stock changes', () => {
+  const a = travelerFor(-100);
+  const b = travelerFor(-100);
+  b.rows[0].have = 50;
+  assert.notEqual(travelerHash(a), travelerHash(b));
 });
 
-test('the rendered message never exceeds Discord\'s 6000-character budget', () => {
-  // 20 travelers, 40 materials each — far beyond any real config.
-  const travelers = {}; const config = { ...defaultConfig(), travelers: {} };
-  for (let t = 0; t < 20; t++) {
-    const name = `Traveler${t}`;
-    travelers[name] = {
-      materials: Array.from({ length: 40 }, (_, i) => ({
-        key: `item:t${t}m${i}`, name: `Really Quite Long Material Name ${i}`,
-        tier: (i % 10) + 1, tag: `Family${i % 4}`, fixed: true, perTurnIn: 100 + i, quantities: [100 + i],
-      })),
-    };
-    config.travelers[name] = { tiers: [1, 10] };
-  }
-  const { embeds } = renderTracker(
-    computeShortfalls({ rulebook: { travelers }, config, stock: new Map() }),
-    { updatedAt: Date.now(), storageCount: 5 },
-  );
-  const total = embeds.reduce((n, e) => n + embedLength(e), 0);
-  assert.ok(total <= 6000, `rendered ${total} characters, over the limit`);
-  assert.ok(embeds.length <= 10, 'Discord allows at most 10 embeds per message');
-});
-
-test('the 10-embed cap holds even when everything fits on characters', () => {
-  // Regression: with a compact layout the character budget no longer bites
-  // first, so the embed count became the real limit. 20 tiny travelers fit in
-  // 6000 characters easily but must still yield at most 10 embeds.
-  const travelers = {}; const config = { ...defaultConfig(), travelers: {} };
-  for (let t = 0; t < 20; t++) {
-    const name = `T${t}`;
-    travelers[name] = {
-      materials: [{
-        key: `item:t${t}`, name: 'X', tier: 1, tag: 'F', family: 'F',
-        fixed: true, perTurnIn: 1, quantities: [1],
-      }],
-    };
-    config.travelers[name] = { tiers: [1, 10] };
-  }
-  const { embeds } = renderTracker(
-    computeShortfalls({ rulebook: { travelers }, config, stock: new Map() }),
-    { storageCount: 1 },
-  );
-  const total = embeds.reduce((n, e) => n + embedLength(e), 0);
-  assert.ok(total < 6000, 'this case should be well inside the character budget');
-  assert.ok(embeds.length <= 10, `rendered ${embeds.length} embeds, over Discord's cap`);
-  assert.match(embeds[embeds.length - 1].footer.text, /omitted/, 'dropped travelers should be disclosed');
-});
-
-test('truncation is disclosed rather than silent', () => {
-  const travelers = {}; const config = { ...defaultConfig(), travelers: {} };
-  for (let t = 0; t < 20; t++) {
-    const name = `Traveler${t}`;
-    travelers[name] = {
-      materials: Array.from({ length: 40 }, (_, i) => ({
-        key: `item:t${t}m${i}`, name: `Material ${i} with a fairly long name`,
-        tier: (i % 10) + 1, tag: `Fam${i}`, fixed: true, perTurnIn: 100, quantities: [100],
-      })),
-    };
-    config.travelers[name] = { tiers: [1, 10] };
-  }
-  const { embeds } = renderTracker(
-    computeShortfalls({ rulebook: { travelers }, config, stock: new Map() }),
-    { storageCount: 1 },
-  );
-  const text = JSON.stringify(embeds);
-  assert.ok(/truncated|omitted/.test(text), 'dropped content should be disclosed');
-});
-
-test('contentHash ignores the clock so unchanged stock does not redraw', () => {
-  const run = () => computeShortfalls({
-    rulebook: RULEBOOK, config: withTracked({ Alesi: { tiers: [1, 10] } }),
-    stock: new Map([['item:grain1', 10]]),
-  });
-  assert.equal(contentHash(run()), contentHash(run()));
-});
-
-test('contentHash changes when stock changes', () => {
-  const at = (n) => computeShortfalls({
-    rulebook: RULEBOOK, config: withTracked({ Alesi: { tiers: [1, 10] } }),
-    stock: new Map([['item:grain1', n]]),
-  });
-  assert.notEqual(contentHash(at(10)), contentHash(at(20)));
+test('travelerHash is per traveler, so one changing leaves the others alone', () => {
+  const alesi = travelerFor(-100);
+  const svim = { ...travelerFor(-100), name: 'Svim' };
+  assert.notEqual(travelerHash(alesi), travelerHash(svim));
 });

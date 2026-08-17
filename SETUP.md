@@ -141,8 +141,17 @@ Storage tracking isn't built yet. These exist so you can confirm the whole chain
 ```
 
 After `/setup channel` the tracker posts immediately and then updates itself every
-20 seconds, editing that one message rather than posting new ones. It only edits when
-the numbers actually change, so a quiet claim costs nothing.
+20 seconds, editing in place rather than posting new messages. It only edits when the
+numbers actually change, so a quiet claim costs nothing.
+
+**Each traveler gets its own message.** They all share the default channel unless you give
+one its own:
+
+```
+/setup channel channel:#alesi-supply traveler:Alesi
+```
+
+That way people can follow the travelers they care about and mute the rest.
 
 | Command | What it does |
 |---|---|
@@ -158,8 +167,10 @@ the numbers actually change, so a quiet claim costs nothing.
 | `/config turnins count:5 [traveler:…]` | how many turn-ins to keep stocked |
 | `/config threshold material:… amount:…` | absolute target for one material |
 | `/config variable amount:… [traveler:…]` | one target for all varying-quantity materials |
+| `/config band tier_min:… tier_max:… turnins:… [traveler:…]` | turn-ins for a tier range |
+| `/config bands-clear [traveler:…]` | remove tier bands |
 | `/config show` | current settings |
-| `/setup channel channel:#…` | where the tracker message goes |
+| `/setup channel channel:#… [traveler:…]` | default channel, or one traveler's own |
 | `/refresh` | redraw now instead of waiting |
 
 `/traveler name:Alesi` should return five families — Plant Fiber, Grain, Vegetable,

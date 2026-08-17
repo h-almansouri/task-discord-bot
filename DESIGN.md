@@ -251,8 +251,29 @@ the two kinds diverge, because turn-in maths only means something for one of the
 |---|---|---|
 | 1 | per-material absolute (`/config threshold`) | per-material absolute (`/config threshold`) |
 | 2 | per-material turn-ins | per-traveler default (`/config variable traveler:…`) |
-| 3 | per-traveler turn-ins (`/config turnins traveler:…`) | global default (`/config variable`) |
-| 4 | global turn-ins (`/config turnins`) | *awaiting a threshold* |
+| 3 | per-traveler tier band (`/config band traveler:…`) | global default (`/config variable`) |
+| 4 | per-traveler turn-ins (`/config turnins traveler:…`) | *awaiting a threshold* |
+| 5 | global tier band (`/config band`) | |
+| 6 | global turn-ins (`/config turnins`) | |
+
+### Tier bands
+
+A band sets turn-ins for a tier range — "250 turn-ins for T1–T4". It holds a **turn-in
+count, not an amount**, so what it costs varies by material:
+
+| Material | Per turn-in | × 250 turn-ins |
+|---|---|---|
+| Rumbagh Brick | 10 | 2,500 |
+| Rumbagh Plank | 20 | 5,000 |
+| Alesi Plant Fiber | 300 | 75,000 |
+
+That is the intent: a band says how many turn-ins' worth to keep, whatever that costs.
+`/config band` echoes the resulting range back so the scale is visible before it
+surprises anyone.
+
+Bands never apply to Ramparte, and need no special case to avoid him: **all 15 of his
+materials are untiered** (tier −1), so no band can match them and they fall through to
+the varying-quantity default.
 
 The varying-quantity defaults exist because setting Ramparte's seven combat drops one at
 a time is tedious when one figure suits all of them. A default of `0` is honoured as
@@ -301,13 +322,19 @@ Per guild. JSON file to start; SQLite only if multi-guild becomes real.
     }
   ],
   "travelers": {
-    "Alesi": { "tiers": [1, 5] },
+    // Each traveler owns one message. channelId is optional — without it the
+    // traveler posts in the guild default above.
+    "Alesi": { "tiers": [1, 5], "channelId": "…", "messageId": "…" },
     "Svim":  { "tiers": [1, 3] },
     "Rumbagh": {
       "tiers": [1, 10],
       "excluded": ["Experimental Compounds"]   // whole family, every tier
     }
   },
+  "tierBands": [
+    { "tiers": [1, 4], "turnIns": 250 },
+    { "tiers": [5, 6], "turnIns": 500 }
+  ],
   "turnIns": 5,
   "variableDefault": 25,              // blanket target for varying-qty materials
   "overrides": {
@@ -381,34 +408,42 @@ flat list of 35 similarly-named chests is miserable to use.
 
 ## 8. Display
 
-Shortfalls only — materials at or above target are not listed, and a traveler with no
-shortfalls gets **no embed at all** rather than an "all stocked" placeholder. One embed
-per traveler that has something to report, all inside one message, edited in place. When
-nothing anywhere is short, the message says so in a single line.
+**One message per traveler**, each optionally in its own channel, so people can follow
+what they care about and mute the rest. Every watched material is shown, stocked or not:
+seeing that Cloth is fine through T5 and falls off at T6 is the point.
+
+The body is a **family × tier grid inside an ANSI code block**. Discord renders colour
+inside ` ```ansi ` fences, and monospace is what makes the columns line up. Surplus is
+green, shortfall red, and a tier a family does not have is a grey dash rather than a
+blank — Rumbagh's Ink stops at T8, and an empty cell would read as "you have none".
+
+Untiered materials — Ramparte's combat drops — have no axis to grid against, so they
+render as a list sorted worst-first.
+
+This is tuned for **desktop**. A ten-tier grid is 76 characters wide and will wrap on a
+phone; that trade was made deliberately.
 
 Rows are **grouped by `item_desc.tag`**, with tiers collapsed onto one line per family.
 Real output, Alesi at tiers 1–5 and 5 turn-ins, against a live claim:
 
 ```
-Alesi · T1–5
-**Healing Potion** · 25/tier
-T1 −21 · T2 −24 · T3 −25 · T4 −25 · T5 −25
-**Plant Fiber** · 1,500/tier
-T1 −1,500 · T2 −1,480 · T3 −1,500 · T4 −1,500 · T5 −1,500
-**Baitfish** · 50/tier
-T1 −45 · T4 −50
-**Parchment** · 100/tier · T3 −22
-⚠️ Needs a threshold: Salt · set with `/config threshold`
+Alesi · T1–6
+MATERIAL            T1    T2    T3    T4    T5    T6
+Healing Potion     -96   -99  -100  -100  -200  -200
+Plant Fiber      -6.0k -6.0k -6.0k -6.0k  -12k  -12k
+Baitfish          -195  +320  +440  -200  -270  -400
+Embergrain       -1.3k  +80k  +63k +160k +9.0k -8.0k
+Starbulb          +975  +15k  +12k  +11k +2.6k -1.2k
+[19 of 30 below target · 35 container(s)]
 ```
 
-Every number is a deficit. The footer states that once, so rows carry no repeated "short"
-label — across a dozen families that word alone cost a line's worth of width each time. A
-family with only one tier short stays on a single line rather than splitting across two.
+Values are abbreviated past 1,000 (`-6.0k`) because tier bands push targets into five and
+six figures, and an unabbreviated number would break the grid. Signs carry the meaning
+where colour cannot: `+` surplus, `-` short.
 
-The same data rendered flat is 19 rows and 1,094 characters; grouped it is 535. Tightened
-as above, a real two-traveler message is 573 characters where the earlier format took 980.
-Against Discord's 6,000-character budget, grouping is what keeps the message inside the
-limit, not merely what makes it readable.
+Real sizes: Rumbagh at ten tiers and seven families is **1,462 of 6,000 characters** and
+76 columns wide. Limits are per *message*, not per bot or channel, so giving each traveler
+its own message means none of them compete for room.
 
 The timestamp is the embed's native `timestamp` field, never a `<t:…>` tag in the footer
 (§4.16).

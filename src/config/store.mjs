@@ -19,6 +19,9 @@ export function defaultConfig() {
     storages: [],
     travelers: {},
     turnIns: 5,
+    // Turn-in counts for tier ranges, e.g. 250 for T1-T4. A band holds turn-ins
+    // rather than an amount, so what it costs varies by material.
+    tierBands: [],
     // Blanket target for materials asked for at varying quantities, where
     // turn-in maths does not apply. null means "ask me" rather than guess.
     variableDefault: null,

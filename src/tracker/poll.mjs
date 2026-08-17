@@ -1,23 +1,63 @@
 /**
- * The polling loop: fetch stock, compare against targets, edit one message.
+ * The polling loop: fetch stock once, then keep one message per traveler
+ * up to date.
  *
- * Polls every 20s, comfortably inside bitjita's own 5s cache, and only calls
- * edit() when the rendered content actually changed. Without that guard an
- * active hauling session would edit three times a minute for hours; with it a
- * quiet claim costs zero Discord calls (DESIGN.md §9).
+ * Each traveler owns a message, optionally in its own channel, so people can
+ * follow the travelers they care about and mute the rest. Splitting costs extra
+ * Discord edits but not extra bitjita calls — stock is fetched once per pass
+ * regardless (DESIGN.md §9).
  */
 import { fetchTrackedStock } from '../stock/fetch.mjs';
 import { computeShortfalls } from './shortfall.mjs';
-import { renderTracker, contentHash } from './render.mjs';
+import { renderTraveler, renderEmpty, travelerHash } from './render.mjs';
 import { loadGuildConfig, updateGuildConfig, listGuildConfigs } from '../config/store.mjs';
 
 export const DEFAULT_INTERVAL_MS = 20_000;
 
 const lastHash = new Map();
+const hashKey = (guildId, traveler) => `${guildId}:${traveler}`;
 
-/** Force the next pass to redraw even if the numbers are unchanged. */
-export function invalidate(guildId) {
-  lastHash.delete(guildId);
+/** Force the next pass to redraw, for one traveler or the whole guild. */
+export function invalidate(guildId, travelerName = null) {
+  if (travelerName) {
+    lastHash.delete(hashKey(guildId, travelerName));
+    return;
+  }
+  for (const key of [...lastHash.keys()]) {
+    if (key.startsWith(`${guildId}:`)) lastHash.delete(key);
+  }
+}
+
+/** Where a traveler's message belongs: its own channel, else the guild default. */
+export function channelForTraveler(config, name) {
+  return config.travelers?.[name]?.channelId ?? config.channelId ?? null;
+}
+
+async function publish(client, guildId, name, channelId, payload, { force }) {
+  const channel = await client.channels.fetch(channelId).catch(() => null);
+  if (!channel?.isTextBased?.()) return { status: 'channel-missing' };
+
+  const config = await loadGuildConfig(guildId);
+  const messageId = config.travelers?.[name]?.messageId;
+
+  if (messageId) {
+    const edited = await channel.messages.fetch(messageId)
+      .then((m) => m.edit(payload))
+      .catch(() => null);
+    if (edited) return { status: force ? 'updated' : 'updated', messageId: edited.id };
+  }
+
+  const sent = await channel.send(payload).catch(() => null);
+  if (!sent) return { status: 'send-failed' };
+
+  await updateGuildConfig(guildId, (c) => ({
+    ...c,
+    travelers: {
+      ...c.travelers,
+      [name]: { ...c.travelers?.[name], messageId: sent.id },
+    },
+  }));
+  return { status: 'created', messageId: sent.id };
 }
 
 /**
@@ -26,52 +66,75 @@ export function invalidate(guildId) {
  */
 export async function runOnce(client, guildId, { rulebook, force = false } = {}) {
   const config = await loadGuildConfig(guildId);
-  if (!config.channelId) return { status: 'no-channel' };
+  const tracked = Object.keys(config.travelers ?? {});
+  if (!tracked.length) return { status: 'no-travelers' };
+  if (!config.channelId && !tracked.some((n) => config.travelers[n].channelId)) {
+    return { status: 'no-channel' };
+  }
 
   const { totals, missing, errors, containerCount } = await fetchTrackedStock(config.storages);
   const result = computeShortfalls({ rulebook, config, stock: totals });
-  const hash = contentHash(result) + `|${missing.length}|${errors.length}`;
+  const byName = new Map(result.travelers.map((t) => [t.name, t]));
 
-  if (!force && lastHash.get(guildId) === hash) {
-    return { status: 'unchanged', totalShort: result.totalShort };
-  }
+  // A data problem is worth surfacing on every message rather than nowhere.
+  const notes = [];
+  if (missing.length) notes.push(`${missing.length} container(s) not visible`);
+  if (errors.length) notes.push(`${errors.length} source(s) failed to load`);
+  const noteSuffix = notes.length ? ` · ⚠️ ${notes.join(' · ')}` : '';
 
-  const message = renderTracker(result, { updatedAt: Date.now(), storageCount: containerCount });
+  let updated = 0, unchanged = 0;
+  const problems = [];
 
-  if (missing.length || errors.length) {
-    const notes = [];
-    if (missing.length) {
-      notes.push(`${missing.length} tracked container(s) not currently visible: ` +
-        missing.slice(0, 5).map((m) => `${m.name} (${m.source})`).join(', '));
+  for (const name of tracked) {
+    const channelId = channelForTraveler(config, name);
+    if (!channelId) { problems.push(`${name}: no channel`); continue; }
+
+    const traveler = byName.get(name);
+    const hash = (traveler ? travelerHash(traveler) : `empty:${name}`) + noteSuffix;
+    const key = hashKey(guildId, name);
+
+    if (!force && lastHash.get(key) === hash) { unchanged++; continue; }
+
+    const payload = traveler
+      ? renderTraveler(traveler, { updatedAt: Date.now(), storageCount: containerCount })
+      : renderEmpty(name);
+    if (noteSuffix && payload.embeds[0].footer) {
+      payload.embeds[0].footer.text += noteSuffix;
     }
-    if (errors.length) {
-      notes.push(`${errors.length} source(s) failed to load: ` +
-        errors.slice(0, 3).map((e) => `${e.source} — ${e.message}`).join('; '));
+
+    const r = await publish(client, guildId, name, channelId, payload, { force });
+    if (r.status === 'updated' || r.status === 'created') {
+      lastHash.set(key, hash);
+      updated++;
+    } else {
+      problems.push(`${name}: ${r.status}`);
     }
-    message.embeds.push({
-      title: 'Notes',
-      description: notes.join('\n').slice(0, 4000),
-      color: 0xf0ad4e,
-    });
   }
 
-  const channel = await client.channels.fetch(config.channelId).catch(() => null);
-  if (!channel?.isTextBased?.()) return { status: 'channel-missing' };
+  return {
+    status: problems.length && !updated ? 'failed' : 'ok',
+    updated,
+    unchanged,
+    problems,
+    totalShort: result.totalShort,
+  };
+}
 
-  let posted = null;
-  if (config.messageId) {
-    posted = await channel.messages.fetch(config.messageId)
-      .then((m) => m.edit(message))
-      .catch(() => null);
-  }
-  if (!posted) {
-    posted = await channel.send(message).catch(() => null);
-    if (!posted) return { status: 'send-failed' };
-    await updateGuildConfig(guildId, (c) => ({ ...c, messageId: posted.id }));
-  }
+/** Remove a traveler's message, used when it stops being tracked. */
+export async function removeTravelerMessage(client, guildId, name) {
+  const config = await loadGuildConfig(guildId);
+  const entry = config.travelers?.[name];
+  const channelId = entry?.channelId ?? config.channelId;
+  if (!entry?.messageId || !channelId) return false;
 
-  lastHash.set(guildId, hash);
-  return { status: 'updated', totalShort: result.totalShort, messageId: posted.id };
+  const channel = await client.channels.fetch(channelId).catch(() => null);
+  if (!channel?.isTextBased?.()) return false;
+  const deleted = await channel.messages.fetch(entry.messageId)
+    .then((m) => m.delete())
+    .then(() => true)
+    .catch(() => false);
+  invalidate(guildId, name);
+  return deleted;
 }
 
 /** Start the timer across every guild that has a config on disk. */
@@ -82,16 +145,12 @@ export function startTracker(client, { rulebook, intervalMs = DEFAULT_INTERVAL_M
     if (running) return;         // never overlap passes
     running = true;
     try {
-      const guildIds = await listGuildConfigs();
-      for (const guildId of guildIds) {
+      for (const guildId of await listGuildConfigs()) {
         if (!client.guilds.cache.has(guildId)) continue;
         try {
           const r = await runOnce(client, guildId, { rulebook });
-          if (r.status === 'updated') {
-            console.log(`[tracker] ${guildId}: redrew, ${r.totalShort} short`);
-          } else if (r.status !== 'unchanged' && r.status !== 'no-channel') {
-            console.warn(`[tracker] ${guildId}: ${r.status}`);
-          }
+          if (r.updated) console.log(`[tracker] ${guildId}: redrew ${r.updated}, ${r.totalShort} short`);
+          if (r.problems?.length) console.warn(`[tracker] ${guildId}: ${r.problems.join('; ')}`);
         } catch (err) {
           console.error(`[tracker] ${guildId} failed:`, err.message);
         }

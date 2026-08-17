@@ -16,7 +16,7 @@ import { loadGuildConfig, updateGuildConfig } from '../config/store.mjs';
 import {
   unconfiguredMaterials, watchedMaterials, familiesOf, inTierRange,
 } from '../tracker/thresholds.mjs';
-import { invalidate } from '../tracker/poll.mjs';
+import { invalidate, removeTravelerMessage } from '../tracker/poll.mjs';
 
 export const PREFIX = 'tv';
 const cid = (...parts) => [PREFIX, ...parts].join('|');
@@ -209,13 +209,21 @@ async function runRemove(interaction, rulebook) {
     await interaction.reply({ content: `**${name}** is not tracked.`, flags: MessageFlags.Ephemeral });
     return;
   }
+  // Tidy up the message first — once the config entry is gone, so is its id.
+  const removed = await removeTravelerMessage(interaction.client, interaction.guildId, name);
+
   await updateGuildConfig(interaction.guildId, (c) => {
     const travelers = { ...c.travelers };
     delete travelers[name];
     return { ...c, travelers };
   });
   invalidate(interaction.guildId);
-  await interaction.reply({ content: `Stopped tracking **${name}**.`, flags: MessageFlags.Ephemeral });
+
+  await interaction.reply({
+    content: `Stopped tracking **${name}**.` +
+      (removed ? ' Its message has been deleted.' : ''),
+    flags: MessageFlags.Ephemeral,
+  });
 }
 
 async function runIgnore(interaction, rulebook, ignoring) {
