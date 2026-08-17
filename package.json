@@ -1,0 +1,20 @@
+{
+  "name": "bitcraft-traveler-supply-bot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Discord bot tracking BitCraft traveler task materials across chosen storages",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "rulebook": "node scripts/fetch-rulebook.mjs",
+    "commands": "node scripts/register-commands.mjs",
+    "start": "node src/bot.mjs",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.5"
+  }
+}

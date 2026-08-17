@@ -1,0 +1,5224 @@
+{
+  "generatedAt": "2026-08-17T03:07:39.293Z",
+  "source": "bitjita",
+  "region": 12,
+  "counts": {
+    "tasks": 321,
+    "tasksUnmapped": 0,
+    "travelers": 6,
+    "items": 8281,
+    "cargo": 636
+  },
+  "travelers": {
+    "Brico": {
+      "npcType": 5,
+      "skills": [
+        15
+      ],
+      "taskCount": 50,
+      "materials": [
+        {
+          "key": "cargo:2400",
+          "name": "Rough Brick Slab",
+          "tier": 1,
+          "tag": "Brick Slab",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:2401",
+          "name": "Simple Brick Slab",
+          "tier": 2,
+          "tag": "Brick Slab",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:2402",
+          "name": "Sturdy Brick Slab",
+          "tier": 3,
+          "tag": "Brick Slab",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:2403",
+          "name": "Fine Brick Slab",
+          "tier": 4,
+          "tag": "Brick Slab",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:2404",
+          "name": "Exquisite Brick Slab",
+          "tier": 5,
+          "tag": "Brick Slab",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:2405",
+          "name": "Peerless Brick Slab",
+          "tier": 6,
+          "tag": "Brick Slab",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:302152262",
+          "name": "Ornate Brick Slab",
+          "tier": 7,
+          "tag": "Brick Slab",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:360403214",
+          "name": "Pristine Brick Slab",
+          "tier": 8,
+          "tag": "Brick Slab",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:888273394",
+          "name": "Magnificent Brick Slab",
+          "tier": 9,
+          "tag": "Brick Slab",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:631093405",
+          "name": "Flawless Brick Slab",
+          "tier": 10,
+          "tag": "Brick Slab",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:970827760",
+          "name": "Ferralith Frames",
+          "tier": 1,
+          "tag": "Frame",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1044447676",
+          "name": "Pyrelite Frames",
+          "tier": 2,
+          "tag": "Frame",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:15195543",
+          "name": "Emarium Frames",
+          "tier": 3,
+          "tag": "Frame",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:341301575",
+          "name": "Elenvar Frames",
+          "tier": 4,
+          "tag": "Frame",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1080157951",
+          "name": "Luminite Frames",
+          "tier": 5,
+          "tag": "Frame",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1989901185",
+          "name": "Rathium Frames",
+          "tier": 6,
+          "tag": "Frame",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1219367849",
+          "name": "Aurumite Frames",
+          "tier": 7,
+          "tag": "Frame",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1654222357",
+          "name": "Celestium Frames",
+          "tier": 8,
+          "tag": "Frame",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1167304009",
+          "name": "Umbracite Frames",
+          "tier": 9,
+          "tag": "Frame",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1811266661",
+          "name": "Astralite Frames",
+          "tier": 10,
+          "tag": "Frame",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1552106905",
+          "name": "Rough Leather Sheeting",
+          "tier": 1,
+          "tag": "Sheeting",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1297204491",
+          "name": "Simple Leather Sheeting",
+          "tier": 2,
+          "tag": "Sheeting",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1090747065",
+          "name": "Sturdy Leather Sheeting",
+          "tier": 3,
+          "tag": "Sheeting",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1784593653",
+          "name": "Fine Leather Sheeting",
+          "tier": 4,
+          "tag": "Sheeting",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:741862367",
+          "name": "Exquisite Leather Sheeting",
+          "tier": 5,
+          "tag": "Sheeting",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1863123674",
+          "name": "Peerless Leather Sheeting",
+          "tier": 6,
+          "tag": "Sheeting",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:897676087",
+          "name": "Ornate Leather Sheeting",
+          "tier": 7,
+          "tag": "Sheeting",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:715636845",
+          "name": "Pristine Leather Sheeting",
+          "tier": 8,
+          "tag": "Sheeting",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:898540348",
+          "name": "Magnificent Leather Sheeting",
+          "tier": 9,
+          "tag": "Sheeting",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1935556465",
+          "name": "Flawless Leather Sheeting",
+          "tier": 10,
+          "tag": "Sheeting",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:7000",
+          "name": "Rough Cloth Tarp",
+          "tier": 1,
+          "tag": "Tarp",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:7001",
+          "name": "Simple Cloth Tarp",
+          "tier": 2,
+          "tag": "Tarp",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:7002",
+          "name": "Sturdy Cloth Tarp",
+          "tier": 3,
+          "tag": "Tarp",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:7003",
+          "name": "Fine Cloth Tarp",
+          "tier": 4,
+          "tag": "Tarp",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:7004",
+          "name": "Exquisite Cloth Tarp",
+          "tier": 5,
+          "tag": "Tarp",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:7005",
+          "name": "Peerless Cloth Tarp",
+          "tier": 6,
+          "tag": "Tarp",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1791508890",
+          "name": "Ornate Cloth Tarp",
+          "tier": 7,
+          "tag": "Tarp",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:503195279",
+          "name": "Pristine Cloth Tarp",
+          "tier": 8,
+          "tag": "Tarp",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:392822871",
+          "name": "Magnificent Cloth Tarp",
+          "tier": 9,
+          "tag": "Tarp",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1836028490",
+          "name": "Flawless Cloth Tarp",
+          "tier": 10,
+          "tag": "Tarp",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1200",
+          "name": "Rough Timber",
+          "tier": 1,
+          "tag": "Timber",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1201",
+          "name": "Simple Timber",
+          "tier": 2,
+          "tag": "Timber",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1202",
+          "name": "Sturdy Timber",
+          "tier": 3,
+          "tag": "Timber",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1203",
+          "name": "Fine Timber",
+          "tier": 4,
+          "tag": "Timber",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1204",
+          "name": "Exquisite Timber",
+          "tier": 5,
+          "tag": "Timber",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1205",
+          "name": "Peerless Timber",
+          "tier": 6,
+          "tag": "Timber",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:884292413",
+          "name": "Ornate Timber",
+          "tier": 7,
+          "tag": "Timber",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1948570022",
+          "name": "Pristine Timber",
+          "tier": 8,
+          "tag": "Timber",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1473504323",
+          "name": "Magnificent Timber",
+          "tier": 9,
+          "tag": "Timber",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1585122058",
+          "name": "Flawless Timber",
+          "tier": 10,
+          "tag": "Timber",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        }
+      ]
+    },
+    "Heimlich": {
+      "npcType": 3,
+      "skills": [
+        13
+      ],
+      "taskCount": 50,
+      "materials": [
+        {
+          "key": "item:1170000",
+          "name": "Plain Cooked Berries",
+          "tier": 1,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1170004",
+          "name": "Plain Mashed Bulbs",
+          "tier": 1,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1170001",
+          "name": "Plain Mushroom Skewer",
+          "tier": 1,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1170002",
+          "name": "Plain Roasted Meat",
+          "tier": 1,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1170007",
+          "name": "Plain Roasted Ocean Fish",
+          "tier": 1,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:2170001",
+          "name": "Savory Mushroom Skewer",
+          "tier": 2,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:2170004",
+          "name": "Savory Mashed Bulbs",
+          "tier": 2,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:2170000",
+          "name": "Savory Cooked Berries",
+          "tier": 2,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:2170007",
+          "name": "Savory Roasted Ocean Fish",
+          "tier": 2,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:2170002",
+          "name": "Savory Roasted Meat",
+          "tier": 2,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:3170004",
+          "name": "Zesty Mashed Bulbs",
+          "tier": 3,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:3170000",
+          "name": "Zesty Cooked Berries",
+          "tier": 3,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:3170007",
+          "name": "Zesty Roasted Ocean Fish",
+          "tier": 3,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:3170002",
+          "name": "Zesty Roasted Meat",
+          "tier": 3,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:3170001",
+          "name": "Zesty Mushroom Skewer",
+          "tier": 3,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:4170000",
+          "name": "Fine Cooked Berries",
+          "tier": 4,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:4170007",
+          "name": "Fine Roasted Ocean Fish",
+          "tier": 4,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:4170002",
+          "name": "Fine Roasted Meat",
+          "tier": 4,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:4170001",
+          "name": "Fine Mushroom Skewer",
+          "tier": 4,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:4170004",
+          "name": "Fine Mashed Bulbs",
+          "tier": 4,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:5170002",
+          "name": "Succulent Roasted Meat",
+          "tier": 5,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:5170001",
+          "name": "Succulent Mushroom Skewer",
+          "tier": 5,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:5170004",
+          "name": "Succulent Mashed Bulbs",
+          "tier": 5,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:5170000",
+          "name": "Succulent Cooked Berries",
+          "tier": 5,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:5170007",
+          "name": "Succulent Roasted Ocean Fish",
+          "tier": 5,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:6170001",
+          "name": "Ambrosial Mushroom Skewer",
+          "tier": 6,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:6170004",
+          "name": "Ambrosial Mashed Bulbs",
+          "tier": 6,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:6170000",
+          "name": "Ambrosial Cooked Berries",
+          "tier": 6,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:6170007",
+          "name": "Ambrosial Roasted Ocean Fish",
+          "tier": 6,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:6170002",
+          "name": "Ambrosial Roasted Meat",
+          "tier": 6,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1936407696",
+          "name": "Flavorful Mashed Bulbs",
+          "tier": 7,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:287213426",
+          "name": "Flavorful Cooked Berries",
+          "tier": 7,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:102576945",
+          "name": "Flavorful Roasted Ocean Fish",
+          "tier": 7,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1221133683",
+          "name": "Flavorful Roasted Meat",
+          "tier": 7,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1783151508",
+          "name": "Flavorful Mushroom Skewer",
+          "tier": 7,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1667103104",
+          "name": "Delicious Cooked Berries",
+          "tier": 8,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:499222991",
+          "name": "Delicious Roasted Ocean Fish",
+          "tier": 8,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1915371751",
+          "name": "Delicious Roasted Meat",
+          "tier": 8,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1962733786",
+          "name": "Delicious Mushroom Skewer",
+          "tier": 8,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:529721253",
+          "name": "Delicious Mashed Bulbs",
+          "tier": 8,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:40349004",
+          "name": "Scrumptious Roasted Meat",
+          "tier": 9,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1927578557",
+          "name": "Scrumptious Mushroom Skewer",
+          "tier": 9,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:2031320058",
+          "name": "Scrumptious Mashed Bulbs",
+          "tier": 9,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:291179803",
+          "name": "Scrumptious Cooked Berries",
+          "tier": 9,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:335141681",
+          "name": "Scrumptious Roasted Ocean Fish",
+          "tier": 9,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1664560257",
+          "name": "Delectable Mushroom Skewer",
+          "tier": 10,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:819149629",
+          "name": "Delectable Mashed Bulbs",
+          "tier": 10,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1510160267",
+          "name": "Delectable Cooked Berries",
+          "tier": 10,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1299649056",
+          "name": "Delectable Roasted Ocean Fish",
+          "tier": 10,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:277511016",
+          "name": "Delectable Roasted Meat",
+          "tier": 10,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        }
+      ]
+    },
+    "Rumbagh": {
+      "npcType": 1,
+      "skills": [
+        19
+      ],
+      "taskCount": 71,
+      "materials": [
+        {
+          "key": "item:1030002",
+          "name": "Rough Brick",
+          "tier": 1,
+          "tag": "Brick",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:2030002",
+          "name": "Simple Brick",
+          "tier": 2,
+          "tag": "Brick",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:3030002",
+          "name": "Sturdy Brick",
+          "tier": 3,
+          "tag": "Brick",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:4030002",
+          "name": "Fine Brick",
+          "tier": 4,
+          "tag": "Brick",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:5030002",
+          "name": "Exquisite Brick",
+          "tier": 5,
+          "tag": "Brick",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:6030002",
+          "name": "Peerless Brick",
+          "tier": 6,
+          "tag": "Brick",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:813610254",
+          "name": "Ornate Brick",
+          "tier": 7,
+          "tag": "Brick",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1221137435",
+          "name": "Pristine Brick",
+          "tier": 8,
+          "tag": "Brick",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:834413277",
+          "name": "Magnificent Brick",
+          "tier": 9,
+          "tag": "Brick",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:931497471",
+          "name": "Flawless Brick",
+          "tier": 10,
+          "tag": "Brick",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1090002",
+          "name": "Rough Cloth",
+          "tier": 1,
+          "tag": "Cloth",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:2090002",
+          "name": "Simple Cloth",
+          "tier": 2,
+          "tag": "Cloth",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:3090002",
+          "name": "Sturdy Cloth",
+          "tier": 3,
+          "tag": "Cloth",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:4090002",
+          "name": "Fine Cloth",
+          "tier": 4,
+          "tag": "Cloth",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:5090002",
+          "name": "Exquisite Cloth",
+          "tier": 5,
+          "tag": "Cloth",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:6090002",
+          "name": "Peerless Cloth",
+          "tier": 6,
+          "tag": "Cloth",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1610800379",
+          "name": "Ornate Cloth",
+          "tier": 7,
+          "tag": "Cloth",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:136406464",
+          "name": "Pristine Cloth",
+          "tier": 8,
+          "tag": "Cloth",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:282660928",
+          "name": "Magnificent Cloth",
+          "tier": 9,
+          "tag": "Cloth",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:35270576",
+          "name": "Flawless Cloth",
+          "tier": 10,
+          "tag": "Cloth",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1",
+          "name": "Hex Coin",
+          "tier": -1,
+          "tag": "Coins",
+          "taskCount": 1,
+          "quantities": [
+            1000
+          ],
+          "fixed": true,
+          "perTurnIn": 1000
+        },
+        {
+          "key": "item:1050001",
+          "name": "Ferralith Ingot",
+          "tier": 1,
+          "tag": "Ingot",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:2050001",
+          "name": "Pyrelite Ingot",
+          "tier": 2,
+          "tag": "Ingot",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:3050001",
+          "name": "Emarium Ingot",
+          "tier": 3,
+          "tag": "Ingot",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:4050001",
+          "name": "Elenvar Ingot",
+          "tier": 4,
+          "tag": "Ingot",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:5050001",
+          "name": "Luminite Ingot",
+          "tier": 5,
+          "tag": "Ingot",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:6050001",
+          "name": "Rathium Ingot",
+          "tier": 6,
+          "tag": "Ingot",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1899017490",
+          "name": "Aurumite Ingot",
+          "tier": 7,
+          "tag": "Ingot",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1464752960",
+          "name": "Celestium Ingot",
+          "tier": 8,
+          "tag": "Ingot",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:445742898",
+          "name": "Umbracite Ingot",
+          "tier": 9,
+          "tag": "Ingot",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:2069757207",
+          "name": "Astralite Ingot",
+          "tier": 10,
+          "tag": "Ingot",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1210001",
+          "name": "Basic Ink",
+          "tier": 1,
+          "tag": "Ink",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:2210001",
+          "name": "Simple Ink",
+          "tier": 2,
+          "tag": "Ink",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:3210001",
+          "name": "Infused Ink",
+          "tier": 3,
+          "tag": "Ink",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:4210001",
+          "name": "Fine Ink",
+          "tier": 4,
+          "tag": "Ink",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:5210001",
+          "name": "Exquisite Ink",
+          "tier": 5,
+          "tag": "Ink",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:6210001",
+          "name": "Peerless Ink",
+          "tier": 6,
+          "tag": "Ink",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:365949150",
+          "name": "Ornate Ink",
+          "tier": 7,
+          "tag": "Ink",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:398010040",
+          "name": "Pristine Ink",
+          "tier": 8,
+          "tag": "Ink",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1070004",
+          "name": "Rough Leather",
+          "tier": 1,
+          "tag": "Leather",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:2070004",
+          "name": "Simple Leather",
+          "tier": 2,
+          "tag": "Leather",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:3070004",
+          "name": "Sturdy Leather",
+          "tier": 3,
+          "tag": "Leather",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:4070004",
+          "name": "Fine Leather",
+          "tier": 4,
+          "tag": "Leather",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:5070004",
+          "name": "Exquisite Leather",
+          "tier": 5,
+          "tag": "Leather",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:6070004",
+          "name": "Peerless Leather",
+          "tier": 6,
+          "tag": "Leather",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:806992520",
+          "name": "Ornate Leather",
+          "tier": 7,
+          "tag": "Leather",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1743778001",
+          "name": "Pristine Leather",
+          "tier": 8,
+          "tag": "Leather",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1580025475",
+          "name": "Magnificent Leather",
+          "tier": 9,
+          "tag": "Leather",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:711364475",
+          "name": "Flawless Leather",
+          "tier": 10,
+          "tag": "Leather",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1210002",
+          "name": "Rough Parchment",
+          "tier": 1,
+          "tag": "Parchment",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:2210002",
+          "name": "Simple Parchment",
+          "tier": 2,
+          "tag": "Parchment",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:3210002",
+          "name": "Sturdy Parchment",
+          "tier": 3,
+          "tag": "Parchment",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:4210002",
+          "name": "Fine Parchment",
+          "tier": 4,
+          "tag": "Parchment",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:5210002",
+          "name": "Exquisite Parchment",
+          "tier": 5,
+          "tag": "Parchment",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:6210002",
+          "name": "Peerless Parchment",
+          "tier": 6,
+          "tag": "Parchment",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:113276733",
+          "name": "Ornate Parchment",
+          "tier": 7,
+          "tag": "Parchment",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:95989045",
+          "name": "Pristine Parchment",
+          "tier": 8,
+          "tag": "Parchment",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1987836568",
+          "name": "Magnificent Parchment",
+          "tier": 9,
+          "tag": "Parchment",
+          "taskCount": 2,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:254492415",
+          "name": "Flawless Parchment",
+          "tier": 10,
+          "tag": "Parchment",
+          "taskCount": 2,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1020003",
+          "name": "Rough Plank",
+          "tier": 1,
+          "tag": "Plank",
+          "taskCount": 1,
+          "quantities": [
+            20
+          ],
+          "fixed": true,
+          "perTurnIn": 20
+        },
+        {
+          "key": "item:2020003",
+          "name": "Simple Plank",
+          "tier": 2,
+          "tag": "Plank",
+          "taskCount": 1,
+          "quantities": [
+            20
+          ],
+          "fixed": true,
+          "perTurnIn": 20
+        },
+        {
+          "key": "item:3020003",
+          "name": "Sturdy Plank",
+          "tier": 3,
+          "tag": "Plank",
+          "taskCount": 1,
+          "quantities": [
+            20
+          ],
+          "fixed": true,
+          "perTurnIn": 20
+        },
+        {
+          "key": "item:4020003",
+          "name": "Fine Plank",
+          "tier": 4,
+          "tag": "Plank",
+          "taskCount": 1,
+          "quantities": [
+            20
+          ],
+          "fixed": true,
+          "perTurnIn": 20
+        },
+        {
+          "key": "item:5020003",
+          "name": "Exquisite Plank",
+          "tier": 5,
+          "tag": "Plank",
+          "taskCount": 1,
+          "quantities": [
+            20
+          ],
+          "fixed": true,
+          "perTurnIn": 20
+        },
+        {
+          "key": "item:6020003",
+          "name": "Peerless Plank",
+          "tier": 6,
+          "tag": "Plank",
+          "taskCount": 1,
+          "quantities": [
+            20
+          ],
+          "fixed": true,
+          "perTurnIn": 20
+        },
+        {
+          "key": "item:1639308227",
+          "name": "Ornate Plank",
+          "tier": 7,
+          "tag": "Plank",
+          "taskCount": 1,
+          "quantities": [
+            20
+          ],
+          "fixed": true,
+          "perTurnIn": 20
+        },
+        {
+          "key": "item:28056473",
+          "name": "Pristine Plank",
+          "tier": 8,
+          "tag": "Plank",
+          "taskCount": 1,
+          "quantities": [
+            20
+          ],
+          "fixed": true,
+          "perTurnIn": 20
+        },
+        {
+          "key": "item:1227914325",
+          "name": "Magnificent Plank",
+          "tier": 9,
+          "tag": "Plank",
+          "taskCount": 1,
+          "quantities": [
+            20
+          ],
+          "fixed": true,
+          "perTurnIn": 20
+        },
+        {
+          "key": "item:117329467",
+          "name": "Flawless Plank",
+          "tier": 10,
+          "tag": "Plank",
+          "taskCount": 1,
+          "quantities": [
+            20
+          ],
+          "fixed": true,
+          "perTurnIn": 20
+        },
+        {
+          "key": "cargo:583106011",
+          "name": "Rough Experimental Compounds",
+          "tier": 1,
+          "tag": "Supplies",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1496962595",
+          "name": "Simple Experimental Compounds",
+          "tier": 2,
+          "tag": "Supplies",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:2146702618",
+          "name": "Infused Experimental Compounds",
+          "tier": 3,
+          "tag": "Supplies",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1026230335",
+          "name": "Fine Experimental Compounds",
+          "tier": 4,
+          "tag": "Supplies",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:338529773",
+          "name": "Exquisite Experimental Compounds",
+          "tier": 5,
+          "tag": "Supplies",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:53658000",
+          "name": "Peerless Experimental Compounds",
+          "tier": 6,
+          "tag": "Supplies",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1546723412",
+          "name": "Ornate Experimental Compounds",
+          "tier": 7,
+          "tag": "Supplies",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:960407828",
+          "name": "Pristine Experimental Compounds",
+          "tier": 8,
+          "tag": "Supplies",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1090785594",
+          "name": "Magnificent Experimental Compounds",
+          "tier": 9,
+          "tag": "Supplies",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1412406838",
+          "name": "Flawless Experimental Compounds",
+          "tier": 10,
+          "tag": "Supplies",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        }
+      ]
+    },
+    "Svim": {
+      "npcType": 2,
+      "skills": [
+        21
+      ],
+      "taskCount": 76,
+      "materials": [
+        {
+          "key": "item:1170006",
+          "name": "Plain Roasted Fish",
+          "tier": 1,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:2170006",
+          "name": "Savory Roasted Fish",
+          "tier": 2,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:3170006",
+          "name": "Zesty Roasted Fish",
+          "tier": 3,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:4170006",
+          "name": "Fine Roasted Fish",
+          "tier": 4,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:5170006",
+          "name": "Succulent Roasted Fish",
+          "tier": 5,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:6170006",
+          "name": "Ambrosial Roasted Fish",
+          "tier": 6,
+          "tag": "Basic Food",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1110010",
+          "name": "Basic Fish Oil",
+          "tier": 1,
+          "tag": "Fish Oil",
+          "taskCount": 1,
+          "quantities": [
+            5
+          ],
+          "fixed": true,
+          "perTurnIn": 5
+        },
+        {
+          "key": "item:2110010",
+          "name": "Simple Fish Oil",
+          "tier": 2,
+          "tag": "Fish Oil",
+          "taskCount": 1,
+          "quantities": [
+            5
+          ],
+          "fixed": true,
+          "perTurnIn": 5
+        },
+        {
+          "key": "item:3110010",
+          "name": "Infused Fish Oil",
+          "tier": 3,
+          "tag": "Fish Oil",
+          "taskCount": 1,
+          "quantities": [
+            5
+          ],
+          "fixed": true,
+          "perTurnIn": 5
+        },
+        {
+          "key": "item:4110010",
+          "name": "Fine Fish Oil",
+          "tier": 4,
+          "tag": "Fish Oil",
+          "taskCount": 1,
+          "quantities": [
+            5
+          ],
+          "fixed": true,
+          "perTurnIn": 5
+        },
+        {
+          "key": "item:5110010",
+          "name": "Exquisite Fish Oil",
+          "tier": 5,
+          "tag": "Fish Oil",
+          "taskCount": 1,
+          "quantities": [
+            5
+          ],
+          "fixed": true,
+          "perTurnIn": 5
+        },
+        {
+          "key": "item:6110010",
+          "name": "Peerless Fish Oil",
+          "tier": 6,
+          "tag": "Fish Oil",
+          "taskCount": 1,
+          "quantities": [
+            5
+          ],
+          "fixed": true,
+          "perTurnIn": 5
+        },
+        {
+          "key": "item:793439431",
+          "name": "Ornate Fish Oil",
+          "tier": 7,
+          "tag": "Fish Oil",
+          "taskCount": 1,
+          "quantities": [
+            5
+          ],
+          "fixed": true,
+          "perTurnIn": 5
+        },
+        {
+          "key": "item:9679815",
+          "name": "Pristine Fish Oil",
+          "tier": 8,
+          "tag": "Fish Oil",
+          "taskCount": 1,
+          "quantities": [
+            5
+          ],
+          "fixed": true,
+          "perTurnIn": 5
+        },
+        {
+          "key": "item:1491156124",
+          "name": "Magnificent Fish Oil",
+          "tier": 9,
+          "tag": "Fish Oil",
+          "taskCount": 1,
+          "quantities": [
+            5
+          ],
+          "fixed": true,
+          "perTurnIn": 5
+        },
+        {
+          "key": "item:1096168904",
+          "name": "Flawless Fish Oil",
+          "tier": 10,
+          "tag": "Fish Oil",
+          "taskCount": 1,
+          "quantities": [
+            5
+          ],
+          "fixed": true,
+          "perTurnIn": 5
+        },
+        {
+          "key": "cargo:6000",
+          "name": "Briny Linus",
+          "tier": 1,
+          "tag": "Ocean Fish",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:6001",
+          "name": "Muddy Oncor",
+          "tier": 2,
+          "tag": "Ocean Fish",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:6002",
+          "name": "Greenhorn Gorbu",
+          "tier": 3,
+          "tag": "Ocean Fish",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:6003",
+          "name": "Azure Centro",
+          "tier": 4,
+          "tag": "Ocean Fish",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:6004",
+          "name": "Rocky Aulono",
+          "tier": 5,
+          "tag": "Ocean Fish",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:6005",
+          "name": "Vibrant Janus",
+          "tier": 6,
+          "tag": "Ocean Fish",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:359813833",
+          "name": "Mossy Amia",
+          "tier": 7,
+          "tag": "Ocean Fish",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:495585314",
+          "name": "Murky Oxy",
+          "tier": 8,
+          "tag": "Ocean Fish",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:390639013",
+          "name": "Abyssal Gladius",
+          "tier": 9,
+          "tag": "Ocean Fish",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1237816866",
+          "name": "Divine Selachii",
+          "tier": 10,
+          "tag": "Ocean Fish",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "item:1110025",
+          "name": "Briny Linus Scale",
+          "tier": 1,
+          "tag": "Oceanfish Scale",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "item:2110025",
+          "name": "Muddy Oncor Scale",
+          "tier": 2,
+          "tag": "Oceanfish Scale",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "item:3110025",
+          "name": "Greenhorn Gorbu Scale",
+          "tier": 3,
+          "tag": "Oceanfish Scale",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "item:4110025",
+          "name": "Azure Centro Scale",
+          "tier": 4,
+          "tag": "Oceanfish Scale",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "item:5110025",
+          "name": "Rocky Aulono Scale",
+          "tier": 5,
+          "tag": "Oceanfish Scale",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "item:6110025",
+          "name": "Vibrant Janus Scale",
+          "tier": 6,
+          "tag": "Oceanfish Scale",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "item:187635334",
+          "name": "Mossy Amia Scale",
+          "tier": 7,
+          "tag": "Oceanfish Scale",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "item:1721428913",
+          "name": "Murky Oxy Scale",
+          "tier": 8,
+          "tag": "Oceanfish Scale",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "item:204941440",
+          "name": "Abyssal Gladius Scale",
+          "tier": 9,
+          "tag": "Oceanfish Scale",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "item:682879572",
+          "name": "Divine Selachii Scale",
+          "tier": 10,
+          "tag": "Oceanfish Scale",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "item:1210002",
+          "name": "Rough Parchment",
+          "tier": 1,
+          "tag": "Parchment",
+          "taskCount": 1,
+          "quantities": [
+            20
+          ],
+          "fixed": true,
+          "perTurnIn": 20
+        },
+        {
+          "key": "item:2210002",
+          "name": "Simple Parchment",
+          "tier": 2,
+          "tag": "Parchment",
+          "taskCount": 1,
+          "quantities": [
+            20
+          ],
+          "fixed": true,
+          "perTurnIn": 20
+        },
+        {
+          "key": "item:3210002",
+          "name": "Sturdy Parchment",
+          "tier": 3,
+          "tag": "Parchment",
+          "taskCount": 1,
+          "quantities": [
+            20
+          ],
+          "fixed": true,
+          "perTurnIn": 20
+        },
+        {
+          "key": "item:4210002",
+          "name": "Fine Parchment",
+          "tier": 4,
+          "tag": "Parchment",
+          "taskCount": 1,
+          "quantities": [
+            20
+          ],
+          "fixed": true,
+          "perTurnIn": 20
+        },
+        {
+          "key": "item:5210002",
+          "name": "Exquisite Parchment",
+          "tier": 5,
+          "tag": "Parchment",
+          "taskCount": 1,
+          "quantities": [
+            20
+          ],
+          "fixed": true,
+          "perTurnIn": 20
+        },
+        {
+          "key": "item:6210002",
+          "name": "Peerless Parchment",
+          "tier": 6,
+          "tag": "Parchment",
+          "taskCount": 1,
+          "quantities": [
+            20
+          ],
+          "fixed": true,
+          "perTurnIn": 20
+        },
+        {
+          "key": "item:113276733",
+          "name": "Ornate Parchment",
+          "tier": 7,
+          "tag": "Parchment",
+          "taskCount": 1,
+          "quantities": [
+            20
+          ],
+          "fixed": true,
+          "perTurnIn": 20
+        },
+        {
+          "key": "item:95989045",
+          "name": "Pristine Parchment",
+          "tier": 8,
+          "tag": "Parchment",
+          "taskCount": 1,
+          "quantities": [
+            20
+          ],
+          "fixed": true,
+          "perTurnIn": 20
+        },
+        {
+          "key": "item:1987836568",
+          "name": "Magnificent Parchment",
+          "tier": 9,
+          "tag": "Parchment",
+          "taskCount": 1,
+          "quantities": [
+            20
+          ],
+          "fixed": true,
+          "perTurnIn": 20
+        },
+        {
+          "key": "item:254492415",
+          "name": "Flawless Parchment",
+          "tier": 10,
+          "tag": "Parchment",
+          "taskCount": 1,
+          "quantities": [
+            20
+          ],
+          "fixed": true,
+          "perTurnIn": 20
+        },
+        {
+          "key": "item:1110015",
+          "name": "Salt",
+          "tier": 1,
+          "tag": "Salt",
+          "taskCount": 10,
+          "quantities": [
+            10,
+            15,
+            20,
+            25,
+            30,
+            35,
+            40,
+            45,
+            50,
+            55
+          ],
+          "fixed": false,
+          "perTurnIn": null
+        },
+        {
+          "key": "cargo:7000",
+          "name": "Rough Cloth Tarp",
+          "tier": 1,
+          "tag": "Tarp",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:7001",
+          "name": "Simple Cloth Tarp",
+          "tier": 2,
+          "tag": "Tarp",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:7002",
+          "name": "Sturdy Cloth Tarp",
+          "tier": 3,
+          "tag": "Tarp",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:7003",
+          "name": "Fine Cloth Tarp",
+          "tier": 4,
+          "tag": "Tarp",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:7004",
+          "name": "Exquisite Cloth Tarp",
+          "tier": 5,
+          "tag": "Tarp",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:7005",
+          "name": "Peerless Cloth Tarp",
+          "tier": 6,
+          "tag": "Tarp",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1791508890",
+          "name": "Ornate Cloth Tarp",
+          "tier": 7,
+          "tag": "Tarp",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:503195279",
+          "name": "Pristine Cloth Tarp",
+          "tier": 8,
+          "tag": "Tarp",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:392822871",
+          "name": "Magnificent Cloth Tarp",
+          "tier": 9,
+          "tag": "Tarp",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1836028490",
+          "name": "Flawless Cloth Tarp",
+          "tier": 10,
+          "tag": "Tarp",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1200",
+          "name": "Rough Timber",
+          "tier": 1,
+          "tag": "Timber",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1201",
+          "name": "Simple Timber",
+          "tier": 2,
+          "tag": "Timber",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1202",
+          "name": "Sturdy Timber",
+          "tier": 3,
+          "tag": "Timber",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1203",
+          "name": "Fine Timber",
+          "tier": 4,
+          "tag": "Timber",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1204",
+          "name": "Exquisite Timber",
+          "tier": 5,
+          "tag": "Timber",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1205",
+          "name": "Peerless Timber",
+          "tier": 6,
+          "tag": "Timber",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:884292413",
+          "name": "Ornate Timber",
+          "tier": 7,
+          "tag": "Timber",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1948570022",
+          "name": "Pristine Timber",
+          "tier": 8,
+          "tag": "Timber",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1473504323",
+          "name": "Magnificent Timber",
+          "tier": 9,
+          "tag": "Timber",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "cargo:1585122058",
+          "name": "Flawless Timber",
+          "tier": 10,
+          "tag": "Timber",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        }
+      ]
+    },
+    "Ramparte": {
+      "npcType": 7,
+      "skills": [
+        18
+      ],
+      "taskCount": 24,
+      "materials": [
+        {
+          "key": "item:711737334",
+          "name": "Insect Wing",
+          "tier": -1,
+          "tag": "Common Slayer Material",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:767727086",
+          "name": "Jakyl Fur",
+          "tier": -1,
+          "tag": "Common Slayer Material",
+          "taskCount": 4,
+          "quantities": [
+            1,
+            5,
+            10
+          ],
+          "fixed": false,
+          "perTurnIn": null
+        },
+        {
+          "key": "item:828731292",
+          "name": "Alpha Jakyl Fur",
+          "tier": -1,
+          "tag": "Common Slayer Material",
+          "taskCount": 1,
+          "quantities": [
+            3
+          ],
+          "fixed": true,
+          "perTurnIn": 3
+        },
+        {
+          "key": "item:540370053",
+          "name": "Chitin",
+          "tier": -1,
+          "tag": "Common Slayer Material",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1665899831",
+          "name": "Umbura Fur",
+          "tier": -1,
+          "tag": "Common Slayer Material",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:420864423",
+          "name": "Glittering Junk",
+          "tier": -1,
+          "tag": "Common Slayer Material",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:796569767",
+          "name": "Araknir Silk",
+          "tier": -1,
+          "tag": "Dungeon Crafting Material",
+          "taskCount": 1,
+          "quantities": [
+            25
+          ],
+          "fixed": true,
+          "perTurnIn": 25
+        },
+        {
+          "key": "item:502555967",
+          "name": "Ancient Skitch Shell",
+          "tier": -1,
+          "tag": "Dungeon Loot",
+          "taskCount": 2,
+          "quantities": [
+            1,
+            5
+          ],
+          "fixed": false,
+          "perTurnIn": null
+        },
+        {
+          "key": "item:542378458",
+          "name": "Araknir Eggsack",
+          "tier": -1,
+          "tag": "Dungeon Loot",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "item:1163107303",
+          "name": "Sentinel's Insignia",
+          "tier": -1,
+          "tag": "Dungeon Loot",
+          "taskCount": 1,
+          "quantities": [
+            1
+          ],
+          "fixed": true,
+          "perTurnIn": 1
+        },
+        {
+          "key": "item:1125718226",
+          "name": "Crystalized Slime",
+          "tier": -1,
+          "tag": "Rare Slayer Material",
+          "taskCount": 2,
+          "quantities": [
+            1,
+            5
+          ],
+          "fixed": false,
+          "perTurnIn": null
+        },
+        {
+          "key": "item:225094001",
+          "name": "Jakyl Fang",
+          "tier": -1,
+          "tag": "Rare Slayer Material",
+          "taskCount": 2,
+          "quantities": [
+            1,
+            5
+          ],
+          "fixed": false,
+          "perTurnIn": null
+        },
+        {
+          "key": "item:209860372",
+          "name": "Hardened Shell",
+          "tier": -1,
+          "tag": "Rare Slayer Material",
+          "taskCount": 2,
+          "quantities": [
+            1,
+            5
+          ],
+          "fixed": false,
+          "perTurnIn": null
+        },
+        {
+          "key": "item:617029534",
+          "name": "Umbura Fang",
+          "tier": -1,
+          "tag": "Rare Slayer Material",
+          "taskCount": 2,
+          "quantities": [
+            1,
+            5
+          ],
+          "fixed": false,
+          "perTurnIn": null
+        },
+        {
+          "key": "item:344122023",
+          "name": "Deadly Stinger",
+          "tier": -1,
+          "tag": "Rare Slayer Material",
+          "taskCount": 2,
+          "quantities": [
+            1,
+            5
+          ],
+          "fixed": false,
+          "perTurnIn": null
+        }
+      ]
+    },
+    "Alesi": {
+      "npcType": 6,
+      "skills": [
+        17
+      ],
+      "taskCount": 50,
+      "materials": [
+        {
+          "key": "item:1110016",
+          "name": "Briny Guppi",
+          "tier": 1,
+          "tag": "Baitfish",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:2110016",
+          "name": "Muddy Guppi",
+          "tier": 2,
+          "tag": "Baitfish",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:3110016",
+          "name": "Greenhorn Guppi",
+          "tier": 3,
+          "tag": "Baitfish",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:4110016",
+          "name": "Azure Minni",
+          "tier": 4,
+          "tag": "Baitfish",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:5110016",
+          "name": "Rocky Minni",
+          "tier": 5,
+          "tag": "Baitfish",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:6110016",
+          "name": "Vibrant Nano",
+          "tier": 6,
+          "tag": "Baitfish",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:297634455",
+          "name": "Mossy Nano",
+          "tier": 7,
+          "tag": "Baitfish",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:540806596",
+          "name": "Murky Chub",
+          "tier": 8,
+          "tag": "Baitfish",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1147002521",
+          "name": "Abyssal Rasbi",
+          "tier": 9,
+          "tag": "Baitfish",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:37723214",
+          "name": "Divine Tetra",
+          "tier": 10,
+          "tag": "Baitfish",
+          "taskCount": 1,
+          "quantities": [
+            10
+          ],
+          "fixed": true,
+          "perTurnIn": 10
+        },
+        {
+          "key": "item:1100007",
+          "name": "Basic Embergrain",
+          "tier": 1,
+          "tag": "Grain",
+          "taskCount": 1,
+          "quantities": [
+            200
+          ],
+          "fixed": true,
+          "perTurnIn": 200
+        },
+        {
+          "key": "item:2100007",
+          "name": "Simple Embergrain",
+          "tier": 2,
+          "tag": "Grain",
+          "taskCount": 1,
+          "quantities": [
+            200
+          ],
+          "fixed": true,
+          "perTurnIn": 200
+        },
+        {
+          "key": "item:3100007",
+          "name": "Infused Embergrain",
+          "tier": 3,
+          "tag": "Grain",
+          "taskCount": 1,
+          "quantities": [
+            200
+          ],
+          "fixed": true,
+          "perTurnIn": 200
+        },
+        {
+          "key": "item:4100007",
+          "name": "Fine Embergrain",
+          "tier": 4,
+          "tag": "Grain",
+          "taskCount": 1,
+          "quantities": [
+            200
+          ],
+          "fixed": true,
+          "perTurnIn": 200
+        },
+        {
+          "key": "item:5100007",
+          "name": "Exquisite Embergrain",
+          "tier": 5,
+          "tag": "Grain",
+          "taskCount": 1,
+          "quantities": [
+            200
+          ],
+          "fixed": true,
+          "perTurnIn": 200
+        },
+        {
+          "key": "item:6100007",
+          "name": "Peerless Embergrain",
+          "tier": 6,
+          "tag": "Grain",
+          "taskCount": 1,
+          "quantities": [
+            200
+          ],
+          "fixed": true,
+          "perTurnIn": 200
+        },
+        {
+          "key": "item:466935552",
+          "name": "Ornate Embergrain",
+          "tier": 7,
+          "tag": "Grain",
+          "taskCount": 1,
+          "quantities": [
+            200
+          ],
+          "fixed": true,
+          "perTurnIn": 200
+        },
+        {
+          "key": "item:1571291352",
+          "name": "Pristine Embergrain",
+          "tier": 8,
+          "tag": "Grain",
+          "taskCount": 1,
+          "quantities": [
+            200
+          ],
+          "fixed": true,
+          "perTurnIn": 200
+        },
+        {
+          "key": "item:2015361382",
+          "name": "Magnificent Embergrain",
+          "tier": 9,
+          "tag": "Grain",
+          "taskCount": 1,
+          "quantities": [
+            200
+          ],
+          "fixed": true,
+          "perTurnIn": 200
+        },
+        {
+          "key": "item:2018635990",
+          "name": "Flawless Embergrain",
+          "tier": 10,
+          "tag": "Grain",
+          "taskCount": 1,
+          "quantities": [
+            200
+          ],
+          "fixed": true,
+          "perTurnIn": 200
+        },
+        {
+          "key": "item:1985753175",
+          "name": "Basic Healing Potion",
+          "tier": 1,
+          "tag": "Healing Potion",
+          "taskCount": 1,
+          "quantities": [
+            5
+          ],
+          "fixed": true,
+          "perTurnIn": 5
+        },
+        {
+          "key": "item:231882109",
+          "name": "Simple Healing Potion",
+          "tier": 2,
+          "tag": "Healing Potion",
+          "taskCount": 1,
+          "quantities": [
+            5
+          ],
+          "fixed": true,
+          "perTurnIn": 5
+        },
+        {
+          "key": "item:1241558565",
+          "name": "Infused Healing Potion",
+          "tier": 3,
+          "tag": "Healing Potion",
+          "taskCount": 1,
+          "quantities": [
+            5
+          ],
+          "fixed": true,
+          "perTurnIn": 5
+        },
+        {
+          "key": "item:60702200",
+          "name": "Fine Healing Potion",
+          "tier": 4,
+          "tag": "Healing Potion",
+          "taskCount": 1,
+          "quantities": [
+            5
+          ],
+          "fixed": true,
+          "perTurnIn": 5
+        },
+        {
+          "key": "item:349664081",
+          "name": "Exquisite Healing Potion",
+          "tier": 5,
+          "tag": "Healing Potion",
+          "taskCount": 1,
+          "quantities": [
+            5
+          ],
+          "fixed": true,
+          "perTurnIn": 5
+        },
+        {
+          "key": "item:150119774",
+          "name": "Peerless Healing Potion",
+          "tier": 6,
+          "tag": "Healing Potion",
+          "taskCount": 1,
+          "quantities": [
+            5
+          ],
+          "fixed": true,
+          "perTurnIn": 5
+        },
+        {
+          "key": "item:1595786521",
+          "name": "Ornate Healing Potion",
+          "tier": 7,
+          "tag": "Healing Potion",
+          "taskCount": 1,
+          "quantities": [
+            5
+          ],
+          "fixed": true,
+          "perTurnIn": 5
+        },
+        {
+          "key": "item:2114450653",
+          "name": "Pristine Healing Potion",
+          "tier": 8,
+          "tag": "Healing Potion",
+          "taskCount": 1,
+          "quantities": [
+            5
+          ],
+          "fixed": true,
+          "perTurnIn": 5
+        },
+        {
+          "key": "item:1633320160",
+          "name": "Magnificent Healing Potion",
+          "tier": 9,
+          "tag": "Healing Potion",
+          "taskCount": 1,
+          "quantities": [
+            5
+          ],
+          "fixed": true,
+          "perTurnIn": 5
+        },
+        {
+          "key": "item:2011003333",
+          "name": "Flawless Healing Potion",
+          "tier": 10,
+          "tag": "Healing Potion",
+          "taskCount": 1,
+          "quantities": [
+            5
+          ],
+          "fixed": true,
+          "perTurnIn": 5
+        },
+        {
+          "key": "item:1130001",
+          "name": "Rough Plant Fiber",
+          "tier": 1,
+          "tag": "Plant Fiber",
+          "taskCount": 1,
+          "quantities": [
+            300
+          ],
+          "fixed": true,
+          "perTurnIn": 300
+        },
+        {
+          "key": "item:2130001",
+          "name": "Simple Plant Fiber",
+          "tier": 2,
+          "tag": "Plant Fiber",
+          "taskCount": 1,
+          "quantities": [
+            300
+          ],
+          "fixed": true,
+          "perTurnIn": 300
+        },
+        {
+          "key": "item:3130001",
+          "name": "Sturdy Plant Fiber",
+          "tier": 3,
+          "tag": "Plant Fiber",
+          "taskCount": 1,
+          "quantities": [
+            300
+          ],
+          "fixed": true,
+          "perTurnIn": 300
+        },
+        {
+          "key": "item:4130001",
+          "name": "Fine Plant Fiber",
+          "tier": 4,
+          "tag": "Plant Fiber",
+          "taskCount": 1,
+          "quantities": [
+            300
+          ],
+          "fixed": true,
+          "perTurnIn": 300
+        },
+        {
+          "key": "item:5130001",
+          "name": "Exquisite Plant Fiber",
+          "tier": 5,
+          "tag": "Plant Fiber",
+          "taskCount": 1,
+          "quantities": [
+            300
+          ],
+          "fixed": true,
+          "perTurnIn": 300
+        },
+        {
+          "key": "item:6130001",
+          "name": "Peerless Plant Fiber",
+          "tier": 6,
+          "tag": "Plant Fiber",
+          "taskCount": 1,
+          "quantities": [
+            300
+          ],
+          "fixed": true,
+          "perTurnIn": 300
+        },
+        {
+          "key": "item:1872328157",
+          "name": "Ornate Plant Fiber",
+          "tier": 7,
+          "tag": "Plant Fiber",
+          "taskCount": 1,
+          "quantities": [
+            300
+          ],
+          "fixed": true,
+          "perTurnIn": 300
+        },
+        {
+          "key": "item:1921640057",
+          "name": "Pristine Plant Fiber",
+          "tier": 8,
+          "tag": "Plant Fiber",
+          "taskCount": 1,
+          "quantities": [
+            300
+          ],
+          "fixed": true,
+          "perTurnIn": 300
+        },
+        {
+          "key": "item:1614190762",
+          "name": "Magnificent Plant Fiber",
+          "tier": 9,
+          "tag": "Plant Fiber",
+          "taskCount": 1,
+          "quantities": [
+            300
+          ],
+          "fixed": true,
+          "perTurnIn": 300
+        },
+        {
+          "key": "item:1358191814",
+          "name": "Flawless Plant Fiber",
+          "tier": 10,
+          "tag": "Plant Fiber",
+          "taskCount": 1,
+          "quantities": [
+            300
+          ],
+          "fixed": true,
+          "perTurnIn": 300
+        },
+        {
+          "key": "item:1100010",
+          "name": "Basic Starbulb",
+          "tier": 1,
+          "tag": "Vegetable",
+          "taskCount": 1,
+          "quantities": [
+            30
+          ],
+          "fixed": true,
+          "perTurnIn": 30
+        },
+        {
+          "key": "item:2100010",
+          "name": "Simple Starbulb",
+          "tier": 2,
+          "tag": "Vegetable",
+          "taskCount": 1,
+          "quantities": [
+            30
+          ],
+          "fixed": true,
+          "perTurnIn": 30
+        },
+        {
+          "key": "item:3100010",
+          "name": "Infused Starbulb",
+          "tier": 3,
+          "tag": "Vegetable",
+          "taskCount": 1,
+          "quantities": [
+            30
+          ],
+          "fixed": true,
+          "perTurnIn": 30
+        },
+        {
+          "key": "item:4100010",
+          "name": "Fine Starbulb",
+          "tier": 4,
+          "tag": "Vegetable",
+          "taskCount": 1,
+          "quantities": [
+            30
+          ],
+          "fixed": true,
+          "perTurnIn": 30
+        },
+        {
+          "key": "item:5100010",
+          "name": "Exquisite Starbulb",
+          "tier": 5,
+          "tag": "Vegetable",
+          "taskCount": 1,
+          "quantities": [
+            30
+          ],
+          "fixed": true,
+          "perTurnIn": 30
+        },
+        {
+          "key": "item:6100010",
+          "name": "Peerless Starbulb",
+          "tier": 6,
+          "tag": "Vegetable",
+          "taskCount": 1,
+          "quantities": [
+            30
+          ],
+          "fixed": true,
+          "perTurnIn": 30
+        },
+        {
+          "key": "item:817656467",
+          "name": "Ornate Starbulb",
+          "tier": 7,
+          "tag": "Vegetable",
+          "taskCount": 1,
+          "quantities": [
+            30
+          ],
+          "fixed": true,
+          "perTurnIn": 30
+        },
+        {
+          "key": "item:1981238432",
+          "name": "Pristine Starbulb",
+          "tier": 8,
+          "tag": "Vegetable",
+          "taskCount": 1,
+          "quantities": [
+            30
+          ],
+          "fixed": true,
+          "perTurnIn": 30
+        },
+        {
+          "key": "item:1599513441",
+          "name": "Magnificent Starbulb",
+          "tier": 9,
+          "tag": "Vegetable",
+          "taskCount": 1,
+          "quantities": [
+            30
+          ],
+          "fixed": true,
+          "perTurnIn": 30
+        },
+        {
+          "key": "item:845990900",
+          "name": "Flawless Starbulb",
+          "tier": 10,
+          "tag": "Vegetable",
+          "taskCount": 1,
+          "quantities": [
+            30
+          ],
+          "fixed": true,
+          "perTurnIn": 30
+        }
+      ]
+    }
+  },
+  "items": {
+    "cargo:2400": {
+      "name": "Rough Brick Slab",
+      "tier": 1,
+      "tag": "Brick Slab"
+    },
+    "cargo:2401": {
+      "name": "Simple Brick Slab",
+      "tier": 2,
+      "tag": "Brick Slab"
+    },
+    "cargo:2402": {
+      "name": "Sturdy Brick Slab",
+      "tier": 3,
+      "tag": "Brick Slab"
+    },
+    "cargo:2403": {
+      "name": "Fine Brick Slab",
+      "tier": 4,
+      "tag": "Brick Slab"
+    },
+    "cargo:2404": {
+      "name": "Exquisite Brick Slab",
+      "tier": 5,
+      "tag": "Brick Slab"
+    },
+    "cargo:2405": {
+      "name": "Peerless Brick Slab",
+      "tier": 6,
+      "tag": "Brick Slab"
+    },
+    "cargo:302152262": {
+      "name": "Ornate Brick Slab",
+      "tier": 7,
+      "tag": "Brick Slab"
+    },
+    "cargo:360403214": {
+      "name": "Pristine Brick Slab",
+      "tier": 8,
+      "tag": "Brick Slab"
+    },
+    "cargo:888273394": {
+      "name": "Magnificent Brick Slab",
+      "tier": 9,
+      "tag": "Brick Slab"
+    },
+    "cargo:631093405": {
+      "name": "Flawless Brick Slab",
+      "tier": 10,
+      "tag": "Brick Slab"
+    },
+    "cargo:970827760": {
+      "name": "Ferralith Frames",
+      "tier": 1,
+      "tag": "Frame"
+    },
+    "cargo:1044447676": {
+      "name": "Pyrelite Frames",
+      "tier": 2,
+      "tag": "Frame"
+    },
+    "cargo:15195543": {
+      "name": "Emarium Frames",
+      "tier": 3,
+      "tag": "Frame"
+    },
+    "cargo:341301575": {
+      "name": "Elenvar Frames",
+      "tier": 4,
+      "tag": "Frame"
+    },
+    "cargo:1080157951": {
+      "name": "Luminite Frames",
+      "tier": 5,
+      "tag": "Frame"
+    },
+    "cargo:1989901185": {
+      "name": "Rathium Frames",
+      "tier": 6,
+      "tag": "Frame"
+    },
+    "cargo:1219367849": {
+      "name": "Aurumite Frames",
+      "tier": 7,
+      "tag": "Frame"
+    },
+    "cargo:1654222357": {
+      "name": "Celestium Frames",
+      "tier": 8,
+      "tag": "Frame"
+    },
+    "cargo:1167304009": {
+      "name": "Umbracite Frames",
+      "tier": 9,
+      "tag": "Frame"
+    },
+    "cargo:1811266661": {
+      "name": "Astralite Frames",
+      "tier": 10,
+      "tag": "Frame"
+    },
+    "cargo:1552106905": {
+      "name": "Rough Leather Sheeting",
+      "tier": 1,
+      "tag": "Sheeting"
+    },
+    "cargo:1297204491": {
+      "name": "Simple Leather Sheeting",
+      "tier": 2,
+      "tag": "Sheeting"
+    },
+    "cargo:1090747065": {
+      "name": "Sturdy Leather Sheeting",
+      "tier": 3,
+      "tag": "Sheeting"
+    },
+    "cargo:1784593653": {
+      "name": "Fine Leather Sheeting",
+      "tier": 4,
+      "tag": "Sheeting"
+    },
+    "cargo:741862367": {
+      "name": "Exquisite Leather Sheeting",
+      "tier": 5,
+      "tag": "Sheeting"
+    },
+    "cargo:1863123674": {
+      "name": "Peerless Leather Sheeting",
+      "tier": 6,
+      "tag": "Sheeting"
+    },
+    "cargo:897676087": {
+      "name": "Ornate Leather Sheeting",
+      "tier": 7,
+      "tag": "Sheeting"
+    },
+    "cargo:715636845": {
+      "name": "Pristine Leather Sheeting",
+      "tier": 8,
+      "tag": "Sheeting"
+    },
+    "cargo:898540348": {
+      "name": "Magnificent Leather Sheeting",
+      "tier": 9,
+      "tag": "Sheeting"
+    },
+    "cargo:1935556465": {
+      "name": "Flawless Leather Sheeting",
+      "tier": 10,
+      "tag": "Sheeting"
+    },
+    "cargo:7000": {
+      "name": "Rough Cloth Tarp",
+      "tier": 1,
+      "tag": "Tarp"
+    },
+    "cargo:7001": {
+      "name": "Simple Cloth Tarp",
+      "tier": 2,
+      "tag": "Tarp"
+    },
+    "cargo:7002": {
+      "name": "Sturdy Cloth Tarp",
+      "tier": 3,
+      "tag": "Tarp"
+    },
+    "cargo:7003": {
+      "name": "Fine Cloth Tarp",
+      "tier": 4,
+      "tag": "Tarp"
+    },
+    "cargo:7004": {
+      "name": "Exquisite Cloth Tarp",
+      "tier": 5,
+      "tag": "Tarp"
+    },
+    "cargo:7005": {
+      "name": "Peerless Cloth Tarp",
+      "tier": 6,
+      "tag": "Tarp"
+    },
+    "cargo:1791508890": {
+      "name": "Ornate Cloth Tarp",
+      "tier": 7,
+      "tag": "Tarp"
+    },
+    "cargo:503195279": {
+      "name": "Pristine Cloth Tarp",
+      "tier": 8,
+      "tag": "Tarp"
+    },
+    "cargo:392822871": {
+      "name": "Magnificent Cloth Tarp",
+      "tier": 9,
+      "tag": "Tarp"
+    },
+    "cargo:1836028490": {
+      "name": "Flawless Cloth Tarp",
+      "tier": 10,
+      "tag": "Tarp"
+    },
+    "cargo:1200": {
+      "name": "Rough Timber",
+      "tier": 1,
+      "tag": "Timber"
+    },
+    "cargo:1201": {
+      "name": "Simple Timber",
+      "tier": 2,
+      "tag": "Timber"
+    },
+    "cargo:1202": {
+      "name": "Sturdy Timber",
+      "tier": 3,
+      "tag": "Timber"
+    },
+    "cargo:1203": {
+      "name": "Fine Timber",
+      "tier": 4,
+      "tag": "Timber"
+    },
+    "cargo:1204": {
+      "name": "Exquisite Timber",
+      "tier": 5,
+      "tag": "Timber"
+    },
+    "cargo:1205": {
+      "name": "Peerless Timber",
+      "tier": 6,
+      "tag": "Timber"
+    },
+    "cargo:884292413": {
+      "name": "Ornate Timber",
+      "tier": 7,
+      "tag": "Timber"
+    },
+    "cargo:1948570022": {
+      "name": "Pristine Timber",
+      "tier": 8,
+      "tag": "Timber"
+    },
+    "cargo:1473504323": {
+      "name": "Magnificent Timber",
+      "tier": 9,
+      "tag": "Timber"
+    },
+    "cargo:1585122058": {
+      "name": "Flawless Timber",
+      "tier": 10,
+      "tag": "Timber"
+    },
+    "item:1170000": {
+      "name": "Plain Cooked Berries",
+      "tier": 1,
+      "tag": "Basic Food"
+    },
+    "item:1170004": {
+      "name": "Plain Mashed Bulbs",
+      "tier": 1,
+      "tag": "Basic Food"
+    },
+    "item:1170001": {
+      "name": "Plain Mushroom Skewer",
+      "tier": 1,
+      "tag": "Basic Food"
+    },
+    "item:1170002": {
+      "name": "Plain Roasted Meat",
+      "tier": 1,
+      "tag": "Basic Food"
+    },
+    "item:1170007": {
+      "name": "Plain Roasted Ocean Fish",
+      "tier": 1,
+      "tag": "Basic Food"
+    },
+    "item:2170001": {
+      "name": "Savory Mushroom Skewer",
+      "tier": 2,
+      "tag": "Basic Food"
+    },
+    "item:2170004": {
+      "name": "Savory Mashed Bulbs",
+      "tier": 2,
+      "tag": "Basic Food"
+    },
+    "item:2170000": {
+      "name": "Savory Cooked Berries",
+      "tier": 2,
+      "tag": "Basic Food"
+    },
+    "item:2170007": {
+      "name": "Savory Roasted Ocean Fish",
+      "tier": 2,
+      "tag": "Basic Food"
+    },
+    "item:2170002": {
+      "name": "Savory Roasted Meat",
+      "tier": 2,
+      "tag": "Basic Food"
+    },
+    "item:3170004": {
+      "name": "Zesty Mashed Bulbs",
+      "tier": 3,
+      "tag": "Basic Food"
+    },
+    "item:3170000": {
+      "name": "Zesty Cooked Berries",
+      "tier": 3,
+      "tag": "Basic Food"
+    },
+    "item:3170007": {
+      "name": "Zesty Roasted Ocean Fish",
+      "tier": 3,
+      "tag": "Basic Food"
+    },
+    "item:3170002": {
+      "name": "Zesty Roasted Meat",
+      "tier": 3,
+      "tag": "Basic Food"
+    },
+    "item:3170001": {
+      "name": "Zesty Mushroom Skewer",
+      "tier": 3,
+      "tag": "Basic Food"
+    },
+    "item:4170000": {
+      "name": "Fine Cooked Berries",
+      "tier": 4,
+      "tag": "Basic Food"
+    },
+    "item:4170007": {
+      "name": "Fine Roasted Ocean Fish",
+      "tier": 4,
+      "tag": "Basic Food"
+    },
+    "item:4170002": {
+      "name": "Fine Roasted Meat",
+      "tier": 4,
+      "tag": "Basic Food"
+    },
+    "item:4170001": {
+      "name": "Fine Mushroom Skewer",
+      "tier": 4,
+      "tag": "Basic Food"
+    },
+    "item:4170004": {
+      "name": "Fine Mashed Bulbs",
+      "tier": 4,
+      "tag": "Basic Food"
+    },
+    "item:5170002": {
+      "name": "Succulent Roasted Meat",
+      "tier": 5,
+      "tag": "Basic Food"
+    },
+    "item:5170001": {
+      "name": "Succulent Mushroom Skewer",
+      "tier": 5,
+      "tag": "Basic Food"
+    },
+    "item:5170004": {
+      "name": "Succulent Mashed Bulbs",
+      "tier": 5,
+      "tag": "Basic Food"
+    },
+    "item:5170000": {
+      "name": "Succulent Cooked Berries",
+      "tier": 5,
+      "tag": "Basic Food"
+    },
+    "item:5170007": {
+      "name": "Succulent Roasted Ocean Fish",
+      "tier": 5,
+      "tag": "Basic Food"
+    },
+    "item:6170001": {
+      "name": "Ambrosial Mushroom Skewer",
+      "tier": 6,
+      "tag": "Basic Food"
+    },
+    "item:6170004": {
+      "name": "Ambrosial Mashed Bulbs",
+      "tier": 6,
+      "tag": "Basic Food"
+    },
+    "item:6170000": {
+      "name": "Ambrosial Cooked Berries",
+      "tier": 6,
+      "tag": "Basic Food"
+    },
+    "item:6170007": {
+      "name": "Ambrosial Roasted Ocean Fish",
+      "tier": 6,
+      "tag": "Basic Food"
+    },
+    "item:6170002": {
+      "name": "Ambrosial Roasted Meat",
+      "tier": 6,
+      "tag": "Basic Food"
+    },
+    "item:1936407696": {
+      "name": "Flavorful Mashed Bulbs",
+      "tier": 7,
+      "tag": "Basic Food"
+    },
+    "item:287213426": {
+      "name": "Flavorful Cooked Berries",
+      "tier": 7,
+      "tag": "Basic Food"
+    },
+    "item:102576945": {
+      "name": "Flavorful Roasted Ocean Fish",
+      "tier": 7,
+      "tag": "Basic Food"
+    },
+    "item:1221133683": {
+      "name": "Flavorful Roasted Meat",
+      "tier": 7,
+      "tag": "Basic Food"
+    },
+    "item:1783151508": {
+      "name": "Flavorful Mushroom Skewer",
+      "tier": 7,
+      "tag": "Basic Food"
+    },
+    "item:1667103104": {
+      "name": "Delicious Cooked Berries",
+      "tier": 8,
+      "tag": "Basic Food"
+    },
+    "item:499222991": {
+      "name": "Delicious Roasted Ocean Fish",
+      "tier": 8,
+      "tag": "Basic Food"
+    },
+    "item:1915371751": {
+      "name": "Delicious Roasted Meat",
+      "tier": 8,
+      "tag": "Basic Food"
+    },
+    "item:1962733786": {
+      "name": "Delicious Mushroom Skewer",
+      "tier": 8,
+      "tag": "Basic Food"
+    },
+    "item:529721253": {
+      "name": "Delicious Mashed Bulbs",
+      "tier": 8,
+      "tag": "Basic Food"
+    },
+    "item:40349004": {
+      "name": "Scrumptious Roasted Meat",
+      "tier": 9,
+      "tag": "Basic Food"
+    },
+    "item:1927578557": {
+      "name": "Scrumptious Mushroom Skewer",
+      "tier": 9,
+      "tag": "Basic Food"
+    },
+    "item:2031320058": {
+      "name": "Scrumptious Mashed Bulbs",
+      "tier": 9,
+      "tag": "Basic Food"
+    },
+    "item:291179803": {
+      "name": "Scrumptious Cooked Berries",
+      "tier": 9,
+      "tag": "Basic Food"
+    },
+    "item:335141681": {
+      "name": "Scrumptious Roasted Ocean Fish",
+      "tier": 9,
+      "tag": "Basic Food"
+    },
+    "item:1664560257": {
+      "name": "Delectable Mushroom Skewer",
+      "tier": 10,
+      "tag": "Basic Food"
+    },
+    "item:819149629": {
+      "name": "Delectable Mashed Bulbs",
+      "tier": 10,
+      "tag": "Basic Food"
+    },
+    "item:1510160267": {
+      "name": "Delectable Cooked Berries",
+      "tier": 10,
+      "tag": "Basic Food"
+    },
+    "item:1299649056": {
+      "name": "Delectable Roasted Ocean Fish",
+      "tier": 10,
+      "tag": "Basic Food"
+    },
+    "item:277511016": {
+      "name": "Delectable Roasted Meat",
+      "tier": 10,
+      "tag": "Basic Food"
+    },
+    "item:1030002": {
+      "name": "Rough Brick",
+      "tier": 1,
+      "tag": "Brick"
+    },
+    "item:2030002": {
+      "name": "Simple Brick",
+      "tier": 2,
+      "tag": "Brick"
+    },
+    "item:3030002": {
+      "name": "Sturdy Brick",
+      "tier": 3,
+      "tag": "Brick"
+    },
+    "item:4030002": {
+      "name": "Fine Brick",
+      "tier": 4,
+      "tag": "Brick"
+    },
+    "item:5030002": {
+      "name": "Exquisite Brick",
+      "tier": 5,
+      "tag": "Brick"
+    },
+    "item:6030002": {
+      "name": "Peerless Brick",
+      "tier": 6,
+      "tag": "Brick"
+    },
+    "item:813610254": {
+      "name": "Ornate Brick",
+      "tier": 7,
+      "tag": "Brick"
+    },
+    "item:1221137435": {
+      "name": "Pristine Brick",
+      "tier": 8,
+      "tag": "Brick"
+    },
+    "item:834413277": {
+      "name": "Magnificent Brick",
+      "tier": 9,
+      "tag": "Brick"
+    },
+    "item:931497471": {
+      "name": "Flawless Brick",
+      "tier": 10,
+      "tag": "Brick"
+    },
+    "item:1090002": {
+      "name": "Rough Cloth",
+      "tier": 1,
+      "tag": "Cloth"
+    },
+    "item:2090002": {
+      "name": "Simple Cloth",
+      "tier": 2,
+      "tag": "Cloth"
+    },
+    "item:3090002": {
+      "name": "Sturdy Cloth",
+      "tier": 3,
+      "tag": "Cloth"
+    },
+    "item:4090002": {
+      "name": "Fine Cloth",
+      "tier": 4,
+      "tag": "Cloth"
+    },
+    "item:5090002": {
+      "name": "Exquisite Cloth",
+      "tier": 5,
+      "tag": "Cloth"
+    },
+    "item:6090002": {
+      "name": "Peerless Cloth",
+      "tier": 6,
+      "tag": "Cloth"
+    },
+    "item:1610800379": {
+      "name": "Ornate Cloth",
+      "tier": 7,
+      "tag": "Cloth"
+    },
+    "item:136406464": {
+      "name": "Pristine Cloth",
+      "tier": 8,
+      "tag": "Cloth"
+    },
+    "item:282660928": {
+      "name": "Magnificent Cloth",
+      "tier": 9,
+      "tag": "Cloth"
+    },
+    "item:35270576": {
+      "name": "Flawless Cloth",
+      "tier": 10,
+      "tag": "Cloth"
+    },
+    "item:1": {
+      "name": "Hex Coin",
+      "tier": -1,
+      "tag": "Coins"
+    },
+    "item:1050001": {
+      "name": "Ferralith Ingot",
+      "tier": 1,
+      "tag": "Ingot"
+    },
+    "item:2050001": {
+      "name": "Pyrelite Ingot",
+      "tier": 2,
+      "tag": "Ingot"
+    },
+    "item:3050001": {
+      "name": "Emarium Ingot",
+      "tier": 3,
+      "tag": "Ingot"
+    },
+    "item:4050001": {
+      "name": "Elenvar Ingot",
+      "tier": 4,
+      "tag": "Ingot"
+    },
+    "item:5050001": {
+      "name": "Luminite Ingot",
+      "tier": 5,
+      "tag": "Ingot"
+    },
+    "item:6050001": {
+      "name": "Rathium Ingot",
+      "tier": 6,
+      "tag": "Ingot"
+    },
+    "item:1899017490": {
+      "name": "Aurumite Ingot",
+      "tier": 7,
+      "tag": "Ingot"
+    },
+    "item:1464752960": {
+      "name": "Celestium Ingot",
+      "tier": 8,
+      "tag": "Ingot"
+    },
+    "item:445742898": {
+      "name": "Umbracite Ingot",
+      "tier": 9,
+      "tag": "Ingot"
+    },
+    "item:2069757207": {
+      "name": "Astralite Ingot",
+      "tier": 10,
+      "tag": "Ingot"
+    },
+    "item:1210001": {
+      "name": "Basic Ink",
+      "tier": 1,
+      "tag": "Ink"
+    },
+    "item:2210001": {
+      "name": "Simple Ink",
+      "tier": 2,
+      "tag": "Ink"
+    },
+    "item:3210001": {
+      "name": "Infused Ink",
+      "tier": 3,
+      "tag": "Ink"
+    },
+    "item:4210001": {
+      "name": "Fine Ink",
+      "tier": 4,
+      "tag": "Ink"
+    },
+    "item:5210001": {
+      "name": "Exquisite Ink",
+      "tier": 5,
+      "tag": "Ink"
+    },
+    "item:6210001": {
+      "name": "Peerless Ink",
+      "tier": 6,
+      "tag": "Ink"
+    },
+    "item:365949150": {
+      "name": "Ornate Ink",
+      "tier": 7,
+      "tag": "Ink"
+    },
+    "item:398010040": {
+      "name": "Pristine Ink",
+      "tier": 8,
+      "tag": "Ink"
+    },
+    "item:1070004": {
+      "name": "Rough Leather",
+      "tier": 1,
+      "tag": "Leather"
+    },
+    "item:2070004": {
+      "name": "Simple Leather",
+      "tier": 2,
+      "tag": "Leather"
+    },
+    "item:3070004": {
+      "name": "Sturdy Leather",
+      "tier": 3,
+      "tag": "Leather"
+    },
+    "item:4070004": {
+      "name": "Fine Leather",
+      "tier": 4,
+      "tag": "Leather"
+    },
+    "item:5070004": {
+      "name": "Exquisite Leather",
+      "tier": 5,
+      "tag": "Leather"
+    },
+    "item:6070004": {
+      "name": "Peerless Leather",
+      "tier": 6,
+      "tag": "Leather"
+    },
+    "item:806992520": {
+      "name": "Ornate Leather",
+      "tier": 7,
+      "tag": "Leather"
+    },
+    "item:1743778001": {
+      "name": "Pristine Leather",
+      "tier": 8,
+      "tag": "Leather"
+    },
+    "item:1580025475": {
+      "name": "Magnificent Leather",
+      "tier": 9,
+      "tag": "Leather"
+    },
+    "item:711364475": {
+      "name": "Flawless Leather",
+      "tier": 10,
+      "tag": "Leather"
+    },
+    "item:1210002": {
+      "name": "Rough Parchment",
+      "tier": 1,
+      "tag": "Parchment"
+    },
+    "item:2210002": {
+      "name": "Simple Parchment",
+      "tier": 2,
+      "tag": "Parchment"
+    },
+    "item:3210002": {
+      "name": "Sturdy Parchment",
+      "tier": 3,
+      "tag": "Parchment"
+    },
+    "item:4210002": {
+      "name": "Fine Parchment",
+      "tier": 4,
+      "tag": "Parchment"
+    },
+    "item:5210002": {
+      "name": "Exquisite Parchment",
+      "tier": 5,
+      "tag": "Parchment"
+    },
+    "item:6210002": {
+      "name": "Peerless Parchment",
+      "tier": 6,
+      "tag": "Parchment"
+    },
+    "item:113276733": {
+      "name": "Ornate Parchment",
+      "tier": 7,
+      "tag": "Parchment"
+    },
+    "item:95989045": {
+      "name": "Pristine Parchment",
+      "tier": 8,
+      "tag": "Parchment"
+    },
+    "item:1987836568": {
+      "name": "Magnificent Parchment",
+      "tier": 9,
+      "tag": "Parchment"
+    },
+    "item:254492415": {
+      "name": "Flawless Parchment",
+      "tier": 10,
+      "tag": "Parchment"
+    },
+    "item:1020003": {
+      "name": "Rough Plank",
+      "tier": 1,
+      "tag": "Plank"
+    },
+    "item:2020003": {
+      "name": "Simple Plank",
+      "tier": 2,
+      "tag": "Plank"
+    },
+    "item:3020003": {
+      "name": "Sturdy Plank",
+      "tier": 3,
+      "tag": "Plank"
+    },
+    "item:4020003": {
+      "name": "Fine Plank",
+      "tier": 4,
+      "tag": "Plank"
+    },
+    "item:5020003": {
+      "name": "Exquisite Plank",
+      "tier": 5,
+      "tag": "Plank"
+    },
+    "item:6020003": {
+      "name": "Peerless Plank",
+      "tier": 6,
+      "tag": "Plank"
+    },
+    "item:1639308227": {
+      "name": "Ornate Plank",
+      "tier": 7,
+      "tag": "Plank"
+    },
+    "item:28056473": {
+      "name": "Pristine Plank",
+      "tier": 8,
+      "tag": "Plank"
+    },
+    "item:1227914325": {
+      "name": "Magnificent Plank",
+      "tier": 9,
+      "tag": "Plank"
+    },
+    "item:117329467": {
+      "name": "Flawless Plank",
+      "tier": 10,
+      "tag": "Plank"
+    },
+    "cargo:583106011": {
+      "name": "Rough Experimental Compounds",
+      "tier": 1,
+      "tag": "Supplies"
+    },
+    "cargo:1496962595": {
+      "name": "Simple Experimental Compounds",
+      "tier": 2,
+      "tag": "Supplies"
+    },
+    "cargo:2146702618": {
+      "name": "Infused Experimental Compounds",
+      "tier": 3,
+      "tag": "Supplies"
+    },
+    "cargo:1026230335": {
+      "name": "Fine Experimental Compounds",
+      "tier": 4,
+      "tag": "Supplies"
+    },
+    "cargo:338529773": {
+      "name": "Exquisite Experimental Compounds",
+      "tier": 5,
+      "tag": "Supplies"
+    },
+    "cargo:53658000": {
+      "name": "Peerless Experimental Compounds",
+      "tier": 6,
+      "tag": "Supplies"
+    },
+    "cargo:1546723412": {
+      "name": "Ornate Experimental Compounds",
+      "tier": 7,
+      "tag": "Supplies"
+    },
+    "cargo:960407828": {
+      "name": "Pristine Experimental Compounds",
+      "tier": 8,
+      "tag": "Supplies"
+    },
+    "cargo:1090785594": {
+      "name": "Magnificent Experimental Compounds",
+      "tier": 9,
+      "tag": "Supplies"
+    },
+    "cargo:1412406838": {
+      "name": "Flawless Experimental Compounds",
+      "tier": 10,
+      "tag": "Supplies"
+    },
+    "item:1170006": {
+      "name": "Plain Roasted Fish",
+      "tier": 1,
+      "tag": "Basic Food"
+    },
+    "item:2170006": {
+      "name": "Savory Roasted Fish",
+      "tier": 2,
+      "tag": "Basic Food"
+    },
+    "item:3170006": {
+      "name": "Zesty Roasted Fish",
+      "tier": 3,
+      "tag": "Basic Food"
+    },
+    "item:4170006": {
+      "name": "Fine Roasted Fish",
+      "tier": 4,
+      "tag": "Basic Food"
+    },
+    "item:5170006": {
+      "name": "Succulent Roasted Fish",
+      "tier": 5,
+      "tag": "Basic Food"
+    },
+    "item:6170006": {
+      "name": "Ambrosial Roasted Fish",
+      "tier": 6,
+      "tag": "Basic Food"
+    },
+    "item:1110010": {
+      "name": "Basic Fish Oil",
+      "tier": 1,
+      "tag": "Fish Oil"
+    },
+    "item:2110010": {
+      "name": "Simple Fish Oil",
+      "tier": 2,
+      "tag": "Fish Oil"
+    },
+    "item:3110010": {
+      "name": "Infused Fish Oil",
+      "tier": 3,
+      "tag": "Fish Oil"
+    },
+    "item:4110010": {
+      "name": "Fine Fish Oil",
+      "tier": 4,
+      "tag": "Fish Oil"
+    },
+    "item:5110010": {
+      "name": "Exquisite Fish Oil",
+      "tier": 5,
+      "tag": "Fish Oil"
+    },
+    "item:6110010": {
+      "name": "Peerless Fish Oil",
+      "tier": 6,
+      "tag": "Fish Oil"
+    },
+    "item:793439431": {
+      "name": "Ornate Fish Oil",
+      "tier": 7,
+      "tag": "Fish Oil"
+    },
+    "item:9679815": {
+      "name": "Pristine Fish Oil",
+      "tier": 8,
+      "tag": "Fish Oil"
+    },
+    "item:1491156124": {
+      "name": "Magnificent Fish Oil",
+      "tier": 9,
+      "tag": "Fish Oil"
+    },
+    "item:1096168904": {
+      "name": "Flawless Fish Oil",
+      "tier": 10,
+      "tag": "Fish Oil"
+    },
+    "cargo:6000": {
+      "name": "Briny Linus",
+      "tier": 1,
+      "tag": "Ocean Fish"
+    },
+    "cargo:6001": {
+      "name": "Muddy Oncor",
+      "tier": 2,
+      "tag": "Ocean Fish"
+    },
+    "cargo:6002": {
+      "name": "Greenhorn Gorbu",
+      "tier": 3,
+      "tag": "Ocean Fish"
+    },
+    "cargo:6003": {
+      "name": "Azure Centro",
+      "tier": 4,
+      "tag": "Ocean Fish"
+    },
+    "cargo:6004": {
+      "name": "Rocky Aulono",
+      "tier": 5,
+      "tag": "Ocean Fish"
+    },
+    "cargo:6005": {
+      "name": "Vibrant Janus",
+      "tier": 6,
+      "tag": "Ocean Fish"
+    },
+    "cargo:359813833": {
+      "name": "Mossy Amia",
+      "tier": 7,
+      "tag": "Ocean Fish"
+    },
+    "cargo:495585314": {
+      "name": "Murky Oxy",
+      "tier": 8,
+      "tag": "Ocean Fish"
+    },
+    "cargo:390639013": {
+      "name": "Abyssal Gladius",
+      "tier": 9,
+      "tag": "Ocean Fish"
+    },
+    "cargo:1237816866": {
+      "name": "Divine Selachii",
+      "tier": 10,
+      "tag": "Ocean Fish"
+    },
+    "item:1110025": {
+      "name": "Briny Linus Scale",
+      "tier": 1,
+      "tag": "Oceanfish Scale"
+    },
+    "item:2110025": {
+      "name": "Muddy Oncor Scale",
+      "tier": 2,
+      "tag": "Oceanfish Scale"
+    },
+    "item:3110025": {
+      "name": "Greenhorn Gorbu Scale",
+      "tier": 3,
+      "tag": "Oceanfish Scale"
+    },
+    "item:4110025": {
+      "name": "Azure Centro Scale",
+      "tier": 4,
+      "tag": "Oceanfish Scale"
+    },
+    "item:5110025": {
+      "name": "Rocky Aulono Scale",
+      "tier": 5,
+      "tag": "Oceanfish Scale"
+    },
+    "item:6110025": {
+      "name": "Vibrant Janus Scale",
+      "tier": 6,
+      "tag": "Oceanfish Scale"
+    },
+    "item:187635334": {
+      "name": "Mossy Amia Scale",
+      "tier": 7,
+      "tag": "Oceanfish Scale"
+    },
+    "item:1721428913": {
+      "name": "Murky Oxy Scale",
+      "tier": 8,
+      "tag": "Oceanfish Scale"
+    },
+    "item:204941440": {
+      "name": "Abyssal Gladius Scale",
+      "tier": 9,
+      "tag": "Oceanfish Scale"
+    },
+    "item:682879572": {
+      "name": "Divine Selachii Scale",
+      "tier": 10,
+      "tag": "Oceanfish Scale"
+    },
+    "item:1110015": {
+      "name": "Salt",
+      "tier": 1,
+      "tag": "Salt"
+    },
+    "item:711737334": {
+      "name": "Insect Wing",
+      "tier": -1,
+      "tag": "Common Slayer Material"
+    },
+    "item:767727086": {
+      "name": "Jakyl Fur",
+      "tier": -1,
+      "tag": "Common Slayer Material"
+    },
+    "item:828731292": {
+      "name": "Alpha Jakyl Fur",
+      "tier": -1,
+      "tag": "Common Slayer Material"
+    },
+    "item:540370053": {
+      "name": "Chitin",
+      "tier": -1,
+      "tag": "Common Slayer Material"
+    },
+    "item:1665899831": {
+      "name": "Umbura Fur",
+      "tier": -1,
+      "tag": "Common Slayer Material"
+    },
+    "item:420864423": {
+      "name": "Glittering Junk",
+      "tier": -1,
+      "tag": "Common Slayer Material"
+    },
+    "item:796569767": {
+      "name": "Araknir Silk",
+      "tier": -1,
+      "tag": "Dungeon Crafting Material"
+    },
+    "item:502555967": {
+      "name": "Ancient Skitch Shell",
+      "tier": -1,
+      "tag": "Dungeon Loot"
+    },
+    "item:542378458": {
+      "name": "Araknir Eggsack",
+      "tier": -1,
+      "tag": "Dungeon Loot"
+    },
+    "item:1163107303": {
+      "name": "Sentinel's Insignia",
+      "tier": -1,
+      "tag": "Dungeon Loot"
+    },
+    "item:1125718226": {
+      "name": "Crystalized Slime",
+      "tier": -1,
+      "tag": "Rare Slayer Material"
+    },
+    "item:225094001": {
+      "name": "Jakyl Fang",
+      "tier": -1,
+      "tag": "Rare Slayer Material"
+    },
+    "item:209860372": {
+      "name": "Hardened Shell",
+      "tier": -1,
+      "tag": "Rare Slayer Material"
+    },
+    "item:617029534": {
+      "name": "Umbura Fang",
+      "tier": -1,
+      "tag": "Rare Slayer Material"
+    },
+    "item:344122023": {
+      "name": "Deadly Stinger",
+      "tier": -1,
+      "tag": "Rare Slayer Material"
+    },
+    "item:1110016": {
+      "name": "Briny Guppi",
+      "tier": 1,
+      "tag": "Baitfish"
+    },
+    "item:2110016": {
+      "name": "Muddy Guppi",
+      "tier": 2,
+      "tag": "Baitfish"
+    },
+    "item:3110016": {
+      "name": "Greenhorn Guppi",
+      "tier": 3,
+      "tag": "Baitfish"
+    },
+    "item:4110016": {
+      "name": "Azure Minni",
+      "tier": 4,
+      "tag": "Baitfish"
+    },
+    "item:5110016": {
+      "name": "Rocky Minni",
+      "tier": 5,
+      "tag": "Baitfish"
+    },
+    "item:6110016": {
+      "name": "Vibrant Nano",
+      "tier": 6,
+      "tag": "Baitfish"
+    },
+    "item:297634455": {
+      "name": "Mossy Nano",
+      "tier": 7,
+      "tag": "Baitfish"
+    },
+    "item:540806596": {
+      "name": "Murky Chub",
+      "tier": 8,
+      "tag": "Baitfish"
+    },
+    "item:1147002521": {
+      "name": "Abyssal Rasbi",
+      "tier": 9,
+      "tag": "Baitfish"
+    },
+    "item:37723214": {
+      "name": "Divine Tetra",
+      "tier": 10,
+      "tag": "Baitfish"
+    },
+    "item:1100007": {
+      "name": "Basic Embergrain",
+      "tier": 1,
+      "tag": "Grain"
+    },
+    "item:2100007": {
+      "name": "Simple Embergrain",
+      "tier": 2,
+      "tag": "Grain"
+    },
+    "item:3100007": {
+      "name": "Infused Embergrain",
+      "tier": 3,
+      "tag": "Grain"
+    },
+    "item:4100007": {
+      "name": "Fine Embergrain",
+      "tier": 4,
+      "tag": "Grain"
+    },
+    "item:5100007": {
+      "name": "Exquisite Embergrain",
+      "tier": 5,
+      "tag": "Grain"
+    },
+    "item:6100007": {
+      "name": "Peerless Embergrain",
+      "tier": 6,
+      "tag": "Grain"
+    },
+    "item:466935552": {
+      "name": "Ornate Embergrain",
+      "tier": 7,
+      "tag": "Grain"
+    },
+    "item:1571291352": {
+      "name": "Pristine Embergrain",
+      "tier": 8,
+      "tag": "Grain"
+    },
+    "item:2015361382": {
+      "name": "Magnificent Embergrain",
+      "tier": 9,
+      "tag": "Grain"
+    },
+    "item:2018635990": {
+      "name": "Flawless Embergrain",
+      "tier": 10,
+      "tag": "Grain"
+    },
+    "item:1985753175": {
+      "name": "Basic Healing Potion",
+      "tier": 1,
+      "tag": "Healing Potion"
+    },
+    "item:231882109": {
+      "name": "Simple Healing Potion",
+      "tier": 2,
+      "tag": "Healing Potion"
+    },
+    "item:1241558565": {
+      "name": "Infused Healing Potion",
+      "tier": 3,
+      "tag": "Healing Potion"
+    },
+    "item:60702200": {
+      "name": "Fine Healing Potion",
+      "tier": 4,
+      "tag": "Healing Potion"
+    },
+    "item:349664081": {
+      "name": "Exquisite Healing Potion",
+      "tier": 5,
+      "tag": "Healing Potion"
+    },
+    "item:150119774": {
+      "name": "Peerless Healing Potion",
+      "tier": 6,
+      "tag": "Healing Potion"
+    },
+    "item:1595786521": {
+      "name": "Ornate Healing Potion",
+      "tier": 7,
+      "tag": "Healing Potion"
+    },
+    "item:2114450653": {
+      "name": "Pristine Healing Potion",
+      "tier": 8,
+      "tag": "Healing Potion"
+    },
+    "item:1633320160": {
+      "name": "Magnificent Healing Potion",
+      "tier": 9,
+      "tag": "Healing Potion"
+    },
+    "item:2011003333": {
+      "name": "Flawless Healing Potion",
+      "tier": 10,
+      "tag": "Healing Potion"
+    },
+    "item:1130001": {
+      "name": "Rough Plant Fiber",
+      "tier": 1,
+      "tag": "Plant Fiber"
+    },
+    "item:2130001": {
+      "name": "Simple Plant Fiber",
+      "tier": 2,
+      "tag": "Plant Fiber"
+    },
+    "item:3130001": {
+      "name": "Sturdy Plant Fiber",
+      "tier": 3,
+      "tag": "Plant Fiber"
+    },
+    "item:4130001": {
+      "name": "Fine Plant Fiber",
+      "tier": 4,
+      "tag": "Plant Fiber"
+    },
+    "item:5130001": {
+      "name": "Exquisite Plant Fiber",
+      "tier": 5,
+      "tag": "Plant Fiber"
+    },
+    "item:6130001": {
+      "name": "Peerless Plant Fiber",
+      "tier": 6,
+      "tag": "Plant Fiber"
+    },
+    "item:1872328157": {
+      "name": "Ornate Plant Fiber",
+      "tier": 7,
+      "tag": "Plant Fiber"
+    },
+    "item:1921640057": {
+      "name": "Pristine Plant Fiber",
+      "tier": 8,
+      "tag": "Plant Fiber"
+    },
+    "item:1614190762": {
+      "name": "Magnificent Plant Fiber",
+      "tier": 9,
+      "tag": "Plant Fiber"
+    },
+    "item:1358191814": {
+      "name": "Flawless Plant Fiber",
+      "tier": 10,
+      "tag": "Plant Fiber"
+    },
+    "item:1100010": {
+      "name": "Basic Starbulb",
+      "tier": 1,
+      "tag": "Vegetable"
+    },
+    "item:2100010": {
+      "name": "Simple Starbulb",
+      "tier": 2,
+      "tag": "Vegetable"
+    },
+    "item:3100010": {
+      "name": "Infused Starbulb",
+      "tier": 3,
+      "tag": "Vegetable"
+    },
+    "item:4100010": {
+      "name": "Fine Starbulb",
+      "tier": 4,
+      "tag": "Vegetable"
+    },
+    "item:5100010": {
+      "name": "Exquisite Starbulb",
+      "tier": 5,
+      "tag": "Vegetable"
+    },
+    "item:6100010": {
+      "name": "Peerless Starbulb",
+      "tier": 6,
+      "tag": "Vegetable"
+    },
+    "item:817656467": {
+      "name": "Ornate Starbulb",
+      "tier": 7,
+      "tag": "Vegetable"
+    },
+    "item:1981238432": {
+      "name": "Pristine Starbulb",
+      "tier": 8,
+      "tag": "Vegetable"
+    },
+    "item:1599513441": {
+      "name": "Magnificent Starbulb",
+      "tier": 9,
+      "tag": "Vegetable"
+    },
+    "item:845990900": {
+      "name": "Flawless Starbulb",
+      "tier": 10,
+      "tag": "Vegetable"
+    }
+  }
+}

@@ -1,0 +1,137 @@
+# Setting the bot up in your Discord server
+
+About ten minutes. You'll create a Discord application, invite it to your server, and run
+it locally.
+
+> **Never paste your bot token into a chat, an issue, or a commit — including to me.**
+> It is a password for the bot account. If one leaks, regenerate it immediately in the
+> Developer Portal; the old one stops working straight away. `.env` is gitignored, and
+> `.gitignore` was committed before any token existed, so there is no window where it
+> could be committed by accident.
+
+---
+
+## 1. Create the application
+
+1. Go to <https://discord.com/developers/applications> and click **New Application**.
+2. Name it whatever you want — this is the name users see. Accept the terms, **Create**.
+3. On **General Information**, copy the **Application ID**. That's your
+   `DISCORD_CLIENT_ID`.
+
+## 2. Create the bot user and get a token
+
+1. Open the **Bot** tab in the left sidebar.
+2. Click **Reset Token**, confirm, then **Copy**. This is your `DISCORD_TOKEN`, and
+   Discord will not show it again — if you lose it, reset it and use the new one.
+3. Leave all three **Privileged Gateway Intents** switched **off**. This bot uses only
+   slash commands and never reads message content, so it needs none of them. If a guide
+   tells you to enable Message Content Intent, it is describing a different kind of bot.
+
+## 3. Invite it to your server
+
+1. Open **Installation** in the sidebar (older portals call this **OAuth2 → URL
+   Generator**).
+2. Under **Guild Install**, set scopes to **`bot`** and **`applications.commands`**.
+   Without `applications.commands`, slash commands will not register.
+3. Give it these permissions, and no more:
+
+   | Permission | Why |
+   |---|---|
+   | View Channels | see the channel it posts in |
+   | Send Messages | post the tracker message |
+   | Embed Links | the tracker is an embed |
+   | Read Message History | find its own message to edit in place |
+
+4. Copy the generated URL, open it, pick your server, **Authorize**.
+
+If you'd rather skip the generator, this is the same thing — replace `YOUR_CLIENT_ID`:
+
+```
+https://discord.com/api/oauth2/authorize?client_id=YOUR_CLIENT_ID&permissions=84992&scope=bot%20applications.commands
+```
+
+`84992` is exactly the four permissions above. It deliberately does **not** include
+Administrator, and you should not grant it.
+
+## 4. Get your server id
+
+Slash commands registered to one server appear instantly; global ones can take up to an
+hour. During testing you want the former.
+
+1. Discord **Settings → Advanced → Developer Mode**, on.
+2. Right-click your server in the sidebar → **Copy Server ID**. That's `DISCORD_GUILD_ID`.
+
+---
+
+## 5. Run it
+
+```bash
+npm install
+```
+
+Copy `.env.example` to `.env` and fill in the three values:
+
+```
+DISCORD_TOKEN=your-token-here
+DISCORD_CLIENT_ID=your-application-id
+DISCORD_GUILD_ID=your-server-id
+```
+
+Generate the rulebook — the list of every task each traveler can give. This reads a
+community relay once and writes `data/rulebook.json`:
+
+```bash
+npm run rulebook
+```
+
+Register the slash commands with Discord:
+
+```bash
+npm run commands
+```
+
+Start the bot:
+
+```bash
+npm start
+```
+
+You should see:
+
+```
+rulebook loaded: 321 tasks, 6 travelers (from bitjita, …)
+logged in as YourBot#1234
+serving 1 guild(s): Your Server
+```
+
+---
+
+## 6. What you can try right now
+
+Storage tracking isn't built yet. These exist so you can confirm the whole chain — relay
+→ rulebook → Discord — actually works.
+
+| Command | What it does |
+|---|---|
+| `/ping` | confirms the bot is connected, shows heartbeat latency |
+| `/travelers` | all six travelers with task and material counts |
+| `/traveler name:Alesi` | one traveler's materials grouped by family |
+
+`/traveler name:Alesi` should return five families — Plant Fiber, Grain, Vegetable,
+Baitfish, Healing Potion — each spanning T1–T10. That is the grouping described in
+DESIGN.md §8, running on real game data.
+
+---
+
+## When something doesn't work
+
+| Symptom | Cause |
+|---|---|
+| Commands don't appear | `applications.commands` scope was missing at invite time. Re-invite with the URL above; you do not need to kick the bot first. |
+| `Missing Access` from `npm run commands` | `DISCORD_GUILD_ID` is a server the bot isn't in, or was invited without `applications.commands`. |
+| `Unauthorized` / 401 | `DISCORD_TOKEN` is wrong or was reset. Copy it again from the Bot tab. |
+| `No rulebook at …` | run `npm run rulebook` first. |
+| `all relays failed` | both community relays were unreachable. They do have brief outages — wait a few minutes and retry. Nothing is wrong with your setup. |
+| Commands appear but nothing happens | the bot process isn't running. `npm start` must stay running; closing the terminal stops it. |
+
+Run `npm test` any time to check the data-handling layer without touching Discord.
