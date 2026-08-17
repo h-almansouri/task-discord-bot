@@ -1,0 +1,34 @@
+# Render blueprint. Create the service from this with New > Blueprint.
+#
+# A Background Worker, not a Web Service: the bot holds an outbound gateway
+# connection and never receives inbound HTTP. A free web service would spin down
+# after 15 minutes of no inbound traffic and stay down, since nothing ever calls
+# it. Background workers are not offered on the free tier.
+#
+# The disk is what keeps per-guild settings. Everything outside it is wiped on
+# every deploy and restart, which would silently reset channels, travelers and
+# thresholds.
+services:
+  - type: worker
+    name: bitcraft-traveler-supply-bot
+    runtime: node
+    plan: starter          # background workers have no free plan
+    buildCommand: npm ci --omit=dev
+    startCommand: node src/bot.mjs
+    autoDeploy: true
+    disk:
+      name: config
+      mountPath: /data
+      sizeGB: 1            # config is a few KB per guild; 1GB is the minimum
+    envVars:
+      - key: CONFIG_DIR
+        value: /data/config
+      - key: NODE_VERSION
+        value: "22"
+      # Set these in the dashboard, never here — this file is committed.
+      - key: DISCORD_TOKEN
+        sync: false
+      - key: DISCORD_CLIENT_ID
+        sync: false
+      - key: DISCORD_GUILD_ID
+        sync: false

@@ -9,7 +9,18 @@ import { readFile, writeFile, rename, mkdir, readdir, unlink } from 'node:fs/pro
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
-const DIR = fileURLToPath(new URL('../../config/', import.meta.url));
+/**
+ * Where guild config lives.
+ *
+ * Defaults to config/ beside the source, which is right for running locally.
+ * Hosted, it must point at persistent storage: most platforms wipe the
+ * filesystem on every deploy and restart, which would silently discard every
+ * guild's channels, travelers and thresholds. On Render that means a mounted
+ * disk, e.g. CONFIG_DIR=/data/config.
+ */
+const DIR = process.env.CONFIG_DIR
+  ? path.resolve(process.env.CONFIG_DIR)
+  : fileURLToPath(new URL('../../config/', import.meta.url));
 
 export function defaultConfig() {
   return {

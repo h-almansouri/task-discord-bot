@@ -223,3 +223,61 @@ Salt — and clears the prompts. Narrow it per traveler with
 | Commands appear but nothing happens | the bot process isn't running. `npm start` must stay running; closing the terminal stops it. |
 
 Run `npm test` any time to check the data-handling layer without touching Discord.
+
+---
+
+## Hosting it on Render
+
+The bot needs to run continuously. Two things about Render decide the shape of this:
+
+- **It must be a Background Worker, not a Web Service.** The bot holds an *outbound*
+  connection to Discord and never receives inbound HTTP. A free web service spins down
+  after 15 minutes without inbound traffic — and since nothing ever calls it, it would
+  stay down.
+- **Background workers have no free plan**, and neither do persistent disks. Expect about
+  **$7/month** for the worker plus a few cents for a 1 GB disk.
+
+The disk matters more than it sounds. Everything outside it is wiped on **every deploy and
+restart**, so without one your per-guild settings — channels, travelers, storages,
+thresholds — reset each time you push.
+
+### Steps
+
+1. **Push your code to GitHub** (already done if you're reading this from the repo).
+2. On Render, **New → Blueprint**, point it at the repository. It picks up
+   [`render.yaml`](render.yaml), which already declares the worker, the disk at `/data`,
+   and `CONFIG_DIR=/data/config`.
+3. Render will prompt for the three values marked `sync: false`. Enter
+   `DISCORD_TOKEN`, `DISCORD_CLIENT_ID` and `DISCORD_GUILD_ID` **in the dashboard** —
+   never in `render.yaml`, which is committed.
+4. Deploy. The logs should show:
+   ```
+   rulebook loaded: 321 tasks, 6 travelers …
+   logged in as YourBot#1234
+   tracker polling every 20s
+   ```
+5. **Register the slash commands once, from your own machine:**
+   ```bash
+   node scripts/register-commands.mjs
+   ```
+   This only talks to Discord's API, so it doesn't need to run on the server. Re-run it
+   whenever a command's shape changes.
+
+### Worth knowing
+
+- **Run the bot in one place at a time.** Two instances on the same token both answer every
+  interaction and both edit the tracker, which looks like the bot fighting itself. Stop
+  your local `node src/bot.mjs` once Render is live.
+- **The rulebook ships with the repo**, so the server never calls a relay at startup. After
+  a game patch, run `npm run rulebook` locally, commit the result, and let it deploy.
+- **A disk means no zero-downtime deploys** — Render stops the old instance before starting
+  the new one. For this bot a few seconds' gap is invisible; the tracker just redraws.
+- **Prefer global commands in production.** Leave `DISCORD_GUILD_ID` blank and the commands
+  work in every server the bot joins, at the cost of up to an hour to propagate.
+
+### If you'd rather not pay
+
+There's no free configuration of Render that works for this: the free tier lacks both the
+worker type and the persistent disk. The realistic alternatives are another host with a
+free always-on tier, a small VPS, or running it on a machine you leave on. `CONFIG_DIR`
+makes any of those a one-line change.
