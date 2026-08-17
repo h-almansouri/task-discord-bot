@@ -155,11 +155,23 @@ Discovered during the spike; several contradict widely-circulated advice.
 10. **`item_desc.tag` is the material-family key.** It groups Alesi's 50 items into 5
     families, and correctly groups `Baitfish` (Briny Guppi, Muddy Guppi, Greenhorn Guppi,
     Azure Minni…) which share no common substring and would defeat any name-parsing rule.
-11. **`/api/players/{id}/inventories` is much broader than "that player's stuff".** One
-    character returned **19 containers**: personal (Inventory, Toolbelt, Wallet), two
-    deployables (a wagon and a bird), and bank slots in **14 different claims** they are
-    merely a citizen of. Personal containers are identifiable by
-    `ownerEntityId === playerId`; everything else is owned by some other building.
+11. **A player's storage is spread across two endpoints that do not overlap.**
+    `/inventories` returned **19 containers** for one character: personal (Inventory,
+    Toolbelt, Wallet), two deployables (a wagon and a bird), and bank slots in **14
+    different claims** they are merely a citizen of. Their house's **35 containers** are
+    not in that response at all — the house building id never appears as an owner. They
+    come only from `/housing` → `/housing/{houseId}`, a 141 KB payload. Total selectable
+    containers for that one character: **54**.
+12. **House containers carry user-set nicknames in `buildingNickname`** — "Metal",
+    "Logs", "Farming", "Seeds N Fert". These are the names a player actually recognises,
+    and the only sane thing to show in a picker.
+13. **There are three different pocket shapes**, not two:
+    | Source | Pocket array | Contents keys |
+    |---|---|---|
+    | claim `/inventories` | `building.inventory[]` | `item_id`, `item_type` |
+    | player `/inventories` | `inventories[].pockets[]` | `itemId`, `itemType` |
+    | house `/housing/{id}` | `inventories[].inventory[]` | `item_id`, `item_type` |
+    One normalizer, applied at the boundary, or counts silently read zero.
 
 ---
 
@@ -216,10 +228,20 @@ Per guild. JSON file to start; SQLite only if multi-guild becomes real.
   "messageId": "…",                 // the message edited in place
   "reminder": { "roleId": "…", "hoursBefore": 24 },
   "storages": [
-    { "type": "claim",  "id": "864691128488445884", "buildings": "all" },
-    { "type": "claim",  "id": "…", "buildings": ["Alesi Tasks"] },
-    { "type": "player", "id": "1369094286781181638",
-      "containers": "personal", "housing": true }
+    {
+      "source": { "type": "player", "id": "1369094286781181638", "name": "Velcruza" },
+      "containers": [                       // explicit; ids are authoritative
+        { "id": "1369094288186713242", "name": "Logs",    "from": "house" },
+        { "id": "…",                   "name": "Metal",   "from": "house" },
+        { "id": "…",                   "name": "Farming", "from": "house" }
+      ]
+    },
+    {
+      "source": { "type": "claim", "id": "864691128488445884", "name": "Mystic Embassy" },
+      "containers": [
+        { "id": "…", "name": "Alesi Tasks", "from": "claim" }
+      ]
+    }
   ],
   "travelers": {
     "Alesi": { "tiers": [1, 5] },
@@ -234,18 +256,14 @@ Per guild. JSON file to start; SQLite only if multi-guild becomes real.
 No region field — ids are region-agnostic *(verified)*. Region arrives as metadata on
 responses and is only worth surfacing in `/storage list` for human recognition.
 
-Building-level selection matters: a claim may hold Embergrain set aside for crafting that
-nobody would ever turn in. Summing all buildings would count it and suppress a warning
-you wanted.
+**Containers are always chosen explicitly — there is no default set.** One character had
+54 of them across personal slots, a wagon, a bird, 14 claim banks and 35 house chests
+*(verified, §4.11)*. No default could guess usefully among those, and a wrong guess
+silently counts stock in other people's towns and suppresses warnings you wanted.
 
-Player storages need the same care, for a sharper reason. `/inventories` returns
-**everything a character can reach** — one test character had 19 containers including bank
-slots in 14 claims they are only a citizen of *(verified, §4.11)*. Adding a player with no
-filter would silently count stock sitting in other people's towns.
-
-So `containers` defaults to `"personal"` — the containers where
-`ownerEntityId === playerId`, i.e. Inventory, Toolbelt and Wallet. `"all"` takes
-everything, or name specific containers. Housing is included by default where it exists.
+Names are stored alongside ids purely for display; the **id is authoritative**, so
+renaming a chest in game doesn't break tracking. `/storage list` should show a container
+whose name has drifted, since that's a signal the layout changed.
 
 ---
 
@@ -253,10 +271,8 @@ everything, or name specific containers. Housing is included by default where it
 
 ```
 /setup channel #channel
-/storage add claim "Mystic Embassy"
-/storage add claim "Mystic Embassy" building "Alesi Tasks"
-/storage add player "Velcruza"                    # personal containers only
-/storage add player "Velcruza" containers all     # incl. claim banks + deployables
+/storage add "Velcruza"           # player or claim name -> container picker
+/storage add "Mystic Embassy"
 /storage list | /storage remove <n>
 /traveler add Alesi tiers 1-5
 /traveler list | /traveler remove Alesi
@@ -267,6 +283,31 @@ everything, or name specific containers. Housing is included by default where it
 /refresh
 /rulebook refresh
 ```
+
+### The `/storage add` flow
+
+One command for both players and claims — the bot works out which the name is.
+
+1. `/storage add "Velcruza"` — resolve the name via `/api/players?q=` and
+   `/api/claims?q=`. If it matches both, or several, disambiguate first.
+2. Fetch every container that source has. For a player that means `/inventories` **and**
+   `/housing` → `/housing/{houseId}` per house, since they don't overlap *(§4.11)*.
+3. Present them all in an ephemeral message, grouped by origin and labelled with the name
+   the player would recognise — `buildingNickname` where set *(§4.12)*.
+4. User multi-selects. Only the chosen containers are stored.
+
+Real listing for one character:
+
+```
+personal   Inventory · Toolbelt · Wallet · Velcruza's Wagon (III) · Velcruza's Bird (I)
+banks      Amberfall · Aurelia · Murwent · Notsolis · Oceansky City · … (14 claims)
+house      Metal · Logs · Planks · Leather · Cloth · Foraging · Fishing · Farming ·
+           Seeds N Fert · Raw Mats · Cooked Mats · Foods · Dropbox · … (35 chests)
+```
+
+**Discord caps a select menu at 25 options**, and 54 containers exceeds that. So the
+picker pages, or filters by origin group first (personal / banks / house) and then lists
+within it. Worth settling before building the command.
 
 ---
 
@@ -364,11 +405,14 @@ Settled since the first draft:
 - **Material families** — `item_desc.tag` is the grouping key (§4.10, §8).
 - **Variable-qty friction** — `/traveler add` prompts for the numbers inline (§5).
 
+- **Housing** — resolved: it is a **separate** request, not covered by `/inventories`
+  (§4.11). A player with a house costs `1 + 1 + houses` requests rather than 1.
+- **Container selection** — always explicit, via a picker. No defaults (§7).
+
 Still open:
 
-- **Does `/api/players/{id}/inventories` already include housing storage?** Still
-  unverified. Ten players sampled, including Velcruza; none owns a house, so there is no
-  test case. Design assumes a separate `/housing` request and dedupes by container entity
-  id, which is correct either way — just possibly one wasted request per player.
-- **Whether `"personal"` is the right default** for player containers, or whether the
-  common case is actually a shared claim bank someone wants counted.
+- **Picker layout for >25 containers.** Discord's select-menu cap is 25; one character
+  has 54. Page, or filter by origin group first?
+- **Refresh cost for house-backed storages.** `/housing/{houseId}` is 141 KB against
+  38 KB for a whole claim. If several tracked players own houses, the 20s poll gets
+  noticeably heavier — may want housing on a slower cycle than claim storage.
