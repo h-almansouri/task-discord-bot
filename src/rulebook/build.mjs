@@ -12,6 +12,16 @@ import { itemKey } from '../stock/normalize.mjs';
 export const RULEBOOK_TABLES = ['traveler_task_desc', 'npc_desc', 'item_desc', 'cargo_desc'];
 
 /**
+ * Tags that are not supply materials.
+ *
+ * Exactly one task in the whole catalogue requires currency — Rumbagh's mystery
+ * shipment, which costs 1,000 Hex Coins — while 320 of 321 tasks *reward* coins.
+ * It is a purchase, not something you stockpile, and coins live in the wallet
+ * rather than in any tracked container.
+ */
+const NON_MATERIAL_TAGS = new Set(['Coins']);
+
+/**
  * The words every name in a family ends with — "Basic Starbulb", "Fine Starbulb"
  * and so on share "Starbulb". Returns '' when there is no shared ending.
  */
@@ -95,6 +105,7 @@ export function buildRulebook({ traveler_task_desc, npc_desc, item_desc, cargo_d
     for (const [key, m] of entry.mats) {
       const distinct = [...new Set(m.quantities)].sort((a, b) => a - b);
       const info = items.get(key);
+      if (info && NON_MATERIAL_TAGS.has(info.tag)) continue;
       materials.push({
         key,
         name: info?.name ?? `<${key}>`,
@@ -117,8 +128,31 @@ export function buildRulebook({ traveler_task_desc, npc_desc, item_desc, cargo_d
       list.push(m);
     }
     for (const [tag, list] of byTag) {
-      const label = familyLabel(tag, list.map((m) => m.name));
-      for (const m of list) m.family = label;
+      // One tag can cover several distinct product lines. Heimlich's 50 materials
+      // are all tagged "Basic Food" but are five foods across ten tiers, so five
+      // items share every tier. Grouping them together would collide in the
+      // display, where a family is shown as one row of tiers.
+      //
+      // Repeated tiers are the signal. When they repeat, split by the name after
+      // the tier adjective — "Plain/Savory/Zesty Cooked Berries" all become
+      // "Cooked Berries". When they don't, the tag already groups a single line
+      // and must be left alone: Alesi's baitfish are ten different fish, one per
+      // tier, and splitting them would make ten families of one.
+      const tiers = list.map((m) => m.tier);
+      const tiersCollide = tiers.length !== new Set(tiers).size;
+
+      const clusters = new Map();
+      for (const m of list) {
+        const words = String(m.name).trim().split(/\s+/);
+        const key = tiersCollide ? (words.slice(1).join(' ') || m.name) : '';
+        const bucket = clusters.get(key) ?? [];
+        clusters.set(key, bucket);
+        bucket.push(m);
+      }
+      for (const members of clusters.values()) {
+        const label = familyLabel(tag, members.map((m) => m.name));
+        for (const m of members) m.family = label;
+      }
     }
 
     materials.sort((a, b) => (a.tag ?? '').localeCompare(b.tag ?? '') || (a.tier ?? 0) - (b.tier ?? 0));

@@ -116,6 +116,83 @@ test('familyLabel does not trim a more specific tag down to a vaguer word', () =
   );
 });
 
+test('one tag covering several product lines is split by tier collision', () => {
+  // Heimlich's shape: every material tagged "Basic Food", but five foods across
+  // two tiers, so each tier holds five different items.
+  const foods = [];
+  const tasks = [];
+  let id = 100;
+  for (const dish of ['Cooked Berries', 'Mashed Bulbs', 'Mushroom Skewer']) {
+    for (const [tier, prefix] of [[1, 'Plain'], [2, 'Savory']]) {
+      foods.push({ id, name: `${prefix} ${dish}`, tier, tag: 'Basic Food' });
+      tasks.push({
+        id: id + 1000,
+        level_requirement: { skill_id: 13 },
+        required_items: [[id, 10, [0, []], [0, 0]]],
+        description: 'Heimlich wants food.',
+      });
+      id++;
+    }
+  }
+  const rb = buildRulebook({
+    traveler_task_desc: tasks,
+    npc_desc: [{ npc_type: 3, name: 'Heimlich', task_skill_check: [13] }],
+    item_desc: foods,
+    cargo_desc: [],
+  });
+
+  const families = new Set(rb.travelers.Heimlich.materials.map((m) => m.family));
+  assert.deepEqual([...families].sort(), ['Cooked Berries', 'Mashed Bulbs', 'Mushroom Skewer']);
+
+  // and no family may repeat a tier
+  const byFamily = new Map();
+  for (const m of rb.travelers.Heimlich.materials) {
+    const list = byFamily.get(m.family) ?? [];
+    byFamily.set(m.family, list);
+    list.push(m.tier);
+  }
+  for (const [family, tiers] of byFamily) {
+    assert.equal(tiers.length, new Set(tiers).size, `${family} repeats a tier`);
+  }
+});
+
+test('a tag with one item per tier is left as a single family', () => {
+  // Alesi's baitfish: ten different fish, one per tier, sharing no name. Splitting
+  // these would make ten families of one.
+  const fish = ['Briny Guppi', 'Muddy Guppi', 'Azure Minni', 'Divine Tetra'];
+  const items = fish.map((name, i) => ({ id: 500 + i, name, tier: i + 1, tag: 'Baitfish' }));
+  const tasks = items.map((it) => ({
+    id: 9000 + it.id,
+    level_requirement: { skill_id: 17 },
+    required_items: [[it.id, 10, [0, []], [0, 0]]],
+    description: 'Alesi wants bait.',
+  }));
+  const rb = buildRulebook({
+    traveler_task_desc: tasks,
+    npc_desc: [{ npc_type: 6, name: 'Alesi', task_skill_check: [17] }],
+    item_desc: items,
+    cargo_desc: [],
+  });
+  const families = new Set(rb.travelers.Alesi.materials.map((m) => m.family));
+  assert.deepEqual([...families], ['Baitfish']);
+});
+
+test('currency is excluded — it is bought with, not stockpiled', () => {
+  // One task in the whole catalogue requires Hex Coins: Rumbagh's mystery
+  // shipment. It is a purchase, and coins live in the wallet.
+  const rb = buildRulebook({
+    traveler_task_desc: [{
+      id: 1, level_requirement: { skill_id: 19 },
+      required_items: [[1, 1000, [0, []], [0, 0]]],
+      description: 'Rumbagh will give you a shipment in exchange for Hex Coins.',
+    }],
+    npc_desc: [{ npc_type: 1, name: 'Rumbagh', task_skill_check: [19] }],
+    item_desc: [{ id: 1, name: 'Hex Coin', tier: -1, tag: 'Coins' }],
+    cargo_desc: [],
+  });
+  assert.equal(rb.travelers.Rumbagh?.materials.length ?? 0, 0);
+});
+
 test('buildRulebook assigns a family label to every material', () => {
   const rb = buildRulebook({ traveler_task_desc, npc_desc, item_desc, cargo_desc });
   for (const traveler of Object.values(rb.travelers)) {

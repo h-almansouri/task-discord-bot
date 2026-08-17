@@ -148,13 +148,19 @@ test('a family is a name line plus one pipe-separated row of tiers', () => {
   const text = renderGroup(groupShortfalls(rows)[0]);
   assert.equal(text.split('\n').length, 2);
   assert.match(text, /^\*\*Grain\*\*$/m);
-  assert.match(text, /T1 −1,000 \| T2 −1,000 \| T3 −1,000/);
+  assert.match(text, /T1 1,000 \| T2 1,000 \| T3 1,000/);
+});
+
+test('deficits are plain numbers, with no minus sign', () => {
+  const rows = [1, 2].map((t) => ({ ...grain(t), have: 0, target: 1000, short: 1000 }));
+  const text = renderGroup(groupShortfalls(rows)[0]);
+  assert.doesNotMatch(text, /[−-]\s*1,000/, 'numbers should not be prefixed with a minus');
 });
 
 test('a family with a single tier stays on one line', () => {
   const text = renderGroup(groupShortfalls([{ ...grain(3), have: 900, target: 1000, short: 100 }])[0]);
   assert.equal(text.split('\n').length, 1);
-  assert.match(text, /\*\*Grain\*\* T3 −100/);
+  assert.match(text, /\*\*Grain\*\* T3 100/);
 });
 
 test('the word "short" is not repeated on every row', () => {
@@ -172,20 +178,45 @@ test('targets are not shown anywhere in a family line', () => {
 
 test('tiers still share a line when their targets differ', () => {
   // Targets are no longer rendered, so uniformity of target no longer matters —
-  // only whether every row is tiered.
+  // only whether every row is tiered and no tier repeats.
   const rows = [
     { ...grain(1), have: 0, target: 1000, short: 1000 },
     { ...grain(2), have: 0, target: 400, short: 400 },
   ];
   const text = renderGroup(groupShortfalls(rows)[0]);
   assert.equal(text.split('\n').length, 2);
-  assert.match(text, /T1 −1,000 \| T2 −400/);
+  assert.match(text, /T1 1,000 \| T2 400/);
 });
 
 test('untiered materials render by name, one per line', () => {
   const text = renderGroup(groupShortfalls([{ ...fur, have: 0, target: 50, short: 50 }])[0]);
-  assert.match(text, /\*\*Jakyl Fur\*\* −50/);
+  assert.match(text, /\*\*Jakyl Fur\*\* 50/);
   assert.doesNotMatch(text, /T-1/);
+});
+
+test('a family whose tiers repeat falls back to naming each material', () => {
+  // Heimlich's foods all share one tag and five of them sit on every tier.
+  // Collapsing those into a tier row would read as one family holding two
+  // values for T1.
+  const rows = [
+    { key: 'a', name: 'Plain Cooked Berries', tier: 1, tag: 'Basic Food', family: 'Food', have: 0, target: 50, short: 40 },
+    { key: 'b', name: 'Plain Mashed Bulbs', tier: 1, tag: 'Basic Food', family: 'Food', have: 0, target: 50, short: 46 },
+  ];
+  const text = renderGroup(groupShortfalls(rows)[0]);
+  assert.doesNotMatch(text, /T1 40 \| T1 46/, 'a repeated tier must not collapse into one row');
+  assert.match(text, /Plain Cooked Berries/);
+  assert.match(text, /Plain Mashed Bulbs/);
+});
+
+test('one tag covering several product lines splits into separate families', () => {
+  const rows = [
+    { key: 'a', name: 'Plain Cooked Berries', tier: 1, tag: 'Basic Food', family: 'Cooked Berries', have: 0, target: 50, short: 40 },
+    { key: 'b', name: 'Savory Cooked Berries', tier: 2, tag: 'Basic Food', family: 'Cooked Berries', have: 0, target: 50, short: 41 },
+    { key: 'c', name: 'Plain Mashed Bulbs', tier: 1, tag: 'Basic Food', family: 'Mashed Bulbs', have: 0, target: 50, short: 46 },
+  ];
+  const groups = groupShortfalls(rows);
+  assert.equal(groups.length, 2, 'the shared tag should not merge two product lines');
+  assert.deepEqual(groups.map((g) => g.label).sort(), ['Cooked Berries', 'Mashed Bulbs']);
 });
 
 test('the family label is preferred over the raw tag', () => {

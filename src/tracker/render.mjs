@@ -44,19 +44,22 @@ const isTiered = (row) => row.tier != null && row.tier >= 1;
  */
 export function renderGroup(group) {
   const label = group.label ?? group.tag;
+  const tiers = group.rows.map((r) => r.tier);
+  const tiersUnique = tiers.length === new Set(tiers).size;
 
-  // With targets gone, tiers can share a header whether or not their targets
-  // matched — only whether every row is tiered still matters.
-  if (group.rows.every(isTiered)) {
-    const cells = group.rows.map((r) => `T${r.tier} −${num(r.short)}`).join(' | ');
+  // A tier row only makes sense when every row is tiered and no tier repeats.
+  // Two materials on the same tier would render as "T1 40 | T1 46", which reads
+  // as a single family having two values for one tier.
+  if (group.rows.every(isTiered) && tiersUnique) {
+    const cells = group.rows.map((r) => `T${r.tier} ${num(r.short)}`).join(' | ');
     // A lone tier reads better on one line than split across two.
     return group.rows.length === 1 ? `**${label}** ${cells}` : `**${label}**\n${cells}`;
   }
 
-  // Untiered materials, like combat drops — one line each.
+  // Untiered materials (combat drops), or a family whose tiers collide.
   return group.rows.map((r) => {
     const name = isTiered(r) ? `${r.name} (T${r.tier})` : r.name;
-    return `**${name}** −${num(r.short)}`;
+    return `**${name}** ${num(r.short)}`;
   }).join('\n');
 }
 

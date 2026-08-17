@@ -83,13 +83,25 @@ test('no choice list anywhere exceeds Discord\'s 25-option cap', () => {
   }
 });
 
-test('traveler pickers offer exactly the six travelers with tasks', () => {
+test('/traveler info offers exactly the six travelers with tasks', () => {
   const traveler = buildCommands(rulebook).find((c) => c.data.name === 'traveler');
   const lists = allChoiceOptions(traveler.data.toJSON());
-  assert.ok(lists.length >= 3, 'add, remove and info should each offer a traveler choice');
-  for (const { path, choices } of lists) {
-    assert.equal(choices.length, 6, `${path} should list 6 travelers`);
+  assert.equal(lists.length, 1, 'only /traveler info should use fixed choices');
+  assert.match(lists[0].path, /info/);
+  assert.equal(lists[0].choices.length, 6);
+});
+
+test('/traveler add and remove use autocomplete, not fixed choices', () => {
+  // The useful list differs per guild — untracked for add, tracked for remove —
+  // and registered choices are identical for every server.
+  const traveler = buildCommands(rulebook).find((c) => c.data.name === 'traveler');
+  const subs = traveler.data.toJSON().options;
+  for (const sub of subs.filter((s) => s.name === 'add' || s.name === 'remove')) {
+    const nameOption = sub.options.find((o) => o.name === 'name');
+    assert.equal(nameOption.autocomplete, true, `/traveler ${sub.name} name should autocomplete`);
+    assert.equal(nameOption.choices, undefined, `/traveler ${sub.name} name should not have choices`);
   }
+  assert.equal(typeof traveler.autocomplete, 'function', 'the command needs an autocomplete handler');
 });
 
 test('the expected commands are registered', () => {

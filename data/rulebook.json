@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-17T05:38:59.776Z",
+  "generatedAt": "2026-08-17T05:54:10.695Z",
   "source": "bitjita",
   "region": 12,
   "counts": {
@@ -687,7 +687,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Cooked Berries"
         },
         {
           "key": "item:1170004",
@@ -700,7 +700,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Mashed Bulbs"
         },
         {
           "key": "item:1170001",
@@ -713,7 +713,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Mushroom Skewer"
         },
         {
           "key": "item:1170002",
@@ -726,7 +726,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Roasted Meat"
         },
         {
           "key": "item:1170007",
@@ -739,7 +739,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Roasted Ocean Fish"
         },
         {
           "key": "item:2170001",
@@ -752,7 +752,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Mushroom Skewer"
         },
         {
           "key": "item:2170004",
@@ -765,7 +765,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Mashed Bulbs"
         },
         {
           "key": "item:2170000",
@@ -778,7 +778,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Cooked Berries"
         },
         {
           "key": "item:2170007",
@@ -791,7 +791,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Roasted Ocean Fish"
         },
         {
           "key": "item:2170002",
@@ -804,7 +804,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Roasted Meat"
         },
         {
           "key": "item:3170004",
@@ -817,7 +817,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Mashed Bulbs"
         },
         {
           "key": "item:3170000",
@@ -830,7 +830,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Cooked Berries"
         },
         {
           "key": "item:3170007",
@@ -843,7 +843,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Roasted Ocean Fish"
         },
         {
           "key": "item:3170002",
@@ -856,7 +856,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Roasted Meat"
         },
         {
           "key": "item:3170001",
@@ -869,7 +869,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Mushroom Skewer"
         },
         {
           "key": "item:4170000",
@@ -882,7 +882,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Cooked Berries"
         },
         {
           "key": "item:4170007",
@@ -895,7 +895,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Roasted Ocean Fish"
         },
         {
           "key": "item:4170002",
@@ -908,7 +908,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Roasted Meat"
         },
         {
           "key": "item:4170001",
@@ -921,7 +921,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Mushroom Skewer"
         },
         {
           "key": "item:4170004",
@@ -934,7 +934,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Mashed Bulbs"
         },
         {
           "key": "item:5170002",
@@ -947,7 +947,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Roasted Meat"
         },
         {
           "key": "item:5170001",
@@ -960,7 +960,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Mushroom Skewer"
         },
         {
           "key": "item:5170004",
@@ -973,7 +973,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Mashed Bulbs"
         },
         {
           "key": "item:5170000",
@@ -986,7 +986,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Cooked Berries"
         },
         {
           "key": "item:5170007",
@@ -999,7 +999,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Roasted Ocean Fish"
         },
         {
           "key": "item:6170001",
@@ -1012,7 +1012,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Mushroom Skewer"
         },
         {
           "key": "item:6170004",
@@ -1025,7 +1025,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Mashed Bulbs"
         },
         {
           "key": "item:6170000",
@@ -1038,7 +1038,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Cooked Berries"
         },
         {
           "key": "item:6170007",
@@ -1051,7 +1051,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Roasted Ocean Fish"
         },
         {
           "key": "item:6170002",
@@ -1064,7 +1064,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Roasted Meat"
         },
         {
           "key": "item:1936407696",
@@ -1077,7 +1077,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Mashed Bulbs"
         },
         {
           "key": "item:287213426",
@@ -1090,7 +1090,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Cooked Berries"
         },
         {
           "key": "item:102576945",
@@ -1103,7 +1103,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Roasted Ocean Fish"
         },
         {
           "key": "item:1221133683",
@@ -1116,7 +1116,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Roasted Meat"
         },
         {
           "key": "item:1783151508",
@@ -1129,7 +1129,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Mushroom Skewer"
         },
         {
           "key": "item:1667103104",
@@ -1142,7 +1142,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Cooked Berries"
         },
         {
           "key": "item:499222991",
@@ -1155,7 +1155,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Roasted Ocean Fish"
         },
         {
           "key": "item:1915371751",
@@ -1168,7 +1168,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Roasted Meat"
         },
         {
           "key": "item:1962733786",
@@ -1181,7 +1181,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Mushroom Skewer"
         },
         {
           "key": "item:529721253",
@@ -1194,7 +1194,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Mashed Bulbs"
         },
         {
           "key": "item:40349004",
@@ -1207,7 +1207,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Roasted Meat"
         },
         {
           "key": "item:1927578557",
@@ -1220,7 +1220,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Mushroom Skewer"
         },
         {
           "key": "item:2031320058",
@@ -1233,7 +1233,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Mashed Bulbs"
         },
         {
           "key": "item:291179803",
@@ -1246,7 +1246,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Cooked Berries"
         },
         {
           "key": "item:335141681",
@@ -1259,7 +1259,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Roasted Ocean Fish"
         },
         {
           "key": "item:1664560257",
@@ -1272,7 +1272,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Mushroom Skewer"
         },
         {
           "key": "item:819149629",
@@ -1285,7 +1285,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Mashed Bulbs"
         },
         {
           "key": "item:1510160267",
@@ -1298,7 +1298,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Cooked Berries"
         },
         {
           "key": "item:1299649056",
@@ -1311,7 +1311,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Roasted Ocean Fish"
         },
         {
           "key": "item:277511016",
@@ -1324,7 +1324,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Basic Food"
+          "family": "Roasted Meat"
         }
       ]
     },
@@ -1594,19 +1594,6 @@
           "fixed": true,
           "perTurnIn": 10,
           "family": "Cloth"
-        },
-        {
-          "key": "item:1",
-          "name": "Hex Coin",
-          "tier": -1,
-          "tag": "Coins",
-          "taskCount": 1,
-          "quantities": [
-            1000
-          ],
-          "fixed": true,
-          "perTurnIn": 1000,
-          "family": "Hex Coin"
         },
         {
           "key": "item:1050001",
@@ -3271,7 +3258,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Common Slayer Material"
+          "family": "Insect Wing"
         },
         {
           "key": "item:767727086",
@@ -3286,7 +3273,7 @@
           ],
           "fixed": false,
           "perTurnIn": null,
-          "family": "Common Slayer Material"
+          "family": "Fur"
         },
         {
           "key": "item:828731292",
@@ -3299,7 +3286,7 @@
           ],
           "fixed": true,
           "perTurnIn": 3,
-          "family": "Common Slayer Material"
+          "family": "Alpha Jakyl Fur"
         },
         {
           "key": "item:540370053",
@@ -3312,7 +3299,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Common Slayer Material"
+          "family": "Chitin"
         },
         {
           "key": "item:1665899831",
@@ -3325,7 +3312,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Common Slayer Material"
+          "family": "Fur"
         },
         {
           "key": "item:420864423",
@@ -3338,7 +3325,7 @@
           ],
           "fixed": true,
           "perTurnIn": 10,
-          "family": "Common Slayer Material"
+          "family": "Glittering Junk"
         },
         {
           "key": "item:796569767",
@@ -3365,7 +3352,7 @@
           ],
           "fixed": false,
           "perTurnIn": null,
-          "family": "Dungeon Loot"
+          "family": "Ancient Skitch Shell"
         },
         {
           "key": "item:542378458",
@@ -3378,7 +3365,7 @@
           ],
           "fixed": true,
           "perTurnIn": 1,
-          "family": "Dungeon Loot"
+          "family": "Araknir Eggsack"
         },
         {
           "key": "item:1163107303",
@@ -3391,7 +3378,7 @@
           ],
           "fixed": true,
           "perTurnIn": 1,
-          "family": "Dungeon Loot"
+          "family": "Sentinel's Insignia"
         },
         {
           "key": "item:1125718226",
@@ -3405,7 +3392,7 @@
           ],
           "fixed": false,
           "perTurnIn": null,
-          "family": "Rare Slayer Material"
+          "family": "Crystalized Slime"
         },
         {
           "key": "item:225094001",
@@ -3419,7 +3406,7 @@
           ],
           "fixed": false,
           "perTurnIn": null,
-          "family": "Rare Slayer Material"
+          "family": "Fang"
         },
         {
           "key": "item:209860372",
@@ -3433,7 +3420,7 @@
           ],
           "fixed": false,
           "perTurnIn": null,
-          "family": "Rare Slayer Material"
+          "family": "Hardened Shell"
         },
         {
           "key": "item:617029534",
@@ -3447,7 +3434,7 @@
           ],
           "fixed": false,
           "perTurnIn": null,
-          "family": "Rare Slayer Material"
+          "family": "Fang"
         },
         {
           "key": "item:344122023",
@@ -3461,7 +3448,7 @@
           ],
           "fixed": false,
           "perTurnIn": null,
-          "family": "Rare Slayer Material"
+          "family": "Deadly Stinger"
         }
       ]
     },
@@ -4725,11 +4712,6 @@
       "name": "Flawless Cloth",
       "tier": 10,
       "tag": "Cloth"
-    },
-    "item:1": {
-      "name": "Hex Coin",
-      "tier": -1,
-      "tag": "Coins"
     },
     "item:1050001": {
       "name": "Ferralith Ingot",

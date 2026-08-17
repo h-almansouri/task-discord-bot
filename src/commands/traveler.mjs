@@ -27,10 +27,13 @@ export function travelerCommands(rulebook) {
     data: new SlashCommandBuilder()
       .setName('traveler')
       .setDescription('Choose which travelers to keep stocked')
+      // add/remove use autocomplete rather than fixed choices: the useful list
+      // differs per guild — untracked travelers for add, tracked ones for
+      // remove — and registered choices are the same for everyone.
       .addSubcommand((s) => s.setName('add')
         .setDescription('Track a traveler')
         .addStringOption((o) => o.setName('name').setDescription('Which traveler')
-          .setRequired(true).addChoices(...choices))
+          .setRequired(true).setAutocomplete(true))
         .addIntegerOption((o) => o.setName('tier_min').setDescription('Lowest tier to watch (default 1)')
           .setMinValue(1).setMaxValue(10))
         .addIntegerOption((o) => o.setName('tier_max').setDescription('Highest tier to watch (default 10)')
@@ -38,13 +41,30 @@ export function travelerCommands(rulebook) {
       .addSubcommand((s) => s.setName('remove')
         .setDescription('Stop tracking a traveler')
         .addStringOption((o) => o.setName('name').setDescription('Which traveler')
-          .setRequired(true).addChoices(...choices)))
+          .setRequired(true).setAutocomplete(true)))
       .addSubcommand((s) => s.setName('list')
         .setDescription('Show which travelers are tracked'))
       .addSubcommand((s) => s.setName('info')
         .setDescription('Show everything a traveler can ask for')
         .addStringOption((o) => o.setName('name').setDescription('Which traveler')
           .setRequired(true).addChoices(...choices))),
+
+    async autocomplete(interaction) {
+      const sub = interaction.options.getSubcommand();
+      const typed = interaction.options.getFocused().toLowerCase();
+      const config = await loadGuildConfig(interaction.guildId);
+      const tracked = new Set(Object.keys(config.travelers ?? {}));
+
+      let pool = Object.keys(rulebook.travelers).sort();
+      if (sub === 'add') pool = pool.filter((n) => !tracked.has(n));
+      if (sub === 'remove') pool = pool.filter((n) => tracked.has(n));
+
+      await interaction.respond(
+        pool.filter((n) => n.toLowerCase().includes(typed))
+          .slice(0, 25)
+          .map((n) => ({ name: n, value: n })),
+      );
+    },
 
     async run(interaction) {
       if (!interaction.inGuild()) {
@@ -78,6 +98,9 @@ async function runAdd(interaction, rulebook) {
     return;
   }
 
+  const before = await loadGuildConfig(interaction.guildId);
+  const wasTracked = Boolean(before.travelers?.[traveler.name]);
+
   const config = await updateGuildConfig(interaction.guildId, (c) => ({
     ...c,
     travelers: { ...c.travelers, [traveler.name]: { tiers: [min, max] } },
@@ -86,10 +109,13 @@ async function runAdd(interaction, rulebook) {
 
   const inRange = traveler.materials.filter((m) => inTierRange(m, [min, max]));
   const pending = unconfiguredMaterials(config, traveler.name, traveler);
+  // Tracked travelers are filtered out of the autocomplete, so reaching here
+  // means the name was typed deliberately — treat it as a tier-range change.
+  const verb = wasTracked ? 'Updated' : 'Tracking';
 
   if (!pending.length) {
     await interaction.reply({
-      content: `Tracking **${traveler.name}** at tiers ${min}–${max} — ${inRange.length} materials, all ready.`,
+      content: `${verb} **${traveler.name}** at tiers ${min}–${max} — ${inRange.length} materials, all ready.`,
       flags: MessageFlags.Ephemeral,
     });
     return;

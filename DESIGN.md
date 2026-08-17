@@ -192,7 +192,17 @@ Discovered during the spike; several contradict widely-circulated advice.
     real advantage over embeds is therefore unusable here, while its text budget is a
     third smaller than the 6,000 embeds allow. Embeds already give one thumbnail per
     traveler, since the tracker renders one embed each.
-18. **Item icons are available** at `https://bitjita.com/{iconAssetName}.webp` — note
+18. **One `tag` can cover several product lines.** All 50 of Heimlich's materials are
+    tagged `Basic Food`, but they are five foods across ten tiers, so five items share
+    every tier. Repeated tiers are the signal: when a tag's tiers repeat, split it by the
+    name after the tier adjective ("Plain/Savory/Zesty Cooked Berries" → "Cooked
+    Berries"). When they don't repeat, leave it alone — Alesi's baitfish are ten
+    different fish, one per tier, and splitting them would make ten families of one.
+19. **Exactly one task in the catalogue requires currency.** Rumbagh's mystery shipment
+    costs 1,000 Hex Coins, while 320 of 321 tasks *reward* coins. It is a purchase rather
+    than something stockpiled, and coins sit in the wallet, so the `Coins` tag is excluded
+    from materials.
+20. **Item icons are available** at `https://bitjita.com/{iconAssetName}.webp` — note
     `.webp`, not `.png`. Coverage is incomplete: Salt's asset path is `Items/Salt` rather
     than `GeneratedIcons/…` and 404s, and only three of six travelers have a portrait
     (found via `npc_desc.prefab_address`, not the display name). If icons are ever used,
