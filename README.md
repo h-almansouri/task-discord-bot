@@ -11,7 +11,7 @@ Embergrain stocked — regardless of who has rolled what this week.
 
 ## Status
 
-Early. The data layer works end to end; storage tracking is not built yet.
+Feature-complete: everything below works end to end. Hosting is the open question.
 
 | | |
 |---|---|
@@ -20,7 +20,7 @@ Early. The data layer works end to end; storage tracking is not built yet.
 | Discord connection + `/travelers`, `/traveler` | done |
 | Storage picker + per-guild config (`/storage`) | done |
 | Thresholds, tier bands, live per-traveler tracker | done |
-| Weekly rotation reminder | not started |
+| Weekly rotation reminder | done |
 
 ## Commands
 
@@ -59,6 +59,8 @@ src/tracker/thresholds.mjs  target resolution, tier ranges
 src/tracker/shortfall.mjs   stock vs target
 src/tracker/render.mjs      embeds, within the 6000-char budget
 src/tracker/poll.mjs        the 20s loop, edit-on-change
+src/reminder/rotation.mjs   reroll clock parsing, the ping window
+src/reminder/poll.mjs       relay reads a few times a day, ping once per rotation
 src/config/store.mjs      per-guild config, serialised writes
 src/commands/             slash commands and component routing
 src/bot.mjs               entry point

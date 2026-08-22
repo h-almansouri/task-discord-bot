@@ -3,8 +3,9 @@
 A Discord bot that watches chosen BitCraft storages and reports which **traveler task
 materials** are running low, editing a single message in place.
 
-Status: **design only.** No bot code exists yet. Everything below marked *verified* was
-tested against live data on 2026-08-16; everything else is a proposal open to change.
+Status: **built.** This document is the design the code follows, kept because its
+findings explain choices the code alone cannot. Everything marked *verified* was tested
+against live data (2026-08-16 unless dated otherwise).
 
 ---
 
@@ -499,15 +500,22 @@ Travelers reroll their tasks on a fixed schedule. The bot pings a configured rol
 configurable interval before it happens (default 24h), as a **new message** — not an edit
 of the tracker, since a silent edit is exactly what nobody notices.
 
-The clock comes from `traveler_task_loop_timer` on a relay. A sample read:
+The clock comes from `traveler_task_loop_timer` on a relay — a single row, columns
+`scheduled_id, scheduled_at`. The `scheduled_at` payload differs by relay *(verified
+2026-08-22)*:
 
 ```
-[49154,[1,["1787237181395131"]]]        // scheduled_id, then micros since epoch
-  -> 2026-08-20T14:46:21Z
+bitjita        [1,["1787841981396070"]]
+bitcraftsync   [1,{"__timestamp_micros_since_unix_epoch__":"1787841981396070"}]
+  -> 2026-08-27T14:46:21Z
 ```
 
-Note the value is **microseconds**, and it exceeds `Number.MAX_SAFE_INTEGER`, so it needs
-the per-row big-int handling from §4.
+Tag 1 is an absolute time (tag 0 would be an interval, which a snapshot cannot anchor).
+Successive readings were exactly **604,800s apart** — the weekly cadence — with
+`scheduled_id` incrementing by one per rotation. Note the value is **microseconds**. At
+16 digits it trips the per-row big-int quoting from §4 and so arrives as a *string*;
+convert with `BigInt`. (Contrary to an earlier claim here, today's values are still
+below `Number.MAX_SAFE_INTEGER` — the quoting is what makes them strings, not overflow.)
 
 Do **not** use `expirationTimestamp` from the per-player traveler-tasks endpoint for this.
 It is a stale per-player snapshot *(verified — see §4.9)*.
@@ -543,4 +551,4 @@ Settled since the first draft:
   claim is ~21 requests/min against a 250/min limit, and roughly 420 KB per poll. Revisit
   only if someone tracks players in double digits.
 
-Nothing blocking remains. Next step is the scaffold.
+Nothing blocking remains. What's left is a hosting decision, not code.

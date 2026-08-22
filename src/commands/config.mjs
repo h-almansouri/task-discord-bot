@@ -7,6 +7,8 @@ import {
 import { loadGuildConfig, updateGuildConfig, countContainers } from '../config/store.mjs';
 import { runOnce, invalidate } from '../tracker/poll.mjs';
 import { inTierRange } from '../tracker/thresholds.mjs';
+import { sanitizeHours } from '../reminder/rotation.mjs';
+import { currentRotation } from '../reminder/poll.mjs';
 
 export function configCommands(rulebook) {
   const travelerChoices = Object.keys(rulebook.travelers).sort().map((n) => ({ name: n, value: n }));
@@ -125,6 +127,18 @@ export function configCommands(rulebook) {
           .setDescription('Remove tier bands and fall back to the plain turn-in count')
           .addStringOption((o) => o.setName('traveler')
             .setDescription('Clear one traveler’s bands only').addChoices(...travelerChoices)))
+        .addSubcommand((s) => s.setName('reminder')
+          .setDescription('Ping a role before the weekly traveler task reroll')
+          .addRoleOption((o) => o.setName('role')
+            .setDescription('Role to ping').setRequired(true))
+          .addIntegerOption((o) => o.setName('hours')
+            .setDescription('How many hours ahead to ping (default 24)')
+            .setMinValue(1).setMaxValue(168))
+          .addChannelOption((o) => o.setName('channel')
+            .setDescription('Where to ping — defaults to the tracker channel')
+            .addChannelTypes(ChannelType.GuildText)))
+        .addSubcommand((s) => s.setName('reminder-off')
+          .setDescription('Stop the reroll reminder'))
         .addSubcommand((s) => s.setName('show')
           .setDescription('Show the current settings')),
 
@@ -156,6 +170,8 @@ export function configCommands(rulebook) {
         if (sub === 'variable') return setVariableDefault(interaction, rulebook);
         if (sub === 'band') return setBand(interaction, rulebook);
         if (sub === 'bands-clear') return clearBands(interaction);
+        if (sub === 'reminder') return setReminder(interaction);
+        if (sub === 'reminder-off') return reminderOff(interaction);
         if (sub === 'show') return showConfig(interaction, rulebook);
       },
     },
@@ -274,6 +290,79 @@ async function clearBands(interaction) {
   });
 }
 
+async function setReminder(interaction) {
+  const role = interaction.options.getRole('role');
+  const hours = interaction.options.getInteger('hours');
+  const channel = interaction.options.getChannel('channel');
+
+  // The @everyone role's id is the guild id. Mentioning it as <@&id> renders
+  // but never notifies, which is exactly the silent failure to refuse.
+  if (role.id === interaction.guildId) {
+    await interaction.reply({
+      content: 'Pick a specific role rather than @everyone — make one people can opt into.',
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  const config = await updateGuildConfig(interaction.guildId, (c) => ({
+    ...c,
+    reminder: {
+      ...c.reminder,
+      roleId: role.id,
+      hoursBefore: hours ?? sanitizeHours(c.reminder?.hoursBefore),
+      channelId: channel?.id ?? c.reminder?.channelId ?? null,
+    },
+  }));
+
+  const effectiveHours = config.reminder.hoursBefore;
+  const channelId = config.reminder.channelId ?? config.channelId;
+
+  const notes = [];
+  if (!channelId) {
+    notes.push('no channel to ping in yet — run `/setup channel`, or pass `channel:` here');
+  }
+  // A non-mentionable role posts fine but notifies nobody, unless the bot may
+  // force mentions in that channel. Warn now rather than at 3am on reroll day.
+  const target = channel ?? (channelId ? interaction.guild.channels.cache.get(channelId) : null);
+  const canForce = target?.permissionsFor?.(interaction.guild.members.me)
+    ?.has(PermissionFlagsBits.MentionEveryone);
+  if (!role.mentionable && !canForce) {
+    notes.push(`${role} isn't mentionable, so the ping won't notify anyone — ` +
+      'make it mentionable, or grant me **Mention @everyone, @here and All Roles**');
+  }
+
+  const rotation = currentRotation();
+  let timing = '';
+  if (rotation && rotation.atMs > Date.now()) {
+    const unix = Math.floor(rotation.atMs / 1000);
+    const pingUnix = Math.floor((rotation.atMs - effectiveHours * 3_600_000) / 1000);
+    timing = config.reminder.announcedFor === rotation.micros
+      ? `\nNext reroll <t:${unix}:F> — already pinged for this one, so the new settings apply from the next.`
+      : pingUnix * 1000 <= Date.now()
+        ? `\nNext reroll <t:${unix}:F> — that is inside the window, so the ping lands within a minute.`
+        : `\nNext reroll <t:${unix}:F> — the ping lands <t:${pingUnix}:R>.`;
+  }
+
+  await interaction.reply({
+    content: `Reroll reminder set: ${role}, **${effectiveHours}h** ahead, in ` +
+      `${channelId ? `<#${channelId}>` : '*no channel yet*'}.` + timing +
+      (notes.length ? `\n⚠️ ${notes.join('\n⚠️ ')}` : ''),
+    flags: MessageFlags.Ephemeral,
+  });
+}
+
+async function reminderOff(interaction) {
+  await updateGuildConfig(interaction.guildId, (c) => ({
+    ...c,
+    reminder: { ...c.reminder, roleId: null },
+  }));
+  await interaction.reply({
+    content: 'Reroll reminder off. `/config reminder` turns it back on.',
+    flags: MessageFlags.Ephemeral,
+  });
+}
+
 async function setVariableDefault(interaction, rulebook) {
   const amount = interaction.options.getInteger('amount');
   const traveler = interaction.options.getString('traveler');
@@ -353,6 +442,13 @@ async function showConfig(interaction, rulebook) {
     .setTitle('Settings')
     .addFields(
       { name: 'Default channel', value: c.channelId ? `<#${c.channelId}>` : '*not set — `/setup channel`*' },
+      {
+        name: 'Reroll reminder',
+        value: c.reminder?.roleId
+          ? `<@&${c.reminder.roleId}> · ${sanitizeHours(c.reminder.hoursBefore)}h ahead · ` +
+            (c.reminder.channelId ? `<#${c.reminder.channelId}>` : 'tracker channel')
+          : '*off — `/config reminder`*',
+      },
       { name: 'Tier bands', value: bandText(c.tierBands) ?? '*none — every tier uses the turn-in count*' },
       { name: 'Turn-ins', value: String(c.turnIns ?? 5), inline: true },
       {

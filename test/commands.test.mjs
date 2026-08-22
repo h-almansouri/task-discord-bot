@@ -107,3 +107,10 @@ test('/traveler exposes add and update as separate subcommands', () => {
   const subs = traveler.data.toJSON().options.map((o) => o.name).sort();
   assert.deepEqual(subs, ['add', 'ignore', 'list', 'remove', 'unignore', 'update']);
 });
+
+test('/config carries the reminder subcommands', () => {
+  const config = buildCommands(rulebook).find((c) => c.data.name === 'config');
+  const subs = config.data.toJSON().options.map((o) => o.name);
+  assert.ok(subs.includes('reminder'), 'reminder is missing');
+  assert.ok(subs.includes('reminder-off'), 'reminder-off is missing');
+});

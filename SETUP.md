@@ -127,10 +127,7 @@ serving 1 guild(s): Your Server
 
 ---
 
-## 6. What you can try right now
-
-Storage tracking isn't built yet. These exist so you can confirm the whole chain — relay
-→ rulebook → Discord — actually works.
+## 6. Using it
 
 **The three-step setup**, in order:
 
@@ -168,6 +165,8 @@ That way people can follow the travelers they care about and mute the rest.
 | `/config variable amount:… [traveler:…]` | one target for all varying-quantity materials |
 | `/config band tier_min:… tier_max:… turnins:… [traveler:…]` | turn-ins for a tier range |
 | `/config bands-clear [traveler:…]` | remove tier bands |
+| `/config reminder role:… [hours:…] [channel:…]` | ping that role before the weekly task reroll |
+| `/config reminder-off` | stop the reroll ping |
 | `/config show` | current settings |
 | `/setup channel channel:#… [traveler:…]` | default channel, or one traveler's own |
 | `/refresh` | redraw now instead of waiting |
@@ -208,6 +207,20 @@ That covers every varying-quantity material — Ramparte's seven combat drops an
 Salt — and clears the prompts. Narrow it per traveler with
 `/config variable amount:5 traveler:Ramparte`, or override a single material with
 `/config threshold`, which always wins.
+
+**Want a heads-up before tasks reroll?** Travelers swap their task lists once a week, and
+the bot can ping a role ahead of it:
+
+```
+/config reminder role:@task-reminders hours:24
+```
+
+The ping lands in the tracker channel unless you pass `channel:`, fires once per
+rotation (a restart won't re-ping), and reads the in-game reroll clock a few times a
+day — so the moment it names is the real one, not a guess. One catch: **the role must be
+mentionable** (Server Settings → Roles → "Allow anyone to @mention this role"), or the
+bot needs the *Mention @everyone, @here and All Roles* permission — otherwise the message
+posts but notifies nobody. The command warns you if that's the case.
 
 ---
 

@@ -26,7 +26,10 @@ export function defaultConfig() {
   return {
     channelId: null,
     messageId: null,
-    reminder: { roleId: null, hoursBefore: 24 },
+    // channelId null means the reminder pings in the guild default channel.
+    // announcedFor is the rotation (micros string) last pinged, persisted so a
+    // restart cannot re-ping the same reroll.
+    reminder: { roleId: null, hoursBefore: 24, channelId: null, announcedFor: null },
     storages: [],
     travelers: {},
     turnIns: 5,

@@ -3,6 +3,7 @@ import { Client, GatewayIntentBits, Events, MessageFlags } from 'discord.js';
 import { loadRulebook } from './rulebook/load.mjs';
 import { buildCommands, routeComponent, routeModal } from './commands/index.mjs';
 import { startTracker, DEFAULT_INTERVAL_MS } from './tracker/poll.mjs';
+import { startReminder } from './reminder/poll.mjs';
 
 const token = process.env.DISCORD_TOKEN;
 if (!token) {
@@ -24,12 +25,15 @@ const ctx = { rulebook };
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 let stopTracker = null;
+let stopReminder = null;
 
 client.once(Events.ClientReady, (c) => {
   console.log(`logged in as ${c.user.tag}`);
   console.log(`serving ${c.guilds.cache.size} guild(s): ${[...c.guilds.cache.values()].map((g) => g.name).join(', ') || '(none yet)'}`);
   stopTracker = startTracker(c, { rulebook });
   console.log(`tracker polling every ${DEFAULT_INTERVAL_MS / 1000}s`);
+  stopReminder = startReminder(c);
+  console.log('reminder watching the reroll timer');
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -63,6 +67,7 @@ for (const signal of ['SIGINT', 'SIGTERM']) {
   process.on(signal, () => {
     console.log(`\n${signal} — shutting down`);
     stopTracker?.();
+    stopReminder?.();
     client.destroy();
     process.exit(0);
   });
