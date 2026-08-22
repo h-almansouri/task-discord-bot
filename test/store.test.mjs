@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   defaultConfig, setStorageContainers, findStorage, countContainers, setTravelerTiers,
+  setDefaultChannel, setTravelerChannel,
   loadGuildConfig, saveGuildConfig, updateGuildConfig, deleteGuildConfig,
 } from '../src/config/store.mjs';
 
@@ -92,6 +93,52 @@ test('setTravelerTiers leaves other travelers untouched', () => {
   };
   const after = setTravelerTiers(before, 'Alesi', [1, 5]);
   assert.deepEqual(after.travelers.Svim, { tiers: [1, 3], channelId: '9' });
+});
+
+// --- channel moves ---------------------------------------------------------
+
+const CHANNELS = {
+  ...defaultConfig(),
+  channelId: 'main',
+  travelers: {
+    Alesi: { tiers: [1, 5], messageId: 'a1' },                       // follows default
+    Svim: { tiers: [1, 3], channelId: 'svim-chan', messageId: 's1' }, // own channel
+    Ramparte: {},                                                     // no message yet
+  },
+};
+
+test('re-running /setup channel with the same channel strands nothing', () => {
+  const { config, orphans } = setDefaultChannel(CHANNELS, 'main');
+  assert.deepEqual(orphans, []);
+  assert.equal(config.travelers.Alesi.messageId, 'a1', 'the live message id was dropped');
+});
+
+test('moving the default channel orphans only the followers, and reports them', () => {
+  const { config, orphans } = setDefaultChannel(CHANNELS, 'new-chan');
+  assert.equal(config.channelId, 'new-chan');
+  assert.equal(config.travelers.Alesi.messageId, null);
+  assert.deepEqual(orphans, [{ channelId: 'main', messageId: 'a1' }]);
+  assert.equal(config.travelers.Svim.messageId, 's1', 'a traveler with its own channel was disturbed');
+  assert.equal(config.travelers.Svim.channelId, 'svim-chan');
+});
+
+test('giving a traveler its own channel equal to where it already posts keeps the message', () => {
+  const { config, orphans } = setTravelerChannel(CHANNELS, 'Alesi', 'main');
+  assert.deepEqual(orphans, []);
+  assert.equal(config.travelers.Alesi.channelId, 'main');
+  assert.equal(config.travelers.Alesi.messageId, 'a1');
+});
+
+test('moving a traveler to a genuinely different channel orphans its message', () => {
+  const { config, orphans } = setTravelerChannel(CHANNELS, 'Svim', 'other');
+  assert.deepEqual(orphans, [{ channelId: 'svim-chan', messageId: 's1' }]);
+  assert.equal(config.travelers.Svim.messageId, null);
+  assert.equal(config.travelers.Svim.channelId, 'other');
+});
+
+test('moving a traveler with no message yet reports no orphans', () => {
+  const { orphans } = setTravelerChannel(CHANNELS, 'Ramparte', 'ramp-chan');
+  assert.deepEqual(orphans, []);
 });
 
 test('config round-trips through disk', async (t) => {

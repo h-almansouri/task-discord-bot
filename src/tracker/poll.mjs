@@ -33,7 +33,16 @@ export function channelForTraveler(config, name) {
   return config.travelers?.[name]?.channelId ?? config.channelId ?? null;
 }
 
-async function publish(client, guildId, name, channelId, payload, { force }) {
+/**
+ * Discord errors that mean the target is genuinely gone, as opposed to a
+ * transient failure. Only these justify posting a replacement: on any other
+ * error (rate limit, outage, missing permission) the tracked id must survive,
+ * or a hiccup turns into a permanent duplicate — the old message frozen at its
+ * last numbers above a live one, which reads as the bot showing wrong data.
+ */
+const GONE = new Set([10003, 10008]); // Unknown Channel, Unknown Message
+
+async function publish(client, guildId, name, channelId, payload) {
   const channel = await client.channels.fetch(channelId).catch(() => null);
   if (!channel?.isTextBased?.()) return { status: 'channel-missing' };
 
@@ -41,10 +50,21 @@ async function publish(client, guildId, name, channelId, payload, { force }) {
   const messageId = config.travelers?.[name]?.messageId;
 
   if (messageId) {
-    const edited = await channel.messages.fetch(messageId)
-      .then((m) => m.edit(payload))
-      .catch(() => null);
-    if (edited) return { status: force ? 'updated' : 'updated', messageId: edited.id };
+    let existing = null;
+    try {
+      existing = await channel.messages.fetch(messageId);
+    } catch (err) {
+      if (!GONE.has(err?.code)) return { status: 'edit-failed' };
+    }
+    if (existing) {
+      try {
+        const edited = await existing.edit(payload);
+        return { status: 'updated', messageId: edited.id };
+      } catch (err) {
+        if (!GONE.has(err?.code)) return { status: 'edit-failed' };
+      }
+    }
+    // Confirmed gone — replacing it is the right move.
   }
 
   const sent = await channel.send(payload).catch(() => null);
@@ -63,8 +83,20 @@ async function publish(client, guildId, name, channelId, payload, { force }) {
 /**
  * Run one pass for a guild. Returns what happened, which makes it testable and
  * lets /refresh reuse exactly the same path as the timer.
+ *
+ * Serialised per guild: a slash-command's forced pass and the timer's pass used
+ * to interleave, both read "no message yet", and both posted one — a permanent
+ * duplicate tracker.
  */
-export async function runOnce(client, guildId, { rulebook, force = false } = {}) {
+const passQueues = new Map();
+export function runOnce(client, guildId, opts = {}) {
+  const prior = passQueues.get(guildId) ?? Promise.resolve();
+  const next = prior.then(() => runPass(client, guildId, opts));
+  passQueues.set(guildId, next.catch(() => {}));
+  return next;
+}
+
+async function runPass(client, guildId, { rulebook, force = false } = {}) {
   const config = await loadGuildConfig(guildId);
   const tracked = Object.keys(config.travelers ?? {});
   if (!tracked.length) return { status: 'no-travelers' };
@@ -102,7 +134,7 @@ export async function runOnce(client, guildId, { rulebook, force = false } = {})
       payload.embeds[0].footer.text += noteSuffix;
     }
 
-    const r = await publish(client, guildId, name, channelId, payload, { force });
+    const r = await publish(client, guildId, name, channelId, payload);
     if (r.status === 'updated' || r.status === 'created') {
       lastHash.set(key, hash);
       updated++;

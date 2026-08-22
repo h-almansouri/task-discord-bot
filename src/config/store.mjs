@@ -152,3 +152,48 @@ export function findStorage(config, source) {
     (s) => s.source.type === source.type && String(s.source.id) === String(source.id),
   );
 }
+
+// --- channel moves ---------------------------------------------------------
+//
+// Moving a channel strands the message being edited in place, and a stranded
+// tracker keeps its last numbers forever — which reads as the bot showing
+// wrong data, not as a leftover. So a move reports the stranded messages as
+// `orphans` for the caller to delete, and a "move" to the same channel keeps
+// every message id, because there is nothing to strand.
+
+/** Point the guild default at a channel. Travelers with their own channel keep it. */
+export function setDefaultChannel(config, channelId) {
+  if (config.channelId === channelId) return { config: { ...config }, orphans: [] };
+
+  const orphans = [];
+  const travelers = Object.fromEntries(
+    Object.entries(config.travelers ?? {}).map(([name, t]) => {
+      if (t.channelId || !t.messageId) return [name, t];
+      if (config.channelId) orphans.push({ channelId: config.channelId, messageId: t.messageId });
+      return [name, { ...t, messageId: null }];
+    }),
+  );
+  return { config: { ...config, channelId, travelers }, orphans };
+}
+
+/** Give one traveler its own channel. */
+export function setTravelerChannel(config, name, channelId) {
+  const t = config.travelers?.[name] ?? {};
+  const current = t.channelId ?? config.channelId;
+
+  // Same place the message already lives — pin the traveler there and keep it.
+  if (current === channelId) {
+    return {
+      config: { ...config, travelers: { ...config.travelers, [name]: { ...t, channelId } } },
+      orphans: [],
+    };
+  }
+  const orphans = t.messageId && current ? [{ channelId: current, messageId: t.messageId }] : [];
+  return {
+    config: {
+      ...config,
+      travelers: { ...config.travelers, [name]: { ...t, channelId, messageId: null } },
+    },
+    orphans,
+  };
+}

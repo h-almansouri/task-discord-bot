@@ -4,7 +4,9 @@
 import {
   SlashCommandBuilder, EmbedBuilder, MessageFlags, ChannelType, PermissionFlagsBits,
 } from 'discord.js';
-import { loadGuildConfig, updateGuildConfig, countContainers } from '../config/store.mjs';
+import {
+  loadGuildConfig, updateGuildConfig, countContainers, setDefaultChannel, setTravelerChannel,
+} from '../config/store.mjs';
 import { runOnce, invalidate } from '../tracker/poll.mjs';
 import { inTierRange } from '../tracker/thresholds.mjs';
 import { sanitizeHours } from '../reminder/rotation.mjs';
@@ -48,25 +50,23 @@ export function configCommands(rulebook) {
           return;
         }
 
-        // Moving channel orphans the old message, so forget its id and post anew.
+        // A real move strands the messages being edited in place; delete them
+        // rather than leave them frozen at their last numbers. Re-running with
+        // the same channel strands nothing and keeps every message.
+        let orphans = [];
         await updateGuildConfig(interaction.guildId, (c) => {
-          if (traveler) {
-            return {
-              ...c,
-              travelers: {
-                ...c.travelers,
-                [traveler]: { ...c.travelers?.[traveler], channelId: channel.id, messageId: null },
-              },
-            };
-          }
-          // Travelers with their own channel keep it; the rest follow the default.
-          const travelers = Object.fromEntries(
-            Object.entries(c.travelers ?? {}).map(([name, t]) => [
-              name, t.channelId ? t : { ...t, messageId: null },
-            ]),
-          );
-          return { ...c, channelId: channel.id, travelers };
+          const moved = traveler
+            ? setTravelerChannel(c, traveler, channel.id)
+            : setDefaultChannel(c, channel.id);
+          orphans = moved.orphans;
+          return moved.config;
         });
+        for (const o of orphans) {
+          const ch = await interaction.client.channels.fetch(o.channelId).catch(() => null);
+          if (ch?.isTextBased?.()) {
+            await ch.messages.fetch(o.messageId).then((m) => m.delete()).catch(() => {});
+          }
+        }
         invalidate(interaction.guildId);
 
         await interaction.reply({
